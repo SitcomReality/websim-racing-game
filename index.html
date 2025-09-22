@@ -145,6 +145,7 @@
             </div>
         </div>
     </main>
+    <script src="loadXmlWordlists.js"></script>
     <script src="domUtils.js"></script>
     <script src="helper_functions.js"></script>
     <script src="preInit.js"></script>
@@ -166,7 +167,6 @@
     <script src="createNewRaceWeek.js"></script>
     <script src="wordlist/const_colors.js"></script>
     <script src="wordlist/const_locationSuffixes.js"></script>
-    <script src="wordlist/const_names.js"></script>
     <script src="setPaletteCSS.js"></script>
     <script src="generateRacers.js"></script>
     <script src="advanceToNextRace.js"></script>
@@ -177,7 +177,21 @@
     <script src="updateHistory.js"></script>
     <script src="scripts.js"></script>
     <script src="GUI.js"></script>
-    <script>window.onload=function(){const m=document.getElementById('no-js');if(m){m.remove();}}</script>
+    <script>
+        // Load XML wordlists before initializing the game
+        loadXmlWordlists().then(() => {
+            console.log('XML wordlists loaded successfully');
+        }).catch(error => {
+            console.error('Failed to load XML wordlists:', error);
+        });
+        
+        window.onload = function() {
+            const m = document.getElementById('no-js');
+            if (m) {
+                m.remove();
+            }
+        }
+    </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
