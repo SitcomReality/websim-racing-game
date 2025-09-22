@@ -6,6 +6,8 @@ class CanvasRenderer {
     this.laneHeight = 40;
     this.segmentWidth = 30;
     this.camera = new Camera();
+    // Set default camera mode to fitAll instead of the current default
+    this.camera.setMode('fitAll');
     this.hitIndex = new HitTestIndex();
     this.screenPositions = [];
     this.textureManager = new TextureManager();

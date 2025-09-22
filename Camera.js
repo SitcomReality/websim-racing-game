@@ -15,17 +15,26 @@ class Camera {
     const loc = race.liveLocations;
     const xs = race.racers.map(rid => loc[rid] || 0);
     const avg = xs.reduce((a,b)=>a+b,0) / xs.length;
+    const minX = Math.max(0, Math.min(...xs));
+    const maxX = Math.min(100, Math.max(...xs));
+    
     // simple modes
     if (this.mode === 'single' && race.racers[0] != null) {
-      this.target.x = avg; // could be specific racer; keep avg minimal
+      this.target.x = avg;
     } else if (this.mode === 'leaders') {
       const lead = Math.max(...xs);
       this.target.x = lead;
     } else if (this.mode === 'average') {
       this.target.x = avg;
     } else if (this.mode === 'fitAll') {
-      this.target.x = avg; // placeholder
-      this.zoom = 1;
+      // Calculate zoom to fit all racers with comfortable margins
+      const margin = 15; // Add 15% margin on each side
+      const span = Math.max(30, (maxX - minX) + margin * 2);
+      this.target.x = (minX + maxX) / 2;
+      // Clamp zoom within reasonable bounds
+      const zMin = (gameState.settings?.render?.camera?.zoomMin) || 0.5;
+      const zMax = (gameState.settings?.render?.camera?.zoomMax) || 2.0;
+      this.zoom = Math.max(zMin, Math.min(zMax, 100 / span));
     }
   }
 }
