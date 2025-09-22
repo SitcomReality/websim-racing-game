@@ -173,7 +173,7 @@ class CanvasRenderer {
     this.drawEyes(ctx, blob, time);
     
     // Draw mouth
-    this.drawMupth(ctx, blob);
+    this.drawMouth(ctx, blob);
     
     ctx.restore();
   }
