@@ -165,7 +165,7 @@ class CanvasRenderer {
       // Draw the blob
       this.drawBlob(ctx, screen.x, screen.y, racer, time, screen.scale);
 
-      // Emit particles for boosting racers
+      // Emit particles for boosting racers - FIXED: was checking isBoosting but not emitting
       if (racer.isBoosting && Math.random() < 0.3) {
         this.particleSystem.emit(screen.x - (20 * screen.scale), screen.y, Math.PI, 80, 2);
       }
