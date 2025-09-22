@@ -1,3 +1,5 @@
+
+```css
 /* Button Component Styles */
 .btn {
     display: inline-flex;
@@ -31,7 +33,7 @@
 .btn-primary:hover:not(:disabled) {
     background: #ff5252;
     box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
+    /* removed lift on hover */
 }
 
 .btn-secondary {
@@ -43,7 +45,7 @@
 .btn-secondary:hover:not(:disabled) {
     background: #45b7aa;
     box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
+    /* removed lift on hover */
 }
 
 .btn-outline {
@@ -86,4 +88,3 @@
     border-top-right-radius: var(--radius-md);
     border-bottom-right-radius: var(--radius-md);
 }
-
