@@ -15,16 +15,15 @@ function beginRace() {
         const currentForm = racer.formThisWeek;
         const currentSpeed = racer.calculateSpeed(currentForm, percentRaceComplete, groundType, weatherType);
 
-        // Assuming distance traveled needs to be calculated as speed per segment
-        let distanceTraveled = currentSpeed;
-        distanceTraveled = distanceTraveled / (100 * totalSegments);
+        let distanceToTravel = currentSpeed;
+        distanceToTravel = distanceToTravel / (100 * totalSegments);
 
-        return distanceTraveled;
+        return distanceToTravel;
     }
 
-    function handleRacerMovement(racerId, currentRacerElem, currentSegment, currentMarginLeft, totalSegments) {
+    function handleRacerMovement(racerId, currentMarginLeft, currentSegment, totalSegments) {
         let thisRacer = gameState.racers[racerId];        
-        const percentRaceComplete = (currentSegment / totalSegments) * 100;
+        const percentRaceComplete = (currentMarginLeft / 100) * 100;
         const percentEnduranceUsed = Math.floor(100 - ((thisRacer.remainingEndurance / thisRacer.stats.endurance) * 100));
         const segmentType = gameState.currentRace.segments[currentSegment] || 'Grass';
 
@@ -32,12 +31,10 @@ function beginRace() {
             thisRacer.remainingStumble -= 1;
         } else {
             if (thisRacer.stats.stumbleChance < Math.random()) {
-                currentRacerElem.classList.remove("stumbling");
-
+                // Handle boost logic
                 if (!thisRacer.isBoosting && thisRacer.remainingBoost > 0 && percentRaceComplete > thisRacer.stats.boostActivationPercent) {
                     if (Math.random() > 0.4) {
                         thisRacer.activateBoost();
-                        currentRacerElem.classList.add("boosting");
                     }
                 }
 
@@ -45,18 +42,14 @@ function beginRace() {
                     thisRacer.reduceRemainingBoost(1);
                     if (thisRacer.remainingBoost < 1) {
                         thisRacer.deactivateBoost();
-                        currentRacerElem.classList.remove("boosting");
                     }
                 }
 
                 const distanceToTravel = updateRacerPosition(racerId, currentSegment, percentRaceComplete);
                 let nextPosition = currentMarginLeft + distanceToTravel;
                 
-                // Update live location for canvas rendering
+                // Update live location for canvas rendering - this is the key change
                 gameState.currentRace.liveLocations[racerId] = nextPosition;
-                
-                // Keep DOM position for now as fallback
-                currentRacerElem.style.left = `${nextPosition}%`;
                 
                 if (!thisRacer.isExhausted) {
                     thisRacer.reduceRemainingEndurance((thisRacer.stats.ground[segmentType] * distanceToTravel) * gameState.settings.racerProperties.enduranceDrainMultiplier);
@@ -64,29 +57,20 @@ function beginRace() {
                         thisRacer.makeExhausted();
                     }
                 }
-                const enduranceElement = currentRacerElem.querySelector(".remainingEndurance");
-                enduranceElement.style.bottom = percentEnduranceUsed + "%";
-                
-                thisRacer.shadowDistance = thisRacer.shadowDistance + (distanceToTravel / 50000);
-                updateBoxShadowX(currentRacerElem, thisRacer.shadowDistance);
             } else {
                 thisRacer.remainingStumble = thisRacer.stats.stumbleDuration;
-                currentRacerElem.classList.add("stumbling");
             }
         }
-
-        updateLivePositionDisplayIndividual(racerId);
     }
 
     function race() {
         gameState.currentRace.racers.forEach(racerId => {
-            const currentRacerElem = document.getElementById(`racer${racerId}`);
-            currentRacerElem.classList.remove("startingLine");
-            let currentMarginLeft = parseFloat(currentRacerElem.style.left) || 0;
             const totalSegments = gameState.currentRace.segments.length;
+            const currentMarginLeft = gameState.currentRace.liveLocations[racerId] || 0;
             const currentSegment = Math.floor((currentMarginLeft / 100) * totalSegments);
+            
             if (currentSegment < totalSegments - 1) {
-                handleRacerMovement(racerId, currentRacerElem, currentSegment, currentMarginLeft, totalSegments);
+                handleRacerMovement(racerId, currentMarginLeft, currentSegment, totalSegments);
             } else {
                 if (!gameState.currentRace.results.includes(racerId)) {
                     processRacerFinish(racerId);

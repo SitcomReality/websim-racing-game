@@ -14,18 +14,62 @@ class CanvasRenderer {
     this.particleSystem = new ParticleSystem();
     this.nameplate = new Nameplate();
     this.lastTime = performance.now();
+    this.dpr = 1;
   }
+  
+  resizeToContainer() {
+    const container = this.canvas.parentElement || document.body;
+    this.dpr = window.devicePixelRatio || 1;
+    
+    // Set canvas dimensions accounting for device pixel ratio
+    this.canvas.width = Math.floor((container.clientWidth || 800) * this.dpr);
+    const lanes = (this.props && this.props.numberOfLanes) || (this.race && this.race.racers.length) || 10;
+    this.canvas.height = Math.floor((lanes * this.laneHeight + 20) * this.dpr);
+    
+    // Scale context to match device pixel ratio
+    this.ctx.scale(this.dpr, this.dpr);
+    
+    // Set display size via CSS
+    this.canvas.style.width = (this.canvas.width / this.dpr) + 'px';
+    this.canvas.style.height = (this.canvas.height / this.dpr) + 'px';
+  }
+  
+  worldToScreen(worldX, laneIndex) {
+    const pad = 10;
+    const segs = this.race.segments.length;
+    const w = (this.canvas.width / this.dpr - pad * 2);
+    const x = pad + (worldX / 100) * w;
+    const y = pad + (laneIndex * this.laneHeight) + (this.laneHeight / 2);
+    return { x, y };
+  }
+  
+  updateCamera() {
+    if (!this.race || !this.race.racers || this.race.racers.length === 0) return;
+    
+    const loc = this.race.liveLocations;
+    const xs = this.race.racers.map(rid => loc[rid] || 0);
+    const avg = xs.reduce((a,b) => a+b, 0) / xs.length;
+    
+    if (this.camera.mode === 'single') {
+      this.camera.target.x = avg;
+    } else if (this.camera.mode === 'leaders') {
+      const lead = Math.max(...xs);
+      this.camera.target.x = lead;
+    } else if (this.camera.mode === 'average') {
+      this.camera.target.x = avg;
+    } else if (this.camera.mode === 'fitAll') {
+      this.camera.target.x = avg;
+      this.camera.zoom = 1;
+    }
+    
+    // Smooth camera movement
+    const damping = 0.15;
+    this.camera.target.x += (this.camera.target.x - this.camera.target.x) * damping;
+  }
+  
   setData(currentRace, trackProps) {
     this.race = currentRace;
     this.props = trackProps;
-  }
-  resizeToContainer() {
-    const container = this.canvas.parentElement || document.body;
-    // match container box
-    this.canvas.width = container.clientWidth || 800;
-    const lanes = (this.props && this.props.numberOfLanes) || (this.race && this.race.racers.length) || 10;
-    // add small padding
-    this.canvas.height = lanes * this.laneHeight + 20;
   }
   start() {
     if (this.loop) cancelAnimationFrame(this.loop);
@@ -43,9 +87,6 @@ class CanvasRenderer {
     this.updateCamera(dt);
     this.render();
     this.hitIndex.update(this.screenPositions);
-  }
-  updateCamera() {
-    this.camera.update(this.race);
   }
   render() {
     const ctx = this.ctx;
@@ -108,43 +149,6 @@ class CanvasRenderer {
     ctx.fillRect(fx, pad, segW, lanes*h-4);
     
     ctx.restore();
-  }
-  drawRacerMarkers() {
-    const ctx = this.ctx;
-    const pad = 10;
-    const segs = this.race.segments.length;
-    const w = (this.canvas.width - pad*2);
-    const h = this.laneHeight;
-    const laneIndexOf = {};
-    this.race.racers.forEach((rid, i) => laneIndexOf[rid] = i);
-    this.screenPositions = [];
-    
-    // Get current time for animations
-    const time = performance.now() * 0.001;
-    
-    this.race.racers.forEach((rid) => {
-      const pos = (this.race.liveLocations[rid] || 0) / 100;
-      const x = pad + Math.max(0, Math.min(1, pos)) * w;
-      const lane = laneIndexOf[rid] ?? 0;
-      const y = pad + lane*h + (h/2);
-      const r = gameState.racers[rid];
-      
-      // Get or create blob data
-      if (!r.blobData) {
-        r.blobData = BlobFactory.create(r);
-      }
-      
-      // Store screen position for hit testing
-      this.screenPositions.push({ rid, x, y, r: r.blobData.baseRadius });
-      
-      // Emit particles when moving
-      if (pos > 0.01) {
-        this.particleSystem.emit(x, y, Math.PI, 30, 1);
-      }
-      
-      // Draw blob with animation
-      this.drawBlob(ctx, x, y, r, time);
-    });
   }
   
   drawBlob(ctx, x, y, racer, time) {

@@ -3,25 +3,28 @@ function setupTrack(track) {
     document.getElementById('startRace').disabled = false;
     const trackDom = document.getElementById('raceTrack');
     trackDom.innerHTML = '';
-	gameState.currentRace.trackName = track.name;
-	gameState.currentRace.sections = [];
-	gameState.currentRace.segments = [];
+    gameState.currentRace.trackName = track.name;
+    gameState.currentRace.sections = [];
+    gameState.currentRace.segments = [];
+    
     for (let section = 0; section < track.sections.length; section++) {
-		 gameState.currentRace.sections.push(track.sections[section]);
-		 // Each section is three segments... so... this is how I'm doing this
-		 gameState.currentRace.segments.push(track.sections[section]);
-		 gameState.currentRace.segments.push(track.sections[section]);
-		 gameState.currentRace.segments.push(track.sections[section]);
+        gameState.currentRace.sections.push(track.sections[section]);
+        // Each section is three segments
+        gameState.currentRace.segments.push(track.sections[section]);
+        gameState.currentRace.segments.push(track.sections[section]);
+        gameState.currentRace.segments.push(track.sections[section]);
     }
-	gameState.currentRace.segments.push("finishLine");
-	gameState.currentRace.weather = gameState.settings.worldProperties.weatherTypes[Math.floor(Math.random() * gameState.settings.worldProperties.weatherTypes.length)] || 'Sunny';
+    gameState.currentRace.segments.push("finishLine");
+    gameState.currentRace.weather = gameState.settings.worldProperties.weatherTypes[Math.floor(Math.random() * gameState.settings.worldProperties.weatherTypes.length)] || 'Sunny';
     gameState.currentRace.racers = [];
     gameState.currentRace.results = [];
     gameState.currentRace.winner = null;
-	gameState.currentRace.liveLocations = [];
-	DOMUtils.updateTrackDetails();
-	const selectedRacers = gameState.raceWeek.selectedRacers;
+    gameState.currentRace.liveLocations = [];
+    
+    DOMUtils.updateTrackDetails();
+    const selectedRacers = gameState.raceWeek.selectedRacers;
     const arrangedRacers = arrangeRacersByPerformance(selectedRacers, gameState);
+    
     for (let i = 0; i < gameState.settings.trackProperties.numberOfLanes; i++) {
         const thisRacerID = arrangedRacers[i];
         const thisRacer = gameState.racers[thisRacerID];
@@ -32,24 +35,55 @@ function setupTrack(track) {
             thisRacer.blobData = BlobFactory.create(thisRacer);
         }
         
-        // Initialize live location
+        // Initialize live location - key change
         gameState.currentRace.liveLocations[thisRacerID] = 0;
         
+        // Keep DOM for now but we'll phase it out
         const lane = DOMUtils.createLane(thisRacerID, track.sections, gameState.settings.trackProperties.segmentsPerSection);
         trackDom.appendChild(lane);
         const totalSegments = gameState.settings.trackProperties.numberOfSegments;
-		const racer = DOMUtils.createRacerElement(thisRacer, thisRacerID, racerNamePrefixes[thisRacer.name[0]], racerNameSuffixes[thisRacer.name[1]], totalSegments);
+        const racer = DOMUtils.createRacerElement(thisRacer, thisRacerID, racerNamePrefixes[thisRacer.name[0]], racerNameSuffixes[thisRacer.name[1]], totalSegments);
         thisRacer.reset();
         lane.appendChild(racer);
     }
     
-   // init/update canvas renderer
-   if (!window.canvasRenderer) {
-       const canvas = document.getElementById('raceCanvas');
-       window.canvasRenderer = new CanvasRenderer(canvas);
-       window.addEventListener('resize', () => window.canvasRenderer.resizeToContainer());
-   }
-   window.canvasRenderer.setData(gameState.currentRace, gameState.settings.trackProperties);
-   window.canvasRenderer.resizeToContainer();
-   window.canvasRenderer.start();
+    // Initialize canvas renderer
+    if (!window.canvasRenderer) {
+        const canvas = document.getElementById('raceCanvas');
+        window.canvasRenderer = new CanvasRenderer(canvas);
+        
+        // Add resize handler
+        const resizeHandler = () => {
+            if (window.canvasRenderer) {
+                window.canvasRenderer.resizeToContainer();
+            }
+        };
+        window.addEventListener('resize', resizeHandler);
+        
+        // Add mouse interaction
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const hits = window.canvasRenderer.hitIndex.getUnderPoint(x, y);
+            
+            // Clear all nameplates first
+            window.canvasRenderer.nameplate.visibleNames.clear();
+            
+            // Show nameplate for hit racers
+            hits.forEach(rid => {
+                const racer = gameState.racers[rid];
+                if (racer && racer.blobData) {
+                    const laneIndex = gameState.currentRace.racers.indexOf(parseInt(rid));
+                    const pos = gameState.currentRace.liveLocations[rid] || 0;
+                    const screenPos = window.canvasRenderer.worldToScreen(pos, laneIndex);
+                    window.canvasRenderer.nameplate.show(rid, screenPos.x, screenPos.y);
+                }
+            });
+        });
+    }
+    
+    window.canvasRenderer.setData(gameState.currentRace, gameState.settings.trackProperties);
+    window.canvasRenderer.resizeToContainer();
+    window.canvasRenderer.start();
 }
