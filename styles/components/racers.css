@@ -1,69 +1,32 @@
-/* Racer Component Styles */
-.racer-container {
-    position: relative;
-    background: var(--color-surface);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
-    transition: all var(--transition-normal);
-    box-shadow: var(--shadow-md);
-}
-
-.racer-container:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-primary);
-}
-
-.racer-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-sm);
-}
-
-.racer-name {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--color-text);
-}
-
-.racer-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-sm);
-}
-
-.racer-stat {
-    background: rgba(255, 255, 255, 0.05);
-    padding: var(--spacing-sm);
-    border-radius: var(--radius-md);
-    text-align: center;
-}
-
-.racer-stat-label {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-xs);
-}
-
-.racer-stat-value {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--color-primary);
-}
-
-.racer-position {
-    position: absolute;
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
-    background: var(--color-accent);
-    color: var(--color-background);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    font-size: var(--font-size-sm);
-}
+.racerColor0 { background-color: var(--racer-color-0); }
+.racerColor1 { background-color: var(--racer-color-1); }
+.racerColor2 { background-color: var(--racer-color-2); }
+.racerColor3 { background-color: var(--racer-color-3); }
+.racerColor4 { background-color: var(--racer-color-4); }
+.racerColor5 { background-color: var(--racer-color-5); }
+.racerColor6 { background-color: var(--racer-color-6); }
+.racerColor7 { background-color: var(--racer-color-7); }
+.racerColor8 { background-color: var(--racer-color-8); }
+.racerColor9 { background-color: var(--racer-color-9); }
+.racerColor10 { background-color: var(--racer-color-10); }
+.racerColor11 { background-color: var(--racer-color-11); }
+.racerColor12 { background-color: var(--racer-color-12); }
+.racerColor13 { background-color: var(--racer-color-13); }
+.racerColor14 { background-color: var(--racer-color-14); }
+.racerColor15 { background-color: var(--racer-color-15); }
+.racerColor16 { background-color: var(--racer-color-16); }
+.racerColor17 { background-color: var(--racer-color-17); }
+.racerColor18 { background-color: var(--racer-color-18); }
+.racerColor19 { background-color: var(--racer-color-19); }
+.racerColor20 { background-color: var(--racer-color-20); }
+.racerColor21 { background-color: var(--racer-color-21); }
+.racerColor22 { background-color: var(--racer-color-22); }
+.racerColor23 { background-color: var(--racer-color-23); }
+.racerColor24 { background-color: var(--racer-color-24); }
+.racerColor25 { background-color: var(--racer-color-25); }
+.racerColor26 { background-color: var(--racer-color-26); }
+.racerColor27 { background-color: var(--racer-color-27); }
+.racerColor28 { background-color: var(--racer-color-28); }
+.racerColor29 { background-color: var(--racer-color-29); }
+.racerColor30 { background-color: var(--racer-color-30); }
 

@@ -1,43 +1,15 @@
-/* Light Theme Overrides */
-[data-theme="light"] {
-    --color-primary: #ff6b6b;
-    --color-secondary: #4ecdc4;
-    --color-accent: #ffe66d;
-    --color-background: #f8f9fa;
-    --color-surface: #ffffff;
-    --color-text: #212529;
-    --color-text-secondary: #6c757d;
-    --color-border: #dee2e6;
+body[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --accent-color: #007bff;
 }
 
-[data-theme="light"] body {
-    background: linear-gradient(135deg, var(--color-background) 0%, #e9ecef 100%);
-}
-
-[data-theme="light"] .racer-container {
-    background: var(--color-surface);
-    border-color: var(--color-border);
-    box-shadow: var(--shadow-sm);
-}
-
-[data-theme="light"] .track-container {
-    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
-    box-shadow: var(--shadow-md);
-}
-
-[data-theme="light"] .gui-container {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .form-control {
-    background: rgba(0, 0, 0, 0.02);
-    border-color: var(--color-border);
-    color: var(--color-text);
-}
-
-[data-theme="light"] .form-control:focus {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: var(--color-primary);
+body[data-theme="light"] .gui-container {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 

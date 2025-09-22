@@ -1,73 +1,24 @@
-/* Responsive Utilities */
-@media (max-width: 640px) {
-    .sm\:hidden { display: none !important; }
-    .sm\:block { display: block !important; }
-    .sm\:flex { display: flex !important; }
-    .sm\:grid { display: grid !important; }
-    
-    .sm\:flex-col { flex-direction: column; }
-    .sm\:flex-row { flex-direction: row; }
-    
-    .sm\:text-sm { font-size: var(--font-size-sm); }
-    .sm\:text-base { font-size: var(--font-size-base); }
-    .sm\:text-lg { font-size: var(--font-size-lg); }
-    
-    .sm\:p-sm { padding: var(--spacing-sm); }
-    .sm\:p-md { padding: var(--spacing-md); }
-    .sm\:p-lg { padding: var(--spacing-lg); }
-    
-    .sm\:m-sm { margin: var(--spacing-sm); }
-    .sm\:m-md { margin: var(--spacing-md); }
-    .sm\:m-lg { margin: var(--spacing-lg); }
-}
-
 @media (max-width: 768px) {
-    .md\:hidden { display: none !important; }
-    .md\:block { display: block !important; }
-    .md\:flex { display: flex !important; }
-    .md\:grid { display: grid !important; }
+    #header {
+        font-size: 20px;
+        height: auto;
+        padding: 10px;
+    }
     
-    .md\:flex-col { flex-direction: column; }
-    .md\:flex-row { flex-direction: row; }
+    #raceWeekContainer {
+        margin-top: 120px;
+    }
     
-    .md\:text-sm { font-size: var(--font-size-sm); }
-    .md\:text-base { font-size: var(--font-size-base); }
-    .md\:text-lg { font-size: var(--font-size-lg); }
-    
-    .md\:p-sm { padding: var(--spacing-sm); }
-    .md\:p-md { padding: var(--spacing-md); }
-    .md\:p-lg { padding: var(--spacing-lg); }
-    
-    .md\:m-sm { margin: var(--spacing-sm); }
-    .md\:m-md { margin: var(--spacing-md); }
-    .md\:m-lg { margin: var(--spacing-lg); }
+    .ui-section {
+        display: block;
+        margin: 2px 0;
+    }
 }
 
-@media (max-width: 1024px) {
-    .lg\:hidden { display: none !important; }
-    .lg\:block { display: block !important; }
-    .lg\:flex { display: flex !important; }
-    .lg\:grid { display: grid !important; }
-    
-    .lg\:flex-col { flex-direction: column; }
-    .lg\:flex-row { flex-direction: row; }
-    
-    .lg\:text-sm { font-size: var(--font-size-sm); }
-    .lg\:text-base { font-size: var(--font-size-base); }
-    .lg\:text-lg { font-size: var(--font-size-lg); }
-    
-    .lg\:p-sm { padding: var(--spacing-sm); }
-    .lg\:p-md { padding: var(--spacing-md); }
-    .lg\:p-lg { padding: var(--spacing-lg); }
-    
-    .lg\:m-sm { margin: var(--spacing-sm); }
-    .lg\:m-md { margin: var(--spacing-md); }
-    .lg\:m-lg { margin: var(--spacing-lg); }
-}
-
-@media (min-width: 1280px) {
-    .xl\:container {
-        max-width: 1280px;
+@media (max-width: 480px) {
+    #introSettingsContainer {
+        width: 90%;
+        left: 5%;
     }
 }
 

@@ -1,48 +1,34 @@
-/* CSS Custom Properties */
 :root {
-    /* Colors */
-    --color-primary: #ff6b6b;
-    --color-secondary: #4ecdc4;
-    --color-accent: #ffe66d;
-    --color-background: #1a1a2e;
-    --color-surface: #16213e;
-    --color-text: #ffffff;
-    --color-text-secondary: #b8b8b8;
-    --color-border: #333333;
-    
-    /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-xxl: 3rem;
-    
-    /* Typography */
-    --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-family-mono: 'Fira Code', 'Consolas', monospace;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
-    --font-size-lg: 1.125rem;
-    --font-size-xl: 1.25rem;
-    --font-size-2xl: 1.5rem;
-    --font-size-3xl: 1.875rem;
-    
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    
-    /* Transitions */
-    --transition-fast: 150ms ease-in-out;
-    --transition-normal: 250ms ease-in-out;
-    --transition-slow: 350ms ease-in-out;
-    
-    /* Border Radius */
-    --radius-sm: 0.25rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
+    --racer-color-0: #FFF275;
+    --racer-color-1: #FF8C42;
+    --racer-color-2: #FF3C38;
+    --racer-color-3: #A23E48;
+    --racer-color-4: #6C8EAD;
+    --racer-color-5: #171219;
+    --racer-color-6: #225560;
+    --racer-color-7: #7AC74F;
+    --racer-color-8: #F1DABF;
+    --racer-color-9: #08BDBD;
+    --racer-color-10: #2A0C4E;
+    --racer-color-11: #EEABC4;
+    --racer-color-12: #006BA6;
+    --racer-color-13: #161032;
+    --racer-color-14: #E06D06;
+    --racer-color-15: #475841;
+    --racer-color-16: #266DD3;
+    --racer-color-17: #B7ADCF;
+    --racer-color-18: #4F646F;
+    --racer-color-19: #083D77;
+    --racer-color-20: #EE964B;
+    --racer-color-21: #1D3557;
+    --racer-color-22: #F7A072;
+    --racer-color-23: #435058;
+    --racer-color-24: #084C61;
+    --racer-color-25: #606C38;
+    --racer-color-26: #283618;
+    --racer-color-27: #FFB2E6;
+    --racer-color-28: #D972FF;
+    --racer-color-29: #EA9E8D;
+    --racer-color-30: #1C2826;
 }
 
