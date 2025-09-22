@@ -30,7 +30,7 @@ class Racer {
     initStats() {
         const stats = {};
         // Generate base stats
-        const baseStats = ['endurance', 'exhaustionMultiplier', 'boostPower', 'boostDuration', 'stumbleChance', 'stumbleDuration'];
+        const baseStats = ['endurance', 'exhaustionMultiplier', 'boostPower', 'boostDuration', 'boostActivationPercent', 'stumbleChance', 'stumbleDuration'];
         baseStats.forEach((statName) => {
             const base = gameState.settings.racerProperties[`${statName}Base`];
             const variance = gameState.settings.racerProperties[`${statName}Variance`];
