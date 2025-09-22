@@ -1,5 +1,5 @@
 /* Track Component Styles */
-.track-container {
+#raceTrack {
     position: relative;
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border-radius: var(--radius-xl);
@@ -9,7 +9,7 @@
     overflow: hidden;
 }
 
-.track-container::before {
+#raceTrack::before {
     content: '';
     position: absolute;
     top: 0;
@@ -26,171 +26,89 @@
     pointer-events: none;
 }
 
-.track-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-lg);
-    z-index: 1;
-    position: relative;
-}
-
-.track-name {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--color-text);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.track-stats {
-    display: flex;
-    gap: var(--spacing-lg);
-}
-
-.track-stat {
-    text-align: center;
-}
-
-.track-stat-value {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--color-secondary);
-}
-
-.track-stat-label {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-}
-
-.race-progress {
-    width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    margin-top: var(--spacing-md);
-}
-
-.race-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
-    border-radius: var(--radius-sm);
-    transition: width var(--transition-fast);
-}
-
 .lane {
     position: relative;
     height: 60px;
-    margin: var(--spacing-xs) 0;
+    margin-bottom: 8px;
     background: rgba(255, 255, 255, 0.02);
     border-radius: var(--radius-sm);
     overflow: hidden;
 }
 
 .segment {
-    position: relative;
     display: inline-block;
     height: 100%;
+    width: 4.76%; /* 100% / 21 segments */
+    background: var(--color-surface);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.finishLine {
-    background: repeating-linear-gradient(
-        45deg,
-        #ff6b6b,
-        #ff6b6b 10px,
-        #ffffff 10px,
-        #ffffff 20px
-    );
+.segment.finishLine {
+    background: linear-gradient(90deg, transparent 0%, #ff6b6b 50%, transparent 100%);
+    width: 8px;
 }
+
+.groundType0 { background: #3a3a3a; } /* asphalt */
+.groundType1 { background: #4a3a2a; } /* gravel */
+.groundType2 { background: #5a4a3a; } /* dirt */
+.groundType3 { background: #3a4a3a; } /* grass */
+.groundType4 { background: #3a3a4a; } /* mud */
+.groundType5 { background: #4a4a4a; } /* rock */
+.groundType6 { background: #6a6a6a; } /* marble */
 
 .racer {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    transition: left 0.1s linear;
+    transition: left 0.1s ease-out;
     z-index: 10;
 }
 
-.racer.startingLine {
-    left: 0 !important;
-}
-
-.racer.finished {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
 .racerInner {
-    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 40px;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
+    position: relative;
 }
 
 .racerStripe {
     position: absolute;
     width: 100%;
-    height: 33.33%;
+    height: 8px;
 }
 
 .racerStripe1 { top: 0; }
-.racerStripe2 { top: 33.33%; }
-.racerStripe3 { top: 66.66%; }
-
-.racerNameContainer {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 20;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.racerID {
-    font-weight: bold;
-    margin-right: var(--spacing-xs);
-}
+.racerStripe2 { top: 50%; transform: translateY(-50%); }
+.racerStripe3 { bottom: 0; }
 
 .remainingEndurance {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 3px;
-    background: var(--color-accent);
-    transition: height 0.2s ease;
+    height: 4px;
+    background: linear-gradient(90deg, #4ecdc4 0%, #ffe66d 50%, #ff6b6b 100%);
+    transition: width 0.3s ease;
 }
 
-.laneResult1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.3) 0%, transparent 100%); }
-.laneResult2 { background: linear-gradient(90deg, rgba(192, 192, 192, 0.3) 0%, transparent 100%); }
-.laneResult3 { background: linear-gradient(90deg, rgba(205, 127, 50, 0.3) 0%, transparent 100%); }
-
-.livePosition1 { box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
-.livePosition2 { box-shadow: 0 0 8px rgba(192, 192, 192, 0.6); }
-.livePosition3 { box-shadow: 0 0 6px rgba(205, 127, 50, 0.6); }
-
-@keyframes stumble {
-    0%, 100% { transform: translateY(-50%) rotate(0deg); }
-    25% { transform: translateY(-50%) rotate(-5deg); }
-    75% { transform: translateY(-50%) rotate(5deg); }
+.racerNameContainer {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
 }
 
-.racer.stumbling {
-    animation: stumble 0.3s ease-in-out infinite;
+.racerID {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
 }
 
-@keyframes boost {
-    0%, 100% { transform: translateY(-50%) scale(1); }
-    50% { transform: translateY(-50%) scale(1.05); }
-}
-
-.racer.boosting {
-    animation: boost 0.2s ease-in-out infinite;
+.racerName {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text);
 }

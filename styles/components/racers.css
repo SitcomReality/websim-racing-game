@@ -67,3 +67,96 @@
     font-size: var(--font-size-sm);
 }
 
+/* Match the actual HTML structure */
+.racer {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: left 0.1s ease-out;
+    z-index: 10;
+}
+
+.racer.startingLine {
+    left: 0 !important;
+}
+
+.racer.finished {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.racer.boosting {
+    filter: brightness(1.3) drop-shadow(0 0 10px var(--color-accent));
+}
+
+.racer.stumbling {
+    animation: bounce 0.5s infinite;
+}
+
+.racerInner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    position: relative;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: var(--radius-md);
+    padding: 0 var(--spacing-sm);
+    box-shadow: var(--shadow-md);
+}
+
+.racerStripe {
+    position: absolute;
+    width: 100%;
+    height: 8px;
+}
+
+.racerStripe1 { top: 0; }
+.racerStripe2 { top: 50%; transform: translateY(-50%); }
+.racerStripe3 { bottom: 0; }
+
+.racerColor0 { background: #FFF275; }
+.racerColor1 { background: #FF8C42; }
+.racerColor2 { background: #FF3C38; }
+.racerColor3 { background: #A23E48; }
+.racerColor4 { background: #6C8EAD; }
+.racerColor5 { background: #171219; }
+.racerColor6 { background: #225560; }
+.racerColor7 { background: #7AC74F; }
+.racerColor8 { background: #F1DABF; }
+.racerColor9 { background: #08BDBD; }
+.racerColor10 { background: #2A0C4E; }
+.racerColor11 { background: #EEABC4; }
+.racerColor12 { background: #006BA6; }
+.racerColor13 { background: #161032; }
+.racerColor14 { background: #E06D06; }
+.racerColor15 { background: #475841; }
+.racerColor16 { background: #266DD3; }
+.racerColor17 { background: #B7ADCF; }
+.racerColor18 { background: #4F646F; }
+.racerColor19 { background: #083D77; }
+.racerColor20 { background: #EE964B; }
+.racerColor21 { background: #1D3557; }
+.racerColor22 { background: #F7A072; }
+.racerColor23 { background: #435058; }
+.racerColor24 { background: #084C61; }
+.racerColor25 { background: #606C38; }
+.racerColor26 { background: #283618; }
+.racerColor27 { background: #FFB2E6; }
+.racerColor28 { background: #D972FF; }
+.racerColor29 { background: #EA9E8D; }
+.racerColor30 { background: #1C2826; }
+
+.laneResult1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.3) 0%, transparent 100%); }
+.laneResult2 { background: linear-gradient(90deg, rgba(192, 192, 192, 0.3) 0%, transparent 100%); }
+.laneResult3 { background: linear-gradient(90deg, rgba(205, 127, 50, 0.3) 0%, transparent 100%); }
+.laneResult4,
+.laneResult5,
+.laneResult6,
+.laneResult7,
+.laneResult8,
+.laneResult9,
+.laneResult10 { background: linear-gradient(90deg, rgba(128, 128, 128, 0.1) 0%, transparent 100%); }
+
+.livePosition1 { box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.5); }
+.livePosition2 { box-shadow: inset 0 0 20px rgba(192, 192, 192, 0.5); }
+.livePosition3 { box-shadow: inset 0 0 20px rgba(205, 127, 50, 0.5); }
