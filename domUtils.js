@@ -1,5 +1,3 @@
-
-```javascript
 class DOMUtils {
     static createLane(racerId, sections, segmentsPerSection) {
         const lane = document.createElement('div');
