@@ -1,4 +1,0 @@
-for each racer compute screen-space AABB
-insert into grid cells
-on hover query grid cell(s) under cursor; refine with circle/path test
-

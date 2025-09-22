@@ -6,6 +6,9 @@ class CanvasRenderer {
     this.loop = null;
     this.laneHeight = 40;
     this.segmentWidth = 30;
+    this.camera = new Camera();
+    this.hitIndex = new HitTestIndex();
+    this.screenPositions = [];
   }
   setData(currentRace, trackProps) {
     this.race = currentRace;
@@ -21,8 +24,8 @@ class CanvasRenderer {
   }
   start() {
     if (this.loop) cancelAnimationFrame(this.loop);
-    const tick = () => {
-      this.render();
+    const tick = (ts) => {
+      this.tick(ts);
       this.loop = requestAnimationFrame(tick);
     };
     tick();
@@ -30,6 +33,14 @@ class CanvasRenderer {
   stop() {
     if (this.loop) cancelAnimationFrame(this.loop);
     this.loop = null;
+  }
+  tick(dt) {
+    this.updateCamera(dt);
+    this.render();
+    this.hitIndex.update(this.screenPositions);
+  }
+  updateCamera() {
+    this.camera.update(this.race);
   }
   render() {
     const ctx = this.ctx;
@@ -74,15 +85,15 @@ class CanvasRenderer {
     const segs = this.race.segments.length;
     const w = (this.canvas.width - pad*2);
     const h = this.laneHeight;
-    // map racerId -> lane index
     const laneIndexOf = {};
     this.race.racers.forEach((rid, i) => laneIndexOf[rid] = i);
-    // draw a small circle for each racer using liveLocations percent [0..100]
+    this.screenPositions = [];
     this.race.racers.forEach((rid) => {
       const pos = (this.race.liveLocations[rid] || 0) / 100;
       const x = pad + Math.max(0, Math.min(1, pos)) * w;
       const lane = laneIndexOf[rid] ?? 0;
       const y = pad + lane*h + (h/2);
+      this.screenPositions.push({ rid, x, y, r: 6 });
       ctx.beginPath();
       ctx.fillStyle = '#fff';
       ctx.strokeStyle = '#000';
