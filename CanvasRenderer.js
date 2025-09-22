@@ -11,6 +11,9 @@ class CanvasRenderer {
     this.screenPositions = [];
     this.textureManager = new TextureManager();
     this.textureManager.loadTextures();
+    this.particleSystem = new ParticleSystem();
+    this.nameplate = new Nameplate();
+    this.lastTime = performance.now();
   }
   setData(currentRace, trackProps) {
     this.race = currentRace;
