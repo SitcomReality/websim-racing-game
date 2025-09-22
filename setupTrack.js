@@ -3,6 +3,10 @@ function setupTrack(track) {
     document.getElementById('startRace').disabled = false;
     const trackDom = document.getElementById('raceTrack');
     trackDom.innerHTML = '';
+    const canvas = document.createElement('canvas');
+    canvas.id = 'raceCanvas';
+    trackDom.appendChild(canvas);
+
     gameState.currentRace.trackName = track.name;
     gameState.currentRace.sections = [];
     gameState.currentRace.segments = [];
@@ -22,11 +26,13 @@ function setupTrack(track) {
     gameState.currentRace.liveLocations = [];
     
     DOMUtils.updateTrackDetails();
-    const selectedRacers = gameState.raceWeek.selectedRacers;
+    const selectedRacers = gameState.raceWeek.selectedRacers.slice(0, gameState.settings.trackProperties.numberOfLanes);
     const arrangedRacers = arrangeRacersByPerformance(selectedRacers, gameState);
     
     for (let i = 0; i < gameState.settings.trackProperties.numberOfLanes; i++) {
         const thisRacerID = arrangedRacers[i];
+        if(thisRacerID === undefined) continue;
+
         const thisRacer = gameState.racers[thisRacerID];
         gameState.currentRace.racers[i] = thisRacerID;
         
@@ -37,19 +43,11 @@ function setupTrack(track) {
         
         // Initialize live location - key change
         gameState.currentRace.liveLocations[thisRacerID] = 0;
-        
-        // Keep DOM for now but we'll phase it out
-        const lane = DOMUtils.createLane(thisRacerID, track.sections, gameState.settings.trackProperties.segmentsPerSection);
-        trackDom.appendChild(lane);
-        const totalSegments = gameState.settings.trackProperties.numberOfSegments;
-        const racer = DOMUtils.createRacerElement(thisRacer, thisRacerID, racerNamePrefixes[thisRacer.name[0]], racerNameSuffixes[thisRacer.name[1]], totalSegments);
         thisRacer.reset();
-        lane.appendChild(racer);
     }
     
     // Initialize canvas renderer
     if (!window.canvasRenderer) {
-        const canvas = document.getElementById('raceCanvas');
         window.canvasRenderer = new CanvasRenderer(canvas);
         
         // Add resize handler
@@ -81,6 +79,8 @@ function setupTrack(track) {
                 }
             });
         });
+    } else {
+        window.canvasRenderer.setCanvas(canvas);
     }
     
     window.canvasRenderer.setData(gameState.currentRace, gameState.settings.trackProperties);

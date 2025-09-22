@@ -1,7 +1,6 @@
 class CanvasRenderer {
   constructor(canvas) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
+    this.setCanvas(canvas);
     this.props = null;
     this.loop = null;
     this.laneHeight = 40;
@@ -16,6 +15,11 @@ class CanvasRenderer {
     this.nameplate = new Nameplate();
     this.lastTime = performance.now();
     this.dpr = 1;
+  }
+
+  setCanvas(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
   }
   
   resizeToContainer() {
@@ -138,19 +142,24 @@ class CanvasRenderer {
     const segs = this.race.segments.length;
     const pad = 10;
     const h = this.laneHeight;
-    const w = (this.canvas.width - pad*2);
+    const w = (this.canvas.width/this.dpr - pad*2);
     const segW = w / Math.max(1, segs);
     
-    // Apply camera transformations
     ctx.save();
-    ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-    ctx.scale(this.camera.zoom, this.camera.zoom);
-    ctx.translate(-this.camera.target.x, -this.camera.target.y);
     
     // lane backgrounds
     for (let l=0; l<lanes; l++) {
       const y = pad + l*h;
-      ctx.fillStyle = l%2 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
+
+      const rid = this.race.racers[l];
+      const racer = gameState.racers[rid];
+
+      if (racer && racer.visual.finished) {
+          const place = this.race.results.indexOf(rid);
+          ctx.fillStyle = this.getPlacingColor(place + 1);
+      } else {
+        ctx.fillStyle = l%2 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
+      }
       ctx.fillRect(pad, y, w, h-4);
     }
     
@@ -178,9 +187,22 @@ class CanvasRenderer {
   drawBlob(ctx, x, y, racer, time) {
     const blob = racer.blobData;
     const breathing = Math.sin(time * 2) * 3;
+
+    let scaleX = 1;
+    let scaleY = 1;
+    if (racer.isBoosting) {
+        const boostEffect = Math.sin(time * 20) * 0.1;
+        scaleX = 1.2 + boostEffect;
+        scaleY = 0.8 - boostEffect;
+    } else {
+        const wobble = Math.sin(time * 5 + blob.controlPoints[0].wobblePhase) * 0.05;
+        scaleX = 1 + wobble;
+        scaleY = 1 - wobble;
+    }
     
     ctx.save();
     ctx.translate(x, y);
+    ctx.scale(scaleX, scaleY);
     
     // Draw blob body
     ctx.beginPath();
@@ -268,6 +290,16 @@ class CanvasRenderer {
     ctx.lineWidth = 3;
     ctx.stroke();
   }
+
+  getPlacingColor(place) {
+    switch(place) {
+        case 1: return '#FFC273';
+        case 2: return '#778B95';
+        case 3: return '#824229';
+        default: return 'rgba(17,17,17,0.85)';
+    }
+  }
+
   groundColor(type) {
     switch(String(type).toLowerCase()) {
       case 'asphalt': return '#2b2b2b';
