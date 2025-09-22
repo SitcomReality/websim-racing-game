@@ -19,11 +19,10 @@ function getRandomElement(suppliedArray) {
 // Helper function to shuffle elements in an array
 function shuffleArray(suppliedArray) {
     for (let i = suppliedArray.length - 1; i > 0; i--) {
-		console.log(suppliedArray);
         const j = Math.floor(Math.random() * (i + 1));
         [suppliedArray[i], suppliedArray[j]] = [suppliedArray[j], suppliedArray[i]];
     }
-	return suppliedArray;
+    return suppliedArray;
 }
 
 // Helper function to generate a set of unique numbers
@@ -95,15 +94,7 @@ function calculateBasePropertyAverage(category) {
     return count > 0 ? sum / count : 0;
 }
 
-
-
-
-
-
 function updateBoxShadowX(element, newXValue) {
-	//console.log("...racer...shadowDistance");
-	console.log("newXValue: "+newXValue);
-	
     // Get the current box-shadow value
     let boxShadow = element.style.boxShadow || getComputedStyle(element).boxShadow;
     
@@ -111,18 +102,16 @@ function updateBoxShadowX(element, newXValue) {
     let match = boxShadow.match(regex);
     
     if (match) {
-	// Extract parts from the regex match
+        // Extract parts from the regex match
         let color = match[1];
         let offsetX = match[2];
         let offsetY = match[3];
-		let blurRadius = match[4];
-       // let blurRadius = newBlurValue + 'px';
+        let blurRadius = match[4];
         let spreadRadius = match[5] ? match[5] : '';
-		
-		offsetX = Math.floor(parseFloat(offsetX) - newXValue);
-		console.log("offsetX: "+offsetX);
-		offsetX = offsetX + "px";
-		
+        
+        offsetX = Math.floor(parseFloat(offsetX) - newXValue);
+        offsetX = offsetX + "px";
+        
         // Reconstruct the box-shadow value
         let newBoxShadow = `${color} ${offsetX} ${offsetY} ${blurRadius} ${spreadRadius}`.trim();
 
@@ -133,17 +122,8 @@ function updateBoxShadowX(element, newXValue) {
     }
 }
 
-
-
-
-
-
-
-
-
 // End the race early if it's taking too long
 function endRaceEarly() {
-    
     // Create an array to store racer progress
     const racersProgress = gameState.currentRace.racers.map(racerId => {
         const currentRacerElem = document.getElementById(`racer${racerId}`);
@@ -159,7 +139,7 @@ function endRaceEarly() {
         if (!gameState.currentRace.results.includes(racerId)) {
             gameState.currentRace.results.push(racerId);
             const currentRacerElem = document.getElementById(`racer${racerId}`);
-			const raceEndPoint = 100 - currentRacerElem.width;
+            const raceEndPoint = 100 - currentRacerElem.width;
             currentRacerElem.style.left = raceEndPoint+'%'; // Visual representation of finished
             const laneRacer = document.getElementById(`laneRacer${racerId}`);
             laneRacer.className = `lane laneResult${gameState.currentRace.results.length}`;
@@ -167,22 +147,20 @@ function endRaceEarly() {
         }
     });
 
-	processRaceFinish();
+    processRaceFinish();
 }
-
 
 // A debug/dev helper function to show a certain stat of all racers
 function showRacerStats(attribute, showOnlyThisWeek) {
-	
-	if (!showOnlyThisWeek) {
-		racers = gameState.racers;
-	}
-	else {
-		racers = [];
-		for (i = 0; i < gameState.raceWeek.selectedRacers.length; i++) {
-			racers.push(gameState.racers[gameState.raceWeek.selectedRacers[i]]);
-		}
-	}
+    if (!showOnlyThisWeek) {
+        racers = gameState.racers;
+    }
+    else {
+        racers = [];
+        for (i = 0; i < gameState.raceWeek.selectedRacers.length; i++) {
+            racers.push(gameState.racers[gameState.raceWeek.selectedRacers[i]]);
+        }
+    }
     // Assuming racers is the array containing all racer objects.
     racers.forEach(racer => {
         // Split key by period to check for nested properties
