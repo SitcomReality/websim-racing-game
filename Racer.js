@@ -1,5 +1,3 @@
-
-```javascript
 class Racer {
     constructor(id, name, colors) {
         this.id = id;
