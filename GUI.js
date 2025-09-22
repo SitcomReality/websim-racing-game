@@ -105,44 +105,72 @@ EventTargetPrototype.addEventListener = function addEventListenerWrapper(type, l
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize the game
-    document.getElementById('initGame').addEventListener('click', initGame);
-	
-	// Start a new week
-    document.getElementById('startRaceWeek').addEventListener('click', function() {
-		this.disabled = true;
-		document.getElementById('setupRace').disabled = false;
-		createNewRaceWeek();
-	});
+    const initGameBtn = document.getElementById('initGame');
+    if (initGameBtn) {
+        initGameBtn.addEventListener('click', initGame);
+    }
+    
+    // Start a new week
+    const startRaceWeekBtn = document.getElementById('startRaceWeek');
+    if (startRaceWeekBtn) {
+        startRaceWeekBtn.addEventListener('click', function() {
+            this.disabled = true;
+            const setupRaceBtn = document.getElementById('setupRace');
+            if (setupRaceBtn) {
+                setupRaceBtn.disabled = false;
+            }
+            createNewRaceWeek();
+        });
+    }
 
     // Setup race and setup betting options when setupRace is clicked
-    document.getElementById('setupRace').addEventListener('click', function() {
-        setupRace();
-        setupBettingOptions();
-    });
+    const setupRaceBtn = document.getElementById('setupRace');
+    if (setupRaceBtn) {
+        setupRaceBtn.addEventListener('click', function() {
+            setupRace();
+            setupBettingOptions();
+        });
+    }
 
     // Start race when button is clicked
-    document.getElementById('startRace').addEventListener('click', startRace);
+    const startRaceBtn = document.getElementById('startRace');
+    if (startRaceBtn) {
+        startRaceBtn.addEventListener('click', startRace);
+    }
 
     // Place a bet when button is clicked
-    document.getElementById('placeBet').addEventListener('click', function() {
-        const selectedRacerIndex = parseInt(document.getElementById('selectRacer').value);
-        const betAmount = parseInt(document.getElementById('betAmount').value);
-        placeBet(selectedRacerIndex, betAmount);
-    });
-	
-	// DEBUG STUFF:
-	
-	// End the race early:
-    document.getElementById('endRace').addEventListener('click', function() {
-        endRaceEarly();
-    });
-	
-	// Change speed multiplier
-    document.getElementById('speedMultiplier').addEventListener('change', function() {
-        gameState.settings.racerProperties.speedMultiplier = document.getElementById('speedMultiplier').value;
-    });
-	
-	refreshParametersPanel();
+    const placeBetBtn = document.getElementById('placeBet');
+    if (placeBetBtn) {
+        placeBetBtn.addEventListener('click', function() {
+            const selectRacer = document.getElementById('selectRacer');
+            const betAmount = document.getElementById('betAmount');
+            if (selectRacer && betAmount) {
+                const selectedRacerIndex = parseInt(selectRacer.value);
+                const betAmountValue = parseInt(betAmount.value);
+                placeBet(selectedRacerIndex, betAmountValue);
+            }
+        });
+    }
+    
+    // DEBUG STUFF:
+    
+    // End the race early:
+    const endRaceBtn = document.getElementById('endRace');
+    if (endRaceBtn) {
+        endRaceBtn.addEventListener('click', function() {
+            endRaceEarly();
+        });
+    }
+    
+    // Change speed multiplier
+    const speedMultiplier = document.getElementById('speedMultiplier');
+    if (speedMultiplier) {
+        speedMultiplier.addEventListener('change', function() {
+            gameState.settings.racerProperties.speedMultiplier = document.getElementById('speedMultiplier').value;
+        });
+    }
+    
+    refreshParametersPanel();
 });
 
 function refreshParametersPanel() {

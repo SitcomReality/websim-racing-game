@@ -35,7 +35,53 @@
     <div id="no-js" style="text-align:center;background-color:white;width:80%;margin:5% 10%;color:#391d1d;padding:2px 4px 12px 4px;border:3px dashed #ff6000;z-index:99999;position:fixed;"><h2 style="color:red;">No JavaScript?</h2><p style="font-weight:bold;">JavaScript is required for this page to work.</p><p>If you're seeing this message, it's because JavaScript is disabled.</p><p>Check your browser/NoScript settings and make sure JavaScript is allowed for this domain.</p></div>
     <div id="introScreen"><div id="introSettingsContainer"><div id="introSettings" class="ui-section"></div><div id="initButtonContainer" class="ui-section" style="display:none"><div class="ui-item"><button id="initGame">New Game</button></div></div></div></div>
     <div id="header" class="ui"><div class="ui-section"><div class="ui-item stat"><span id="playerBalanceLabel">Player Balance:</span> <span id="playerBalance">$1000</span></div></div><div class="ui-section"><div class="ui-item"><button id="startRaceWeek">Start Race Week</button></div><div class="ui-item"><button id="setupRace" disabled="disabled">Setup Race</button></div><div class="ui-item"><button id="startRace" disabled="disabled">Start Race</button></div></div><div class="ui-section debugui"><div class="ui-item"><button id="endRace">End Race</button></div><div class="ui-item"><label for="speedMultiplier">speedMultiplier</label><input type="range" min="0.01" max="1.5" step="0.01" id="speedMultiplier" name="speedMultiplier"></div></div><div class="ui-section raceNumbers" id="raceNumbers"><div class="ui-item"><div class="raceNumbersInfo">Race Week <span id="raceWeekNumber">-1</span></div><div class="raceNumbersInfo">Race <span id="raceNumberThisWeek">-1</span> (<span id="raceNumber">-1</span>)</div></div></div></div>
-    <div id="bettingPanel" class="ui"><section id="raceWeekContainer"><div class="raceWeekInfoSection" id="raceWeekInfoSection1">...</div><div class="raceWeekInfoSection" id="raceWeekInfoSection2">Waiting for race week data</div><div class="raceWeekInfoSection" id="raceWeekInfoSection3">...</div></section><section id="placeBetFlowContainer" style="display:none"><button id="newBetButton">Place New Bet</button><div id="betTypeSelection"><label for="betType">Select Bet Type:</label><select id="betType"><option value="win">Win Bet</option><option value="quinella">Quinella</option></select></div><div id="raceSelection"><label for="raceNumber">Select Race:</label><select id="raceNumber"><option value="1">Race 1</option><option value="2">Race 2</option></select></div><div id="racerSelection"></div><div id="betsSummary"></div><button id="submitBetsButton">Submit Bets</button></section><section id="formGuideContainer"><div class="trackDetails" id="trackHeader"><h2><span id="trackNameDisplay">Welcome To Racing!</span> <span class="weatherDisplayWrapper">(<span id="weatherDisplay">Includes weather!</span>)</span></h2></div></section></div>
+    <div id="bettingPanel" class="ui">
+        <section id="raceWeekContainer">
+            <div class="raceWeekInfoSection" id="raceWeekInfoSection1">...</div>
+            <div class="raceWeekInfoSection" id="raceWeekInfoSection2">Waiting for race week data</div>
+            <div class="raceWeekInfoSection" id="raceWeekInfoSection3">...</div>
+        </section>
+
+        <section id="placeBetFlowContainer" style="display:none">
+            <button id="newBetButton">Place New Bet</button>
+            <div id="betTypeSelection">
+                <label for="betType">Select Bet Type:</label>
+                <select id="betType">
+                    <option value="win">Win Bet</option>
+                    <option value="quinella">Quinella</option>
+                </select>
+            </div>
+
+            <div id="raceSelection">
+                <label for="raceNumber">Select Race:</label>
+                <select id="raceNumber">
+                    <option value="1">Race 1</option>
+                    <option value="2">Race 2</option>
+                </select>
+            </div>
+
+            <div id="racerSelection"></div>
+            <div id="betsSummary"></div>
+            <button id="submitBetsButton">Submit Bets</button>
+        </section>
+
+        <section id="formGuideContainer">
+            <div class="trackDetails" id="trackHeader">
+                <h2><span id="trackNameDisplay">Welcome To Racing!</span> <span class="weatherDisplayWrapper">(<span id="weatherDisplay">Includes weather!</span>)</span></h2>
+            </div>
+        </section>
+        
+        <div id="placeBetContainer" class="ui-section" style="display:none">
+            <label for="selectRacer">Select Racer:</label>
+            <select id="selectRacer"></select>
+            <label for="betAmount">Bet Amount:</label>
+            <input type="number" id="betAmount" value="100">
+            <button id="placeBet">Place Bet</button>
+        </div>
+        <div id="currentBetContainer" class="ui-section" style="display:none">
+            <h4>Current Bets</h4>
+        </div>
+    </div>
     <div id="settings" class="ui"><div class="ui-section"><h4>Settings</h4></div></div>
     <div class="track" id="raceTrack"></div>
     <div id="raceHistory" class="ui"><h4>Race History</h4><ul id="historyList"></ul></div>
