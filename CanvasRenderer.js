@@ -12,6 +12,7 @@ class CanvasRenderer {
     this.textureManager = new TextureManager();
     this.textureManager.loadTextures();
     this.particleSystem = new ParticleSystem();
+    this.particleSystem.maxParticles = (gameState.settings?.render?.particles?.maxParticles) || this.particleSystem.maxParticles;
     this.nameplate = new Nameplate();
     this.lastTime = performance.now();
     this.dpr = 1;

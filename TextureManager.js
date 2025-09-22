@@ -38,7 +38,8 @@ class TextureManager {
     }
 
     this.ctx.putImageData(imageData, 0, 0);
-    this.images.set('asphalt', this.canvas.toDataURL());
+    // store offscreen canvas instead of dataURL
+    this.images.set('asphalt', this.canvas);
   }
 
   createGrassTexture() {
@@ -60,7 +61,8 @@ class TextureManager {
       );
     }
 
-    this.images.set('grass', this.canvas.toDataURL());
+    // store offscreen canvas instead of dataURL
+    this.images.set('grass', this.canvas);
   }
 
   createDirtTexture() {
@@ -84,7 +86,8 @@ class TextureManager {
       this.ctx.fill();
     }
 
-    this.images.set('dirt', this.canvas.toDataURL());
+    // store offscreen canvas instead of dataURL
+    this.images.set('dirt', this.canvas);
   }
 
   createGravelTexture() {
@@ -108,7 +111,8 @@ class TextureManager {
       this.ctx.fill();
     }
 
-    this.images.set('gravel', this.canvas.toDataURL());
+    // store offscreen canvas instead of dataURL
+    this.images.set('gravel', this.canvas);
   }
 
   createMudTexture() {
@@ -132,7 +136,8 @@ class TextureManager {
       this.ctx.fill();
     }
 
-    this.images.set('mud', this.canvas.toDataURL());
+    // store offscreen canvas instead of dataURL
+    this.images.set('mud', this.canvas);
   }
 
   createRockTexture() {
@@ -154,7 +159,8 @@ class TextureManager {
       );
     }
 
-    this.images.set('rock', this.canvas.toDataURL());
+    // store offscreen canvas instead of dataURL
+    this.images.set('rock', this.canvas);
   }
 
   createMarbleTexture() {
@@ -175,29 +181,24 @@ class TextureManager {
       this.ctx.stroke();
     }
 
-    this.images.set('marble', this.canvas.toDataURL());
+    // store offscreen canvas instead of dataURL
+    this.images.set('marble', this.canvas);
   }
 
   getPattern(name, ctx) {
     if (this.patterns.has(name)) {
       return this.patterns.get(name);
     }
-
-    const img = new Image();
-    img.src = this.images.get(name);
-
-    // For now, return a solid color if texture isn't loaded
-    // In a full implementation, you'd wait for the image to load
+    const src = this.images.get(name);
+    if (src) {
+      const pattern = ctx.createPattern(src, 'repeat');
+      this.patterns.set(name, pattern);
+      return pattern;
+    }
     const colors = {
-      asphalt: '#2b2b2b',
-      grass: '#0a4d1f',
-      dirt: '#5a3b1f',
-      gravel: '#464646',
-      mud: '#4a2c14',
-      rock: '#2f3b3f',
-      marble: '#606a70'
+      asphalt: '#2b2b2b', grass: '#0a4d1f', dirt: '#5a3b1f',
+      gravel: '#464646', mud: '#4a2c14', rock: '#2f3b3f', marble: '#606a70'
     };
-
     return colors[name] || '#303030';
   }
 }
