@@ -1,7 +1,7 @@
 .gui-container {
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    background: url("./assets/images/panel_background.png") repeat, linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+    background: url("../assets/images/panel_background.png") repeat, linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
     border: 1px solid #444;
     padding: 15px;
 }
