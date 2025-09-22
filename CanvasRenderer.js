@@ -217,16 +217,20 @@ class CanvasRenderer {
     }
 
     currentY = 0;
-    // segments with textures
+    // segments with textures - draw as continuous strips
     for (let i = 0; i < segs; i++) {
       const x = i * segW;
-      ctx.fillStyle = this.textureManager.getPattern(this.race.segments[i], ctx);
-      ctx.fillRect(x, 0, segW - 1, totalPerspectiveHeight);
+      const segmentType = this.race.segments[i];
+      const pattern = this.textureManager.getPattern(segmentType, ctx);
+      
+      // Draw continuous texture for this segment type
+      ctx.fillStyle = pattern;
+      ctx.fillRect(x, 0, segW, totalPerspectiveHeight);
 
-      // every 3rd segment – strong divider
-      if ((i + 1) % 3 === 0) {
-        ctx.fillStyle = 'rgba(255,255,255,0.2)';
-        ctx.fillRect(x + segW - 2, 0, 2, totalPerspectiveHeight);
+      // every 3rd segment – subtle divider (thin line, not gap)
+      if ((i + 1) % 3 === 0 && i < segs - 1) {
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fillRect(x + segW - 1, 0, 1, totalPerspectiveHeight);
       }
     }
 
