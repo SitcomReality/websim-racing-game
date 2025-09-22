@@ -1,0 +1,531 @@
+		:root {
+		  --racer-color-0: #FFF275;
+		  --racer-color-1: #FF8C42;
+		  --racer-color-2: #FF3C38;
+		  --racer-color-3: #A23E48;
+		  --racer-color-4: #6C8EAD;
+		  --racer-color-5: #171219;
+		  --racer-color-6: #225560;
+		  --racer-color-7: #7AC74F;
+		  --racer-color-8: #F1DABF;
+		  --racer-color-9: #08BDBD;
+		  --racer-color-10: #2A0C4E;
+		  --racer-color-11: #EEABC4;
+		  --racer-color-12: #006BA6;
+		  --racer-color-13: #161032;
+		  --racer-color-14: #E06D06;
+		  --racer-color-15: #475841;
+		  --racer-color-16: #266DD3;
+		  --racer-color-17: #B7ADCF;
+		  --racer-color-18: #4F646F;
+		  --racer-color-19: #083D77;
+		  --racer-color-20: #EE964B;
+		  --racer-color-21: #1D3557;
+		  --racer-color-22: #F7A072;
+		  --racer-color-23: #435058;
+		  --racer-color-24: #084C61;
+		  --racer-color-25: #606C38;
+		  --racer-color-26: #283618;
+		  --racer-color-27: #FFB2E6;
+		  --racer-color-28: #D972FF;
+		  --racer-color-29: #EA9E8D;
+		  --racer-color-30: #1C2826;
+		}
+
+		.racerColor0 { background-color: var(--racer-color-0); }
+		.racerColor1 { background-color: var(--racer-color-1); }
+		.racerColor2 { background-color: var(--racer-color-2); }
+		.racerColor3 { background-color: var(--racer-color-3); }
+		.racerColor4 { background-color: var(--racer-color-4); }
+		.racerColor5 { background-color: var(--racer-color-5); }
+		.racerColor6 { background-color: var(--racer-color-6); }
+		.racerColor7 { background-color: var(--racer-color-7); }
+		.racerColor8 { background-color: var(--racer-color-8); }
+		.racerColor9 { background-color: var(--racer-color-9); }
+		.racerColor10 { background-color: var(--racer-color-10); }
+		.racerColor11 { background-color: var(--racer-color-11); }
+		.racerColor12 { background-color: var(--racer-color-12); }
+		.racerColor13 { background-color: var(--racer-color-13); }
+		.racerColor14 { background-color: var(--racer-color-14); }
+		.racerColor15 { background-color: var(--racer-color-15); }
+		.racerColor16 { background-color: var(--racer-color-16); }
+		.racerColor17 { background-color: var(--racer-color-17); }
+		.racerColor18 { background-color: var(--racer-color-18); }
+		.racerColor19 { background-color: var(--racer-color-19); }
+		.racerColor20 { background-color: var(--racer-color-20); }
+		.racerColor21 { background-color: var(--racer-color-21); }
+		.racerColor22 { background-color: var(--racer-color-22); }
+		.racerColor23 { background-color: var(--racer-color-23); }
+		.racerColor24 { background-color: var(--racer-color-24); }
+		.racerColor25 { background-color: var(--racer-color-25); }
+		.racerColor26 { background-color: var(--racer-color-26); }
+		.racerColor27 { background-color: var(--racer-color-27); }
+		.racerColor28 { background-color: var(--racer-color-28); }
+		.racerColor29 { background-color: var(--racer-color-29); }
+		.racerColor30 { background-color: var(--racer-color-30); }
+	
+	
+        body {
+            font-family: Arial, sans-serif;
+			background-color: #353740;
+			color: #E2E0E9;
+			margin: 0;
+        }
+        button {
+            vertical-align: middle;
+        }
+		.ui-section {
+		  margin: 4px;
+		  padding: 4px;
+		  border: 1px solid #75757554;
+		  background: linear-gradient(#48405300,#0026396b);
+		}
+		.ui-item {
+		  border-bottom: 1px solid #00000059;
+		  padding: 10px;
+		  width: fit-content;
+		  display: inline-block;
+		}	
+		.ui-item label {
+		  display: block;
+		}
+		.debugui {
+		  font-size: 11px;
+		  font-family: Courier;
+		  background-color: #00ff341c;
+		}
+		#introScreen {
+		  position: fixed;
+		  left: 0;
+		  right: 0;
+		  top: 0;
+		  bottom: 0;
+		  background-color: #282828db;
+		  z-index: 200;
+		}
+		#introSettingsContainer {
+		  width: 400px;
+		  position: absolute;
+		  left: calc(50% - 240px);
+		  padding: 20px;
+		  background-color: #0c021c;
+		  border-radius: 10px;
+		  border: 1px solid #18005b;
+		  height: 100%;
+		}
+		#introSettings {
+		  max-height: calc(100% - 100px);
+		  overflow-y: scroll;
+		  border: 1px solid #18005b;
+		}
+		#initButtonContainer {
+		  height: 100px;
+		}
+		
+		
+		#header {
+		  position: fixed;
+		  top: 0;
+		  left: 0;
+		  right: 0;
+		  height: 90px;
+		  background: linear-gradient(#390060,#002444);
+		  padding: 4px;
+		  font-weight: bold;
+		  font-size: 30px;
+		  z-index: 100;
+		}
+		#header .ui-section {
+		  display: inline-block;
+		}
+		.raceNumbers {
+		  position: absolute;
+		  right: 0;
+		  top: 0;
+		  bottom: 0;
+		  font-size: 20px;
+		}
+		#bettingPanel {
+		  background: linear-gradient(#002444,#040b13);
+		  padding: 10px;
+		}
+		
+		#raceWeekContainer {
+		  margin-top: 90px;
+		}
+						
+		#raceWeekInfoSection1 > li {
+		  display: inline-block;
+		}
+		
+		#settings {
+		  position: absolute;
+		  right: 4px;
+		  top: 4px;
+		  border: 1px solid #5c218c7d;
+		}
+		#trackHeader {
+		  text-align: center;
+		}
+		.weatherDisplayWrapper {
+		  font-weight: normal;
+		  font-size: 11px;
+		  vertical-align: middle;
+		}
+		#raceTrack {
+		  margin: 20px;
+		  border: 2px solid #626262;
+		  padding: 4px;
+		  padding-bottom: 0px;
+		}
+
+
+		
+		.track {
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+        }
+        .lane {
+			display: flex;
+			height: 40px;
+			border-top: 2px solid #725b82;
+			border-bottom: 2px solid #725b82;
+			position: relative;
+        }
+        .segment {
+            flex: 1;
+            border-right: 1px dashed #959595;
+			background-color: #282828;
+			position: relative;
+        }
+		.segment:nth-child(3n) /*, .segment:nth-child(n/3) */ {
+		  border-color:white;
+		  border-right-style: double;
+		}
+
+		.segment:last-child:after {
+		  content:".";
+		  right: 0;
+		  top: 0;
+		  bottom: 0;
+		  width: 20%;
+		  overflow:hidden;
+		  position:absolute;
+		  background-color:#ff1f3e8a;
+		  color: #ff1f3e8a;
+		}
+		.groundTypemud {
+		  background-color: #84370a50;
+		}
+		.groundTypemarble {
+		  background-color: #88a6a850;
+		}
+		.groundTyperock {
+		  background-color: #0c282f50;
+		}
+		.groundTypegrass {
+		  background-color: #03571450;
+		}
+		.groundTypegravel {
+		  background-color: #443a624f;
+		}
+		.groundTypedirt {
+		  background-color: #2d190050;
+		}
+		.groundTypeasphalt {
+		  background-color: #13131350;
+		}
+		
+		.finishLine {
+		  background-color: #fffb0c59;
+		}
+        .racer {
+            height: calc(100% - 6px);
+			width: calc(100% - 6px);
+			background-color: black;
+			position: absolute;
+			border-radius: 10px;
+			border: 3px solid #515151;
+			box-shadow: -90px 4px 37px #000000;
+        }
+		.racerInner {
+		  position: relative;
+		  height: 100%;
+		}
+		.racer .racerName {
+		  position: absolute;
+		  padding: 2px;
+		  text-align: center;
+		  width: calc(90% - 4px);
+		  left: 5%;
+		  top: 10%;
+		}
+		.racerName {
+		  
+		  
+		  font-size: 10px;
+		  background: #000000c2;
+		  font-weight: bold;
+		  text-shadow: 1px 1px black;
+		  text-transform: uppercase;
+		  font-family: verdana;
+		}
+		.racerStripe {
+		  width: calc(33% - 1px);
+		  height: 100%;
+		  float: left;
+		}
+		.racerStripe1 {
+		  border-radius: 6px 0px 0px 6px;
+		}
+		.racerStripe3 {
+		  border-radius: 0px 6px 6px 0px;
+		}
+		.racerStripe2 {
+			width: 33%;
+		  border-left: 1px solid black;
+		  border-right: 1px solid black;
+		}
+
+		.racerID {
+		  position: absolute;
+		  bottom: -1px;
+		  right: -1px;
+		  z-index: 9;
+		  font-weight: bold;
+		  color: #fff;
+		  text-shadow: 1px 1px black;
+		  background-color: #ffffffab;
+		  padding: 1px 4px;
+		  border-radius: 4px;
+		  font-size: 9px;
+		}
+
+		.laneResult1 {
+		  background-color: #FFC273;
+		}
+		.laneResult2 {
+		  background-color: #778B95;
+		}
+		.laneResult3 {
+		  background-color: #824229;
+		}
+		.laneResult4 {
+		  background-color: #1115;
+		}
+		.laneResult5 {
+		  background-color: #1115;
+		}
+		.laneResult6 {
+		  background-color: #1115;
+		}
+		.laneResult7 {
+		  background-color: #1115;
+		}
+		.laneResult8 {
+		  background-color: #1115;
+		}
+		.laneResult9 {
+		  background-color: #1115;
+		}
+		.laneResult10 {
+		  background-color: #1115;
+		}
+		.laneResult11 {
+		  background-color: #1115;
+		}
+		.laneResult12 {
+		  background-color: #1115;
+		}
+		.laneResult13 {
+		  background-color: #1115;
+		}
+		.laneResult14 {
+		  background-color: #1115;
+		}
+		.laneResult15 {
+		  background-color: #1115;
+		}
+		
+		.racer.boosting {
+		  box-shadow: 0px 0px 20px white;
+		}
+		.remainingEndurance {
+		  position: absolute;
+		  background-color: #bf0;
+		  left: -10px;
+		  border: 1px solid black;
+		  right: 100%;
+		  top: 0px;
+		  bottom: 0px;
+		}
+		
+		#historyList li {
+		  list-style: none;
+		  margin-bottom: 5px;
+		  border-bottom: 3px solid #797979;
+		  padding-bottom: 5px;
+		}
+		#historyList li:nth-child(2n) {
+		  background-color: #0000006b;
+		}
+		.historyRacerPlacingContainer {
+		  display: inline-block;
+			border: 1px solid #686868;
+			margin-right: 5px;
+			padding: 0px 5px 0px 0px;
+			border-radius: 3px;
+			position: relative;
+			font-size: 10px;
+		}
+		.historyRacerPlacingContainer:nth-child(2) {
+			opacity: 0.9;
+		}
+		.historyRacerPlacingContainer:nth-child(3) {
+			opacity: 0.8;
+		}
+		.historyRacerPlacingContainer:nth-child(4) {
+			opacity: 0.7;
+		}
+		.historyRacerPlacingContainer:nth-child(5) {
+			opacity: 0.6;
+		}
+		.historyRacerPlacingContainer:nth-child(6) {
+			opacity: 0.5;
+		}
+		.historyRacerPlacingContainer:nth-child(7) {
+			opacity: 0.4;
+		}
+		.historyRacerPlacingContainer:nth-child(8) {
+			opacity: 0.3;
+		}
+		.historyRacerPlacingContainer:nth-child(n+9) {
+			opacity: 0.2;
+		}
+		.historyRacerPlacingContainer div {
+		  display: inline-block;
+		}
+		.historyRacerPlacingContainer .historyRacerPlacing {
+		  border: 1px solid black;
+		  margin-right: 4px;
+		  padding: 2px;
+		  background-color: black;
+		}
+		.historyRacerId {
+		  margin-left: 5px;
+		  background-color: #CCCCCC91;
+		  color: #313131;
+		  padding: 0px 5px;
+		}
+		.placingContainerBackground .racerStripe {
+		  z-index: -1;
+		  position: absolute;
+		  top: 0;
+		}
+		.placingContainerBackground .racerStripe2 {
+		  left: 33%;
+		}
+		.placingContainerBackground .racerStripe3 {
+		  left: 66%;
+		}
+		
+		.livePosition1 {
+		  border-color: white;
+		}
+		.stumbling {
+		  border-color:black;
+		  opacity: 0.5;
+		}
+		
+		li .historyRacerPlacingContainer {
+		  min-width: 140px;
+		  position: relative;
+		}
+		
+		li .placingContainerBackground .racerStripe {
+		  z-index: auto;
+		}
+
+		li .historyRacerPlacingContainer .historyRacerPlacing {
+		  z-index: 10;
+		  display: none;
+		}
+
+		li .historyRacerPlacingContainer .racerName {
+		  z-index: 11;
+			display: block;
+			position: absolute;
+			top: 5%;
+			left: 10%;
+			right: 10%;
+			overflow-x: hidden;
+			bottom: 5%;
+			text-align: center;
+			font-size: 8px;
+		}
+		
+		
+		
+		.smoke {
+			width: 100px;
+			height: 20px;
+			background-color: #fff;
+			border-radius: 50%;
+			position: absolute;
+			top: 50%;
+			left: 0;
+			/*! transform: translateX(-50%); */
+			filter: blur(10px);
+			animation: smokeAnimation 2s infinite;
+			opacity: 0.5;
+			z-index: 999999;
+		}
+
+	@keyframes smokeAnimation {
+		0% {
+			transform: translateY(-50%) translateX(0) scale(1);
+			opacity: 0.5;
+		}
+		50% {
+			transform: translateY(-50%) translateX(-40px) scale(1.5);
+			opacity: 0.2;
+		}
+		100% {
+			transform: translateY(-50%) translateX(-80px) scale(2);
+			opacity: 0;
+		}
+	}
+
+
+.air {
+    position: absolute;
+    width: 20px;
+    height: 10px;
+    background: rgba(173, 216, 230, 0.8); /* Light blue color */
+    border-radius: 0%;
+    opacity: 0;
+	left: 0px;
+	top: calc(50% - 5px);
+    animation: exhale 0.8s infinite;
+}
+.startingLine .air, .stumbling .air, .finished .air {
+	display: none;
+}
+
+@keyframes exhale {
+    0% {
+        transform: translate(0, 0) scale(0.5);
+        opacity: 0;
+		filter: blur(0px);
+    }
+    25% {
+        opacity: 1;
+		filter: blur(2px);
+    }
+    100% {
+        transform: translate(-20px, 0px) scaleX(5) scaleY(2);
+        opacity: 0;
+		filter: blur(10px);
+    }
+}
