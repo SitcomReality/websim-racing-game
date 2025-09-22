@@ -65,68 +65,83 @@
     
     <main id="game-container">
         <div id="left-panel">
-            <div id="bettingPanel" class="ui gui-container">
-                <section id="raceWeekContainer">
-                    <div class="raceWeekInfoSection" id="raceWeekInfoSection1">...</div>
-                    <div class="raceWeekInfoSection" id="raceWeekInfoSection2">Waiting for race week data</div>
-                    <div class="raceWeekInfoSection" id="raceWeekInfoSection3">...</div>
-                </section>
-        
-                <section id="placeBetFlowContainer" style="display:none">
-                    <button id="newBetButton" class="btn btn-secondary">Place New Bet</button>
-                    <div id="betTypeSelection">
-                        <label for="betType">Select Bet Type:</label>
-                        <select id="betType" class="form-control">
-                            <option value="win">Win Bet</option>
-                            <option value="quinella">Quinella</option>
-                        </select>
-                    </div>
-        
-                    <div id="raceSelection">
-                        <label for="raceNumber">Select Race:</label>
-                        <select id="raceNumber" class="form-control">
-                            <option value="1">Race 1</option>
-                            <option value="2">Race 2</option>
-                        </select>
-                    </div>
-        
-                    <div id="racerSelection"></div>
-                    <div id="betsSummary"></div>
-                    <button id="submitBetsButton" class="btn btn-primary">Submit Bets</button>
-                </section>
-        
-                <section id="formGuideContainer">
-                    <div class="trackDetails" id="trackHeader">
-                        <h2><span id="trackNameDisplay">Welcome To Racing!</span> <span class="weatherDisplayWrapper">(<span id="weatherDisplay">Includes weather!</span>)</span></h2>
-                    </div>
-                </section>
-                
-                <div id="placeBetContainer" class="ui-section" style="display:none">
-                    <label for="selectRacer">Select Racer:</label>
-                    <select id="selectRacer" class="form-control"></select>
-                    <label for="betAmount">Bet Amount:</label>
-                    <input type="number" id="betAmount" value="100" class="form-control">
-                    <button id="placeBet" class="btn btn-primary">Place Bet</button>
+            <div class="ui gui-container tabs" id="sidebarTabs">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="betting">Betting</button>
+                    <button class="tab-button" data-tab="history">History</button>
+                    <button class="tab-button" data-tab="settings">Settings</button>
                 </div>
-                <div id="currentBetContainer" class="ui-section" style="display:none">
-                    <h4>Current Bets</h4>
+                <div class="tab-content">
+                    <div class="tab-panel active" data-tab-panel="betting">
+                        <div id="bettingPanel" class="ui gui-container">
+                            <section id="raceWeekContainer">
+                                <div class="raceWeekInfoSection" id="raceWeekInfoSection1">...</div>
+                                <div class="raceWeekInfoSection" id="raceWeekInfoSection2">Waiting for race week data</div>
+                                <div class="raceWeekInfoSection" id="raceWeekInfoSection3">...</div>
+                            </section>
+                            
+                            <section id="placeBetFlowContainer" style="display:none">
+                                <button id="newBetButton" class="btn btn-secondary">Place New Bet</button>
+                                <div id="betTypeSelection">
+                                    <label for="betType">Select Bet Type:</label>
+                                    <select id="betType" class="form-control">
+                                        <option value="win">Win Bet</option>
+                                        <option value="quinella">Quinella</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="raceSelection">
+                                    <label for="raceNumber">Select Race:</label>
+                                    <select id="raceNumber" class="form-control">
+                                        <option value="1">Race 1</option>
+                                        <option value="2">Race 2</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="racerSelection"></div>
+                                <div id="betsSummary"></div>
+                                <button id="submitBetsButton" class="btn btn-primary">Submit Bets</button>
+                            </section>
+                            
+                            <section id="formGuideContainer">
+                                <div class="trackDetails" id="trackHeader">
+                                    <h2><span id="trackNameDisplay">Welcome To Racing!</span> <span class="weatherDisplayWrapper">(<span id="weatherDisplay">Includes weather!</span>)</span></h2>
+                                </div>
+                            </section>
+                            
+                            <div id="placeBetContainer" class="ui-section" style="display:none">
+                                <label for="selectRacer">Select Racer:</label>
+                                <select id="selectRacer" class="form-control"></select>
+                                <label for="betAmount">Bet Amount:</label>
+                                <input type="number" id="betAmount" value="100" class="form-control">
+                                <button id="placeBet" class="btn btn-primary">Place Bet</button>
+                            </div>
+                            <div id="currentBetContainer" class="ui-section" style="display:none">
+                                <h4>Current Bets</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-panel" data-tab-panel="history">
+                        <div id="raceHistory" class="ui gui-container"><h4>Race History</h4><ul id="historyList"></ul></div>
+                    </div>
+                    <div class="tab-panel" data-tab-panel="settings">
+                        <div id="settings" class="ui gui-container debugui">
+                            <div class="ui-section"><h4>Settings</h4></div>
+                            <div class="ui-item"><button id="endRace" class="btn btn-outline">End Race</button></div>
+                            <div class="ui-item"><label for="speedMultiplier">speedMultiplier</label><input type="range" min="0.01" max="1.5" step="0.01" id="speedMultiplier" name="speedMultiplier" class="form-control"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div id="raceHistory" class="ui gui-container"><h4>Race History</h4><ul id="historyList"></ul></div>
         </div>
 
         <div id="right-panel">
-             <div id="liveLeaderboard" class="ui gui-container">
-            <h4>Live Leaderboard</h4>
-            <ol id="leaderList"></ol>
-         </div>
-         <div class="track track-container" id="raceTrack">
-            <canvas id="raceCanvas"></canvas>
-         </div>
-             <div id="settings" class="ui gui-container debugui">
-                <div class="ui-section"><h4>Settings</h4></div>
-                <div class="ui-item"><button id="endRace" class="btn btn-outline">End Race</button></div>
-                <div class="ui-item"><label for="speedMultiplier">speedMultiplier</label><input type="range" min="0.01" max="1.5" step="0.01" id="speedMultiplier" name="speedMultiplier" class="form-control"></div>
+            <div class="track track-container" id="raceTrack">
+                <canvas id="raceCanvas"></canvas>
+                <div id="liveLeaderboard" class="overlay-leaderboard">
+                    <h5>Leaders</h5>
+                    <ol id="leaderList"></ol>
+                </div>
             </div>
         </div>
     </main>
