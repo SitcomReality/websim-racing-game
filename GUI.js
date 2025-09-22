@@ -75,10 +75,22 @@ function generateSettingsHTML() {
         html += `</div>`;
       } else {
         // Handle leaf settings
-        html += `<div class="ui-item">
-                   <label for="${fullKey}">${finalTerm}:</label>
-                   <input class="settings-input" type="number" id="${fullKey}" value="${value}" step="1" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">
-                 </div>`;
+        html += `<div class="ui-item">`;
+        // Check if this is a ground, weather, or third type property
+        const isGroundType = parentKey.includes('groundProperties');
+        const isWeatherType = parentKey.includes('weatherProperties');
+        const isThirdType = parentKey.includes('thirdProperties');
+        
+        if (isGroundType || isWeatherType || isThirdType) {
+          // Use text input for these properties instead of number
+          html += `<label for="${fullKey}">${finalTerm}:</label>`;
+          html += `<input class="settings-input" type="text" id="${fullKey}" value="${value}" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">`;
+        } else {
+          // Use number input for other properties
+          html += `<label for="${fullKey}">${finalTerm}:</label>`;
+          html += `<input class="settings-input" type="number" id="${fullKey}" value="${value}" step="1" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">`;
+        }
+        html += `</div>`;
         tabCount++;
       }
     }
