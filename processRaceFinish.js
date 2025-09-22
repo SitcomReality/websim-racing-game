@@ -11,4 +11,5 @@ function processRaceFinish() {
 		document.getElementById('startRace').disabled = true;
 		setStep(4,'done'); setStep(3,'active'); setStatus('Race finished. Setup the next race.');
 	}
+	if (window.canvasRenderer) window.canvasRenderer.stop();
 }

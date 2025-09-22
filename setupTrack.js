@@ -34,4 +34,13 @@ function setupTrack(track) {
     }
     gameState.currentRace.liveLocations = [];
     gameState.currentRace.livePositions = [];
+   // init/update canvas renderer
+   if (!window.canvasRenderer) {
+       const canvas = document.getElementById('raceCanvas');
+       window.canvasRenderer = new CanvasRenderer(canvas);
+       window.addEventListener('resize', () => window.canvasRenderer.resizeToContainer());
+   }
+   window.canvasRenderer.setData(gameState.currentRace, gameState.settings.trackProperties);
+   window.canvasRenderer.resizeToContainer();
+   window.canvasRenderer.start();
 }
