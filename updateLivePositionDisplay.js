@@ -24,7 +24,7 @@ function updateLivePositionDisplayIndividual(racerid) {
             sortedRacerIds.slice(0,5).forEach((rid, i) => {
                 const li = document.createElement('li');
                 const r = gameState.racers[parseInt(rid,10)];
-                li.textContent = `${i+1}. ${racerNamePrefixes[r.name[0]]} ${racerNameSuffixes[r.name[1]]}`;
+                li.textContent = `${i+1}. ${window.racerNamePrefixes[r.name[0]]} ${window.racerNameSuffixes[r.name[1]]}`;
                 leaderList.appendChild(li);
             });
         }
