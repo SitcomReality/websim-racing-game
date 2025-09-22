@@ -1,0 +1,80 @@
+/* Track Component Styles */
+.track-container {
+    position: relative;
+    background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin: var(--spacing-lg) 0;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+}
+
+.track-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 98px,
+            rgba(255, 255, 255, 0.1) 100px
+        );
+    pointer-events: none;
+}
+
+.track-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    z-index: 1;
+    position: relative;
+}
+
+.track-name {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-text);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.track-stats {
+    display: flex;
+    gap: var(--spacing-lg);
+}
+
+.track-stat {
+    text-align: center;
+}
+
+.track-stat-value {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+.track-stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.race-progress {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-top: var(--spacing-md);
+}
+
+.race-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    border-radius: var(--radius-sm);
+    transition: width var(--transition-fast);
+}
+

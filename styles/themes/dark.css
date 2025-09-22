@@ -1,0 +1,41 @@
+/* Dark Theme Overrides */
+[data-theme="dark"] {
+    --color-primary: #ff6b6b;
+    --color-secondary: #4ecdc4;
+    --color-accent: #ffe66d;
+    --color-background: #1a1a2e;
+    --color-surface: #16213e;
+    --color-text: #ffffff;
+    --color-text-secondary: #b8b8b8;
+    --color-border: #333333;
+}
+
+[data-theme="dark"] body {
+    background: linear-gradient(135deg, var(--color-background) 0%, #0f0f1e 100%);
+}
+
+[data-theme="dark"] .racer-container {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] .track-container {
+    background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
+}
+
+[data-theme="dark"] .gui-container {
+    background: rgba(22, 33, 62, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .form-control {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .form-control:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-primary);
+}
+

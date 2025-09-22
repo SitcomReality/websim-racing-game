@@ -1,0 +1,42 @@
+/* Flexbox Utilities */
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.items-center { align-items: center; }
+.items-stretch { align-items: stretch; }
+
+.flex-1 { flex: 1; }
+.flex-auto { flex: auto; }
+.flex-none { flex: none; }
+
+.gap-xs > * + * { margin-left: var(--spacing-xs); }
+.gap-sm > * + * { margin-left: var(--spacing-sm); }
+.gap-md > * + * { margin-left: var(--spacing-md); }
+.gap-lg > * + * { margin-left: var(--spacing-lg); }
+
+.flex-col.gap-xs > * + * { margin-left: 0; margin-top: var(--spacing-xs); }
+.flex-col.gap-sm > * + * { margin-left: 0; margin-top: var(--spacing-sm); }
+.flex-col.gap-md > * + * { margin-left: 0; margin-top: var(--spacing-md); }
+.flex-col.gap-lg > * + * { margin-left: 0; margin-top: var(--spacing-lg); }
+
