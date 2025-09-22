@@ -15,6 +15,7 @@ class CanvasRenderer {
     this.nameplate = new Nameplate();
     this.lastTime = performance.now();
     this.dpr = 1;
+    this.camera.damping = (gameState.settings?.render?.camera?.smoothing) || 0.15;
   }
 
   setCanvas(canvas) {
@@ -32,6 +33,7 @@ class CanvasRenderer {
     this.canvas.height = Math.floor((lanes * this.laneHeight + 20) * this.dpr);
     
     // Scale context to match device pixel ratio
+    this.ctx.setTransform(1,0,0,1,0,0);
     this.ctx.scale(this.dpr, this.dpr);
     
     // Set display size via CSS
@@ -41,10 +43,14 @@ class CanvasRenderer {
   
   worldToScreen(worldX, laneIndex) {
     const pad = 10;
-    const segs = this.race.segments.length;
+    const lanes = (this.props && this.props.numberOfLanes) || this.race.racers.length;
     const w = (this.canvas.width / this.dpr - pad * 2);
-    const x = pad + (worldX / 100) * w;
-    const y = pad + (laneIndex * this.laneHeight) + (this.laneHeight / 2);
+    const h = this.laneHeight;
+    const visRange = Math.max(10, Math.min(100, 100 / (this.camera.zoom || 1)));
+    const half = visRange / 2;
+    const left = Math.max(0, Math.min(100 - visRange, (this.camera.target.x || 0) - half));
+    const x = pad + ((worldX - left) / visRange) * w;
+    const y = pad + (laneIndex * h) + (h / 2);
     return { x, y };
   }
   
@@ -54,22 +60,22 @@ class CanvasRenderer {
     const loc = this.race.liveLocations;
     const xs = this.race.racers.map(rid => loc[rid] || 0);
     const avg = xs.reduce((a,b) => a+b, 0) / xs.length;
-    
-    if (this.camera.mode === 'single') {
-      this.camera.target.x = avg;
-    } else if (this.camera.mode === 'leaders') {
-      const lead = Math.max(...xs);
-      this.camera.target.x = lead;
-    } else if (this.camera.mode === 'average') {
-      this.camera.target.x = avg;
-    } else if (this.camera.mode === 'fitAll') {
-      this.camera.target.x = avg;
-      this.camera.zoom = 1;
+    const minX = Math.min(...xs, 0), maxX = Math.max(...xs, 100);
+    let desiredX = avg, desiredZoom = this.camera.zoom || 1;
+
+    if (this.camera.mode === 'leaders') desiredX = Math.max(...xs);
+    else if (this.camera.mode === 'single') desiredX = avg;
+    else if (this.camera.mode === 'fitAll') {
+      const margin = 8;
+      const span = Math.max(10, (maxX - minX) + margin*2);
+      desiredX = (minX + maxX) / 2;
+      const w = this.canvas.width / this.dpr - 20;
+      desiredZoom = Math.max((gameState.settings?.render?.camera?.zoomMin)||0.5,
+                     Math.min((gameState.settings?.render?.camera?.zoomMax)||3.0, 100 / span));
     }
-    
-    // Smooth camera movement
-    const damping = 0.15;
-    this.camera.target.x += (this.camera.target.x - this.camera.target.x) * damping;
+
+    this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
+    this.camera.zoom += ((desiredZoom||1) - (this.camera.zoom||1)) * this.camera.damping;
   }
   
   setData(currentRace, trackProps) {

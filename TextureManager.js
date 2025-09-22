@@ -19,170 +19,92 @@ class TextureManager {
 
   createAsphaltTexture() {
     const size = 64;
-    this.canvas.width = size;
-    this.canvas.height = size;
-
-    // Base asphalt color
-    this.ctx.fillStyle = '#2b2b2b';
-    this.ctx.fillRect(0, 0, size, size);
-
-    // Add subtle noise for texture
-    const imageData = this.ctx.getImageData(0, 0, size, size);
+    const c = document.createElement('canvas'); c.width = size; c.height = size;
+    const cx = c.getContext('2d');
+    cx.fillStyle = '#2b2b2b'; cx.fillRect(0, 0, size, size);
+    const imageData = cx.getImageData(0, 0, size, size);
     const data = imageData.data;
-
     for (let i = 0; i < data.length; i += 4) {
-      const noise = (Math.random() - 0.5) * 30;
-      data[i] = Math.max(0, Math.min(255, data[i] + noise));
-      data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
-      data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+      const n = (Math.random() - 0.5) * 30;
+      data[i] = Math.max(0, Math.min(255, data[i] + n));
+      data[i+1] = Math.max(0, Math.min(255, data[i+1] + n));
+      data[i+2] = Math.max(0, Math.min(255, data[i+2] + n));
     }
-
-    this.ctx.putImageData(imageData, 0, 0);
-    // store offscreen canvas instead of dataURL
-    this.images.set('asphalt', this.canvas);
+    cx.putImageData(imageData, 0, 0);
+    this.images.set('asphalt', c);
   }
 
   createGrassTexture() {
     const size = 64;
-    this.canvas.width = size;
-    this.canvas.height = size;
-
-    this.ctx.fillStyle = '#0a4d1f';
-    this.ctx.fillRect(0, 0, size, size);
-
-    // Add grass-like texture
+    const c = document.createElement('canvas'); c.width = size; c.height = size;
+    const cx = c.getContext('2d');
+    cx.fillStyle = '#0a4d1f'; cx.fillRect(0, 0, size, size);
     for (let i = 0; i < 100; i++) {
-      this.ctx.fillStyle = `hsl(120, 60%, ${20 + Math.random() * 20}%)`;
-      this.ctx.fillRect(
-        Math.random() * size,
-        Math.random() * size,
-        2 + Math.random() * 4,
-        2 + Math.random() * 4
-      );
+      cx.fillStyle = `hsl(120, 60%, ${20 + Math.random() * 20}%)`;
+      cx.fillRect(Math.random()*size, Math.random()*size, 2+Math.random()*4, 2+Math.random()*4);
     }
-
-    // store offscreen canvas instead of dataURL
-    this.images.set('grass', this.canvas);
+    this.images.set('grass', c);
   }
 
   createDirtTexture() {
     const size = 64;
-    this.canvas.width = size;
-    this.canvas.height = size;
-
-    this.ctx.fillStyle = '#5a3b1f';
-    this.ctx.fillRect(0, 0, size, size);
-
-    // Add dirt clumps
+    const c = document.createElement('canvas'); c.width = size; c.height = size;
+    const cx = c.getContext('2d');
+    cx.fillStyle = '#5a3b1f'; cx.fillRect(0, 0, size, size);
     for (let i = 0; i < 50; i++) {
-      this.ctx.fillStyle = `hsl(30, 50%, ${15 + Math.random() * 15}%)`;
-      this.ctx.beginPath();
-      this.ctx.arc(
-        Math.random() * size,
-        Math.random() * size,
-        1 + Math.random() * 3,
-        0, Math.PI * 2
-      );
-      this.ctx.fill();
+      cx.fillStyle = `hsl(30, 50%, ${15 + Math.random() * 15}%)`;
+      cx.beginPath(); cx.arc(Math.random()*size, Math.random()*size, 1+Math.random()*3, 0, Math.PI*2); cx.fill();
     }
-
-    // store offscreen canvas instead of dataURL
-    this.images.set('dirt', this.canvas);
+    this.images.set('dirt', c);
   }
 
   createGravelTexture() {
     const size = 64;
-    this.canvas.width = size;
-    this.canvas.height = size;
-
-    this.ctx.fillStyle = '#464646';
-    this.ctx.fillRect(0, 0, size, size);
-
-    // Add gravel pieces
+    const c = document.createElement('canvas'); c.width = size; c.height = size;
+    const cx = c.getContext('2d');
+    cx.fillStyle = '#464646'; cx.fillRect(0, 0, size, size);
     for (let i = 0; i < 80; i++) {
-      this.ctx.fillStyle = `hsl(0, 0%, ${40 + Math.random() * 40}%)`;
-      this.ctx.beginPath();
-      this.ctx.arc(
-        Math.random() * size,
-        Math.random() * size,
-        1 + Math.random() * 2,
-        0, Math.PI * 2
-      );
-      this.ctx.fill();
+      cx.fillStyle = `hsl(0, 0%, ${40 + Math.random() * 40}%)`;
+      cx.beginPath(); cx.arc(Math.random()*size, Math.random()*size, 1+Math.random()*2, 0, Math.PI*2); cx.fill();
     }
-
-    // store offscreen canvas instead of dataURL
-    this.images.set('gravel', this.canvas);
+    this.images.set('gravel', c);
   }
 
   createMudTexture() {
     const size = 64;
-    this.canvas.width = size;
-    this.canvas.height = size;
-
-    this.ctx.fillStyle = '#4a2c14';
-    this.ctx.fillRect(0, 0, size, size);
-
-    // Add muddy texture
+    const c = document.createElement('canvas'); c.width = size; c.height = size;
+    const cx = c.getContext('2d');
+    cx.fillStyle = '#4a2c14'; cx.fillRect(0, 0, size, size);
     for (let i = 0; i < 30; i++) {
-      this.ctx.fillStyle = `hsl(25, 40%, ${10 + Math.random() * 10}%)`;
-      this.ctx.beginPath();
-      this.ctx.arc(
-        Math.random() * size,
-        Math.random() * size,
-        2 + Math.random() * 4,
-        0, Math.PI * 2
-      );
-      this.ctx.fill();
+      cx.fillStyle = `hsl(25, 40%, ${10 + Math.random() * 10}%)`;
+      cx.beginPath(); cx.arc(Math.random()*size, Math.random()*size, 2+Math.random()*4, 0, Math.PI*2); cx.fill();
     }
-
-    // store offscreen canvas instead of dataURL
-    this.images.set('mud', this.canvas);
+    this.images.set('mud', c);
   }
 
   createRockTexture() {
     const size = 64;
-    this.canvas.width = size;
-    this.canvas.height = size;
-
-    this.ctx.fillStyle = '#2f3b3f';
-    this.ctx.fillRect(0, 0, size, size);
-
-    // Add rock-like patterns
+    const c = document.createElement('canvas'); c.width = size; c.height = size;
+    const cx = c.getContext('2d');
+    cx.fillStyle = '#2f3b3f'; cx.fillRect(0, 0, size, size);
     for (let i = 0; i < 40; i++) {
-      this.ctx.fillStyle = `hsl(200, 20%, ${25 + Math.random() * 25}%)`;
-      this.ctx.fillRect(
-        Math.random() * size,
-        Math.random() * size,
-        3 + Math.random() * 6,
-        1 + Math.random() * 3
-      );
+      cx.fillStyle = `hsl(200, 20%, ${25 + Math.random() * 25}%)`;
+      cx.fillRect(Math.random()*size, Math.random()*size, 3+Math.random()*6, 1+Math.random()*3);
     }
-
-    // store offscreen canvas instead of dataURL
-    this.images.set('rock', this.canvas);
+    this.images.set('rock', c);
   }
 
   createMarbleTexture() {
     const size = 64;
-    this.canvas.width = size;
-    this.canvas.height = size;
-
-    this.ctx.fillStyle = '#606a70';
-    this.ctx.fillRect(0, 0, size, size);
-
-    // Add marble veining
+    const c = document.createElement('canvas'); c.width = size; c.height = size;
+    const cx = c.getContext('2d');
+    cx.fillStyle = '#606a70'; cx.fillRect(0, 0, size, size);
     for (let i = 0; i < 20; i++) {
-      this.ctx.strokeStyle = `hsl(210, 10%, ${60 + Math.random() * 20}%)`;
-      this.ctx.lineWidth = 0.5 + Math.random();
-      this.ctx.beginPath();
-      this.ctx.moveTo(Math.random() * size, 0);
-      this.ctx.lineTo(Math.random() * size, size);
-      this.ctx.stroke();
+      cx.strokeStyle = `hsl(210, 10%, ${60 + Math.random() * 20}%)`;
+      cx.lineWidth = 0.5 + Math.random(); cx.beginPath();
+      cx.moveTo(Math.random()*size, 0); cx.lineTo(Math.random()*size, size); cx.stroke();
     }
-
-    // store offscreen canvas instead of dataURL
-    this.images.set('marble', this.canvas);
+    this.images.set('marble', c);
   }
 
   getPattern(name, ctx) {
