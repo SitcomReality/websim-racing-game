@@ -1,5 +1,3 @@
-
-```
 class Nameplate {
   constructor() {
     this.visibleNames = new Map();

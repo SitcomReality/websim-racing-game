@@ -1,5 +1,3 @@
-
-```javascript
 class ParticleSystem {
   constructor() {
     this.particles = [];
