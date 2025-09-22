@@ -51,10 +51,31 @@ function createNewRaceWeek() {
 		}
 	
         const selectedRacersIndexes = generateUniqueNumbers(0,selectedRacers.length-1,gameState.settings.trackProperties.numberOfLanes); // Choose racers as needed
-		const racesListDom = document.createElement('li');
-		const racesListDomInnerList = document.createElement('ul');
 		
-		let racersSelectedForThisRace = [];
+		// Create race week display with track info
+		const weekContainer = document.createElement('div');
+		weekContainer.className = 'race-week-container';
+		
+		// Highlight current week
+		if (raceIndex === 0) {
+			weekContainer.classList.add('current-week');
+		} else {
+			weekContainer.classList.add('past-week');
+		}
+		
+		const weekHeader = document.createElement('div');
+		weekHeader.className = 'race-week-header';
+		weekHeader.innerHTML = `
+			<h4>Race ${raceIndex + 1}: ${track.name}</h4>
+			<div class="track-info">
+				<span class="track-length">${track.sections.length * gameState.settings.trackProperties.segmentsPerSection} segments</span>
+				<span class="ground-types">${getUniqueGroundTypes(track.sections).join(', ')}</span>
+			</div>
+		`;
+		
+		const racersList = document.createElement('ul');
+		racersList.className = 'racers-list';
+		
 		for (let racerIndex = 0; racerIndex < selectedRacersIndexes.length; racerIndex++) {
 			
 			if (selectedRacersIndexes[racerIndex] < 0 || selectedRacersIndexes[racerIndex] >= selectedRacers.length) {
@@ -64,21 +85,21 @@ function createNewRaceWeek() {
 				console.log("selectedRacersIndexes[racerIndex]: "+selectedRacersIndexes[racerIndex]);
 				console.log("selectedRacers[selectedRacersIndexes[racerIndex]]: "+selectedRacers[selectedRacersIndexes[racerIndex]]);
 			}
-			racersSelectedForThisRace.push(selectedRacers[selectedRacersIndexes[racerIndex]]);
 
 			const selectedRacerListDom = document.createElement('li');
 			selectedRacerListDom.append(DOMUtils.createRacerGuiElement(gameState.racers[selectedRacers[selectedRacersIndexes[racerIndex]]].id));
-			racesListDomInnerList.appendChild(selectedRacerListDom);
+			racersList.appendChild(selectedRacerListDom);
 		}
         
         // Create a new Race object with the track
         const race = new Race(raceIndex, racersSelectedForThisRace, track);
-		racesListDom.innerHTML = (race.id + 1)+": "+track.name;
-		racesListDom.appendChild(racesListDomInnerList);
-
+		
+		weekContainer.appendChild(weekHeader);
+		weekContainer.appendChild(racersList);
+		
         // Add the race to the race week
         raceWeek.addRace(race);
-		raceWeekInfoSection1.appendChild(racesListDom);
+		raceWeekInfoSection1.appendChild(weekContainer);
     }
 	raceWeek.selectedRacers = selectedRacers;
 
@@ -87,4 +108,13 @@ function createNewRaceWeek() {
     gameState.currentRaceIndex = 0;
 	
 	document.getElementById("raceWeekNumber").innerHTML = gameState.raceWeekCounter;
+}
+
+// Helper function to get unique ground types from track sections
+function getUniqueGroundTypes(sections) {
+	const groundTypes = {};
+	sections.forEach(section => {
+		groundTypes[section] = true;
+	});
+	return Object.keys(groundTypes);
 }
