@@ -34,9 +34,9 @@
 </head>
 <body data-theme="dark">
     <div id="no-js" style="text-align:center;background-color:white;width:80%;margin:5% 10%;color:#391d1d;padding:2px 4px 12px 4px;border:3px dashed #ff6000;z-index:99999;position:fixed;"><h2 style="color:red;">No JavaScript?</h2><p style="font-weight:bold;">JavaScript is required for this page to work.</p><p>If you're seeing this message, it's because JavaScript is disabled.</p><p>Check your browser/NoScript settings and make sure JavaScript is allowed for this domain.</p></div>
-    <div id="introScreen"><div id="introSettingsContainer"><div id="introSettings" class="ui-section"></div><div id="initButtonContainer" class="ui-section" style="display:none"><div class="ui-item"><button id="initGame">New Game</button></div></div></div></div>
-    <div id="header" class="ui"><div class="ui-section"><div class="ui-item stat"><span id="playerBalanceLabel">Player Balance:</span> <span id="playerBalance">$1000</span></div></div><div class="ui-section"><div class="ui-item"><button id="startRaceWeek">Start Race Week</button></div><div class="ui-item"><button id="setupRace" disabled="disabled">Setup Race</button></div><div class="ui-item"><button id="startRace" disabled="disabled">Start Race</button></div></div><div class="ui-section debugui"><div class="ui-item"><button id="endRace">End Race</button></div><div class="ui-item"><label for="speedMultiplier">speedMultiplier</label><input type="range" min="0.01" max="1.5" step="0.01" id="speedMultiplier" name="speedMultiplier"></div></div><div class="ui-section raceNumbers" id="raceNumbers"><div class="ui-item"><div class="raceNumbersInfo">Race Week <span id="raceWeekNumber">-1</span></div><div class="raceNumbersInfo">Race <span id="raceNumberThisWeek">-1</span> (<span id="raceNumber">-1</span>)</div></div></div></div>
-    <div id="bettingPanel" class="ui">
+    <div id="introScreen"><div id="introSettingsContainer"><div id="introSettings" class="ui-section"></div><div id="initButtonContainer" class="ui-section" style="display:none"><div class="ui-item"><button id="initGame" class="btn btn-primary">New Game</button></div></div></div></div>
+    <div id="header" class="ui gui-container"><div class="ui-section"><div class="ui-item stat"><span id="playerBalanceLabel">Player Balance:</span> <span id="playerBalance">$1000</span></div></div><div class="ui-section"><div class="ui-item"><button id="startRaceWeek" class="btn btn-primary">Start Race Week</button></div><div class="ui-item"><button id="setupRace" disabled="disabled" class="btn btn-secondary">Setup Race</button></div><div class="ui-item"><button id="startRace" disabled="disabled" class="btn btn-primary">Start Race</button></div></div><div class="ui-section debugui"><div class="ui-item"><button id="endRace" class="btn btn-outline">End Race</button></div><div class="ui-item"><label for="speedMultiplier">speedMultiplier</label><input type="range" min="0.01" max="1.5" step="0.01" id="speedMultiplier" name="speedMultiplier" class="form-control"></div></div><div class="ui-section raceNumbers" id="raceNumbers"><div class="ui-item"><div class="raceNumbersInfo">Race Week <span id="raceWeekNumber">-1</span></div><div class="raceNumbersInfo">Race <span id="raceNumberThisWeek">-1</span> (<span id="raceNumber">-1</span>)</div></div></div></div>
+    <div id="bettingPanel" class="ui gui-container">
         <section id="raceWeekContainer">
             <div class="raceWeekInfoSection" id="raceWeekInfoSection1">...</div>
             <div class="raceWeekInfoSection" id="raceWeekInfoSection2">Waiting for race week data</div>
@@ -44,10 +44,10 @@
         </section>
 
         <section id="placeBetFlowContainer" style="display:none">
-            <button id="newBetButton">Place New Bet</button>
+            <button id="newBetButton" class="btn btn-secondary">Place New Bet</button>
             <div id="betTypeSelection">
                 <label for="betType">Select Bet Type:</label>
-                <select id="betType">
+                <select id="betType" class="form-control">
                     <option value="win">Win Bet</option>
                     <option value="quinella">Quinella</option>
                 </select>
@@ -55,7 +55,7 @@
 
             <div id="raceSelection">
                 <label for="raceNumber">Select Race:</label>
-                <select id="raceNumber">
+                <select id="raceNumber" class="form-control">
                     <option value="1">Race 1</option>
                     <option value="2">Race 2</option>
                 </select>
@@ -63,7 +63,7 @@
 
             <div id="racerSelection"></div>
             <div id="betsSummary"></div>
-            <button id="submitBetsButton">Submit Bets</button>
+            <button id="submitBetsButton" class="btn btn-primary">Submit Bets</button>
         </section>
 
         <section id="formGuideContainer">
@@ -74,18 +74,18 @@
         
         <div id="placeBetContainer" class="ui-section" style="display:none">
             <label for="selectRacer">Select Racer:</label>
-            <select id="selectRacer"></select>
+            <select id="selectRacer" class="form-control"></select>
             <label for="betAmount">Bet Amount:</label>
-            <input type="number" id="betAmount" value="100">
-            <button id="placeBet">Place Bet</button>
+            <input type="number" id="betAmount" value="100" class="form-control">
+            <button id="placeBet" class="btn btn-primary">Place Bet</button>
         </div>
         <div id="currentBetContainer" class="ui-section" style="display:none">
             <h4>Current Bets</h4>
         </div>
     </div>
-    <div id="settings" class="ui"><div class="ui-section"><h4>Settings</h4></div></div>
-    <div class="track" id="raceTrack"></div>
-    <div id="raceHistory" class="ui"><h4>Race History</h4><ul id="historyList"></ul></div>
+    <div id="settings" class="ui gui-container"><div class="ui-section"><h4>Settings</h4></div></div>
+    <div class="track track-container" id="raceTrack"></div>
+    <div id="raceHistory" class="ui gui-container"><h4>Race History</h4><ul id="historyList"></ul></div>
     <script src="domUtils.js"></script><script src="helper_functions.js"></script><script src="preInit.js"></script><script src="gameState.js"></script><script src="init.js"></script><script src="wordlist/const_colors.js"></script><script src="wordlist/const_names.js"></script><script src="wordlist/const_locationSuffixes.js"></script><script src="generateRacers.js"></script><script src="scripts.js"></script><script src="arrangeRacersByPerformance.js"></script><script src="setupTrack.js"></script><script src="Track.js"></script><script src="Race.js"></script><script src="Racer.js"></script><script src="RaceWeek.js"></script><script src="createNewRaceWeek.js"></script><script src="advanceToNextRace.js"></script><script src="updateLivePositionDisplay.js"></script><script src="beginRace.js"></script><script src="processRacerFinish.js"></script><script src="processRaceFinish.js"></script><script src="updateHistory.js"></script><script src="GUI.js"></script>
     <script>window.onload=function(){const m=document.getElementById('no-js');if(m){m.remove();}}</script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
