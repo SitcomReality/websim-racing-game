@@ -1,5 +1,3 @@
-
-```
 /* Form Component Styles */
 .form-group {
     margin-bottom: var(--spacing-md);
@@ -71,3 +69,4 @@
 .form-row > * {
     flex: 1;
 }
+

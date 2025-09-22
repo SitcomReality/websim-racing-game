@@ -1,5 +1,3 @@
-
-```javascript
 function updateRaceHistoryLog() {
     const historyLog = document.getElementById('historyList');
     historyLog.innerHTML = '';
