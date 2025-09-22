@@ -7,7 +7,7 @@ class Camera {
   }
   setMode(mode, opts = {}) {
     this.mode = mode || this.mode;
-    if (opts.zoom) this.zoom = Math.max(0.5, Math.min(5, opts.zoom));
+    if (opts.zoom) this.zoom = Math.max(0.5, Math.min(3, opts.zoom));
     if (opts.target) this.target = { x: opts.target.x || 0, y: opts.target.y || 0 };
   }
   update(race) {
