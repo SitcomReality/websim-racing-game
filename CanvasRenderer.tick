@@ -1,0 +1,13 @@
+updateCamera(dt)
+clear()
+if (usePerspective) drawSky()
+drawTrack()
+for racer in sortByScreenY(racers):
+  updateBlobAnimation(racer, dt)
+  drawShadow(racer)
+  drawBlob(racer)
+  drawEyesAndMouth(racer)
+  if (particles.enabled) particleSystem.emitFrom(racer.mouth)
+particleSystem.updateAndDraw(dt)
+nameplate.renderVisible()
+

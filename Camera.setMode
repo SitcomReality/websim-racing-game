@@ -1,0 +1,7 @@
+switch mode:
+  single: target = racer.position
+  leaders: target = average(topK)
+  average: target = average(all)
+  fitAll: target = bboxCenter; zoom = min to fit bbox + margin
+apply damping to pan/zoom
+
