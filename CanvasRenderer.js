@@ -60,7 +60,8 @@ class CanvasRenderer {
     const loc = this.race.liveLocations;
     const xs = this.race.racers.map(rid => loc[rid] || 0);
     const avg = xs.reduce((a,b) => a+b, 0) / xs.length;
-    const minX = Math.min(...xs, 0), maxX = Math.max(...xs, 100);
+    const minX = Math.max(0, Math.min(...xs));
+    const maxX = Math.min(100, Math.max(...xs));
     let desiredX = avg, desiredZoom = this.camera.zoom || 1;
 
     if (this.camera.mode === 'leaders') desiredX = Math.max(...xs);
@@ -69,9 +70,9 @@ class CanvasRenderer {
       const margin = 8;
       const span = Math.max(10, (maxX - minX) + margin*2);
       desiredX = (minX + maxX) / 2;
-      const w = this.canvas.width / this.dpr - 20;
-      desiredZoom = Math.max((gameState.settings?.render?.camera?.zoomMin)||0.5,
-                     Math.min((gameState.settings?.render?.camera?.zoomMax)||3.0, 100 / span));
+      const zMin = (gameState.settings?.render?.camera?.zoomMin) || 0.5;
+      const zMax = (gameState.settings?.render?.camera?.zoomMax) || 3.0;
+      desiredZoom = Math.max(zMin, Math.min(zMax, 100 / span));
     }
 
     this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
@@ -220,8 +221,9 @@ class CanvasRenderer {
       const next = points[(i + 1) % N];
       const prev = points[(i - 1 + N) % N];
       
-      // Apply breathing animation
-      const radius = p.rad + breathing;
+      // Apply breathing and per-point wobble
+      const wobble = Math.sin(time * 2 + p.wobblePhase) * (blob.baseRadius * 0.05);
+      const radius = p.rad + breathing + wobble;
       const px = Math.cos(p.ang) * radius;
       const py = Math.sin(p.ang) * radius;
       

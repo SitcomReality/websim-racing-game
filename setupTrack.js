@@ -79,6 +79,11 @@ function setupTrack(track) {
                 }
             });
         });
+        canvas.addEventListener('mouseleave', () => {
+            if (window.canvasRenderer) {
+                window.canvasRenderer.nameplate.visibleNames.clear();
+            }
+        });
     } else {
         window.canvasRenderer.setCanvas(canvas);
     }
