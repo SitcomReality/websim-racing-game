@@ -94,8 +94,21 @@ class CanvasRenderer {
       const zoomH = worldUnitsVisibleAtZoom1 / neededUnits;
       let totalH = 0; for (let i=0;i<this.props.numberOfLanes;i++) totalH += this.laneHeight * (1 - (i / this.props.numberOfLanes) * 0.2);
       const marginPx = 30; const zoomV = (h - marginPx * 2) / Math.max(1, totalH);
-      desiredX = (minX + maxX) / 2;
       desiredZoom = Math.max(zMin, Math.min(zMax, Math.min(zoomH, zoomV)));
+      
+      // KEY CHANGE: Always bias camera to keep leader in view
+      // If we can't show everyone, show the leader and cut off the back
+      const leaderX = Math.max(...xs);
+      const visibleWorldUnits = worldUnitsVisibleAtZoom1 / desiredZoom;
+      const minVisibleX = leaderX - visibleWorldUnits + marginUnits;
+      const maxVisibleX = leaderX + marginUnits;
+      
+      // Center the view but ensure leader stays visible
+      const idealCenter = (minX + maxX) / 2;
+      const minAllowedCenter = minVisibleX + (visibleWorldUnits / 2);
+      const maxAllowedCenter = maxVisibleX - (visibleWorldUnits / 2);
+      
+      desiredX = Math.max(minAllowedCenter, Math.min(maxAllowedCenter, idealCenter));
     }
 
     this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
