@@ -1,5 +1,3 @@
-
-```javascript
 class Camera {
   constructor() {
     this.mode = 'fitAll';
