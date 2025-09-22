@@ -1,5 +1,3 @@
-
-```javascript
 async function loadXmlWordlists() {
     try {
         // Load prefixes
