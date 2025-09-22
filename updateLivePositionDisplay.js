@@ -1,5 +1,3 @@
-
-```javascript
 function updateLivePositionDisplayIndividual(racerid) {
     if (gameState.currentRace.results.length < gameState.settings.trackProperties.numberOfLanes) {
         const liveLocations = gameState.currentRace.liveLocations;
