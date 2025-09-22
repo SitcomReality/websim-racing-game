@@ -5,8 +5,7 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #353740;
+    background: url(./assets/page_background.png) repeat;
     color: #E2E0E9;
     margin: 0;
 }
