@@ -1,5 +1,3 @@
-
-```javascript
 function createNewRaceWeek() {
     // Check if wordlists are loaded, if not wait for them
     if (!window.racerNamePrefixes || !window.racerNameSuffixes) {
