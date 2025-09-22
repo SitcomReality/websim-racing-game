@@ -43,15 +43,35 @@ class CanvasRenderer {
   
   worldToScreen(worldX, laneIndex) {
     const pad = 10;
-    const lanes = (this.props && this.props.numberOfLanes) || this.race.racers.length;
-    const w = (this.canvas.width / this.dpr - pad * 2);
+    const w = (this.canvas.width / this.dpr);
     const h = this.laneHeight;
-    const visRange = Math.max(10, Math.min(100, 100 / (this.camera.zoom || 1)));
-    const half = visRange / 2;
-    const left = Math.max(0, Math.min(100 - visRange, (this.camera.target.x || 0) - half));
-    const x = pad + ((worldX - left) / visRange) * w;
-    const y = pad + (laneIndex * h) + (h / 2);
-    return { x, y };
+
+    // Perspective scaling: racers higher up are slightly smaller
+    const perspectiveFactor = 1 - (laneIndex / this.props.numberOfLanes) * 0.2;
+    const scaledLaneHeight = h * perspectiveFactor;
+
+    // Total height of all lanes with perspective
+    let totalPerspectiveHeight = 0;
+    for(let i = 0; i < this.props.numberOfLanes; i++) {
+        totalPerspectiveHeight += h * (1 - (i / this.props.numberOfLanes) * 0.2);
+    }
+    const trackCenterY = pad + totalPerspectiveHeight / 2;
+
+    // Calculate Y position for this lane, accounting for perspective
+    let yPos = pad;
+    for(let i = 0; i < laneIndex; i++) {
+        yPos += h * (1 - (i / this.props.numberOfLanes) * 0.2);
+    }
+    yPos += scaledLaneHeight / 2;
+    
+    const worldPixelWidth = w * 4; // Arbitrary world width for more zoom granularity
+    const cameraPixelX = this.camera.target.x / 100 * worldPixelWidth;
+    
+    // Apply transformations
+    const screenX = (worldX / 100 * worldPixelWidth - cameraPixelX) * this.camera.zoom + w / 2;
+    const screenY = (yPos - trackCenterY) * this.camera.zoom + (this.canvas.height / this.dpr) / 2;
+    
+    return { x: screenX, y: screenY, scale: perspectiveFactor * this.camera.zoom };
   }
   
   updateCamera() {
@@ -89,7 +109,7 @@ class CanvasRenderer {
       this.tick(ts);
       this.loop = requestAnimationFrame(tick);
     };
-    tick();
+    this.loop = requestAnimationFrame(tick);
   }
   stop() {
     if (this.loop) cancelAnimationFrame(this.loop);
@@ -132,31 +152,47 @@ class CanvasRenderer {
       const screen = this.worldToScreen(worldX, idx);
       
       // Store screen position for hit testing
-      this.screenPositions.push({ rid, x: screen.x, y: screen.y, r: 25 });
+      this.screenPositions.push({ rid, x: screen.x, y: screen.y, r: 25 * screen.scale });
       
       // Draw the blob
-      this.drawBlob(ctx, screen.x, screen.y, racer, time);
+      this.drawBlob(ctx, screen.x, screen.y, racer, time, screen.scale);
       
       // Emit particles for boosting racers
       if (racer.isBoosting && Math.random() < 0.3) {
-        this.particleSystem.emit(screen.x - 20, screen.y, Math.PI, 80, 2);
+        this.particleSystem.emit(screen.x - (20 * screen.scale), screen.y, Math.PI, 80, 2);
       }
     }
   }
   drawTrack() {
     const ctx = this.ctx;
-    const lanes = this.props.numberOfLanes;
-    const segs = this.race.segments.length;
-    const pad = 10;
-    const h = this.laneHeight;
-    const w = (this.canvas.width/this.dpr - pad*2);
-    const segW = w / Math.max(1, segs);
+    const w = this.canvas.width / this.dpr;
+    const h = this.canvas.height / this.dpr;
     
     ctx.save();
+    // Center view for zoom and pan
+    ctx.translate(w / 2, h / 2);
+    ctx.scale(this.camera.zoom, this.camera.zoom);
     
+    // Calculate total track height with perspective for centering
+    let totalPerspectiveHeight = 0;
+    for(let i = 0; i < this.props.numberOfLanes; i++) {
+        totalPerspectiveHeight += this.laneHeight * (1 - (i / this.props.numberOfLanes) * 0.2);
+    }
+    const trackCenterOffsetY = totalPerspectiveHeight / 2;
+    ctx.translate(0, -trackCenterOffsetY);
+    
+    const worldPixelWidth = w * 4;
+    const cameraPixelX = this.camera.target.x / 100 * worldPixelWidth;
+    ctx.translate(-cameraPixelX, 0);
+
+    const segs = this.race.segments.length;
+    const segW = worldPixelWidth / Math.max(1, segs);
+
+    let currentY = 0;
     // lane backgrounds
-    for (let l=0; l<lanes; l++) {
-      const y = pad + l*h;
+    for (let l = 0; l < this.props.numberOfLanes; l++) {
+      const perspectiveFactor = 1 - (l / this.props.numberOfLanes) * 0.2;
+      const laneH = this.laneHeight * perspectiveFactor;
 
       const rid = this.race.racers[l];
       const racer = gameState.racers[rid];
@@ -165,33 +201,35 @@ class CanvasRenderer {
           const place = this.race.results.indexOf(rid);
           ctx.fillStyle = this.getPlacingColor(place + 1);
       } else {
-        ctx.fillStyle = l%2 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
+        ctx.fillStyle = l % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
       }
-      ctx.fillRect(pad, y, w, h-4);
+      ctx.fillRect(0, currentY, worldPixelWidth, laneH - 2);
+      currentY += laneH;
     }
-    
+
+    currentY = 0;
     // segments with textures
-    for (let i=0; i<segs; i++) {
-      const x = pad + i*segW;
+    for (let i = 0; i < segs; i++) {
+      const x = i * segW;
       ctx.fillStyle = this.textureManager.getPattern(this.race.segments[i], ctx);
-      ctx.fillRect(x, pad, segW-1, lanes*h-4);
+      ctx.fillRect(x, 0, segW - 1, totalPerspectiveHeight);
       
       // every 3rd segment – strong divider
-      if ((i+1)%3===0) {
+      if ((i + 1) % 3 === 0) {
         ctx.fillStyle = 'rgba(255,255,255,0.2)';
-        ctx.fillRect(x+segW-2, pad, 2, lanes*h-4);
+        ctx.fillRect(x + segW - 2, 0, 2, totalPerspectiveHeight);
       }
     }
     
     // finish line
-    const fx = pad + (segs-1)*segW;
+    const fx = (segs - 1) * segW;
     ctx.fillStyle = 'rgba(255,255,0,0.35)';
-    ctx.fillRect(fx, pad, segW, lanes*h-4);
+    ctx.fillRect(fx, 0, segW, totalPerspectiveHeight);
     
     ctx.restore();
   }
   
-  drawBlob(ctx, x, y, racer, time) {
+  drawBlob(ctx, x, y, racer, time, scale = 1) {
     const blob = racer.blobData;
     const breathing = Math.sin(time * 2) * 3;
 
@@ -209,7 +247,7 @@ class CanvasRenderer {
     
     ctx.save();
     ctx.translate(x, y);
-    ctx.scale(scaleX, scaleY);
+    ctx.scale(scaleX * scale, scaleY * scale);
     
     // Draw blob body
     ctx.beginPath();
