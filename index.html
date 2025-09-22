@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Racing Game</title>
     
-    <!-- Base Styles -->
-    <link rel="stylesheet" href="styles/base/reset.css">
+    <!-- Load variables first so other styles can use them -->
     <link rel="stylesheet" href="styles/base/variables.css">
+    <!-- Base Reset & Typography -->
+    <link rel="stylesheet" href="styles/base/reset.css">
     <link rel="stylesheet" href="styles/base/typography.css">
     
     <!-- Layout Styles -->
@@ -16,18 +17,18 @@
     <link rel="stylesheet" href="styles/layout/flex.css">
     
     <!-- Component Styles -->
-    <link rel="stylesheet" href="styles/components/racers.css">
-    <link rel="stylesheet" href="styles/components/track.css">
-    <link rel="stylesheet" href="styles/components/gui.css">
     <link rel="stylesheet" href="styles/components/buttons.css">
     <link rel="stylesheet" href="styles/components/forms.css">
+    <link rel="stylesheet" href="styles/components/gui.css">
+    <link rel="stylesheet" href="styles/components/track.css">
+    <link rel="stylesheet" href="styles/components/racers.css">
     
     <!-- Utility Styles -->
-    <link rel="stylesheet" href="styles/utilities/animations.css">
     <link rel="stylesheet" href="styles/utilities/helpers.css">
+    <link rel="stylesheet" href="styles/utilities/animations.css">
     <link rel="stylesheet" href="styles/utilities/responsive.css">
     
-    <!-- Theme Styles -->
+    <!-- Theme Styles (load last to allow overrides) -->
     <link rel="stylesheet" href="styles/themes/dark.css">
     <link rel="stylesheet" href="styles/themes/light.css">
 </head>

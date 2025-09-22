@@ -1,5 +1,5 @@
 /* Track Component Styles */
-#raceTrack {
+.track-container {
     position: relative;
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border-radius: var(--radius-xl);
@@ -9,7 +9,7 @@
     overflow: hidden;
 }
 
-#raceTrack::before {
+.track-container::before {
     content: '';
     position: absolute;
     top: 0;
@@ -26,89 +26,55 @@
     pointer-events: none;
 }
 
-.lane {
-    position: relative;
-    height: 60px;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-}
-
-.segment {
-    display: inline-block;
-    height: 100%;
-    width: 4.76%; /* 100% / 21 segments */
-    background: var(--color-surface);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.segment.finishLine {
-    background: linear-gradient(90deg, transparent 0%, #ff6b6b 50%, transparent 100%);
-    width: 8px;
-}
-
-.groundType0 { background: #3a3a3a; } /* asphalt */
-.groundType1 { background: #4a3a2a; } /* gravel */
-.groundType2 { background: #5a4a3a; } /* dirt */
-.groundType3 { background: #3a4a3a; } /* grass */
-.groundType4 { background: #3a3a4a; } /* mud */
-.groundType5 { background: #4a4a4a; } /* rock */
-.groundType6 { background: #6a6a6a; } /* marble */
-
-.racer {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: left 0.1s ease-out;
-    z-index: 10;
-}
-
-.racerInner {
+.track-info {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    height: 40px;
+    margin-bottom: var(--spacing-lg);
+    z-index: 1;
     position: relative;
 }
 
-.racerStripe {
-    position: absolute;
+.track-name {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-text);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.track-stats {
+    display: flex;
+    gap: var(--spacing-lg);
+}
+
+.track-stat {
+    text-align: center;
+}
+
+.track-stat-value {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+.track-stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.race-progress {
     width: 100%;
     height: 8px;
-}
-
-.racerStripe1 { top: 0; }
-.racerStripe2 { top: 50%; transform: translateY(-50%); }
-.racerStripe3 { bottom: 0; }
-
-.remainingEndurance {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, #4ecdc4 0%, #ffe66d 50%, #ff6b6b 100%);
-    transition: width 0.3s ease;
-}
-
-.racerNameContainer {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-}
-
-.racerID {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--color-text);
-    background: rgba(0, 0, 0, 0.5);
-    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-top: var(--spacing-md);
 }
 
-.racerName {
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--color-text);
+.race-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    border-radius: var(--radius-sm);
+    transition: width var(--transition-fast);
 }
+
