@@ -99,7 +99,7 @@ class CanvasRenderer {
     this.lastTime = now;
     
     this.drawTrack();
-    this.drawRacerMarkers();
+    this.drawRacers();
     
     // Update and render particles
     this.particleSystem.update(deltaTime);
@@ -107,6 +107,29 @@ class CanvasRenderer {
     
     // Render nameplates
     this.nameplate.render(ctx);
+  }
+  drawRacers() {
+    const ctx = this.ctx;
+    const time = performance.now() / 1000;
+    this.screenPositions = [];
+    
+    for (let idx = 0; idx < this.race.racers.length; idx++) {
+      const rid = this.race.racers[idx];
+      const racer = gameState.racers[rid];
+      const worldX = this.race.liveLocations[rid] || 0;
+      const screen = this.worldToScreen(worldX, idx);
+      
+      // Store screen position for hit testing
+      this.screenPositions.push({ rid, x: screen.x, y: screen.y, r: 25 });
+      
+      // Draw the blob
+      this.drawBlob(ctx, screen.x, screen.y, racer, time);
+      
+      // Emit particles for boosting racers
+      if (racer.isBoosting && Math.random() < 0.3) {
+        this.particleSystem.emit(screen.x - 20, screen.y, Math.PI, 80, 2);
+      }
+    }
   }
   drawTrack() {
     const ctx = this.ctx;
