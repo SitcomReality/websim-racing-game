@@ -1,14 +1,5 @@
-import { Camera } from './Camera.js';
-import { HitTestIndex } from './HitTestIndex.js';
-import { ParticleSystem } from '../effects/ParticleSystem.js';
-import { Nameplate } from '../ui/Nameplate.js';
-import { CanvasBase } from './CanvasBase.js';
-import { WorldTransform } from './WorldTransform.js';
-import { AnimationLoop } from './AnimationLoop.js';
-import { TrackRenderer } from '../renderers/TrackRenderer.js';
-import { RacerRenderer } from '../renderers/RacerRenderer.js';
-
-export class CanvasRenderer extends CanvasBase {
+// Removed module import lines and switched to using global classes
+class CanvasRenderer extends CanvasBase {
   constructor(canvas) {
     super(canvas);
     this.props = null;
