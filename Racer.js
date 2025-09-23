@@ -6,8 +6,6 @@ class Racer {
         this.isExhausted = false;
         this.isBoosting = false;
         this.currentForm = 1;
-        this.remainingEndurance = this.endurance;
-        this.remainingBoost = this.boostDuration;
         this.remainingStumble = 0;
         this.history = [];
         this.performance = [];
@@ -20,6 +18,13 @@ class Racer {
             finished: false
         };
         this.didNotFinish = false; // New DNF flag
+        
+        // Initialize stats first
+        this.generateStats();
+        
+        // Now we can safely access stats properties
+        this.remainingEndurance = this.stats.endurance;
+        this.remainingBoost = this.stats.boostDuration;
     }
 
     generateStats() {
