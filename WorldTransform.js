@@ -6,7 +6,8 @@ class WorldTransform {
 
   worldToScreen(worldX, laneIndex, camera, canvasWidth, canvasHeight, numberOfLanes) {
     const pad = 10;
-    const w = canvasWidth / camera.dpr;
+    const dpr = (camera && camera.dpr) || window.devicePixelRatio || 1;
+    const w = canvasWidth / dpr;
     const h = this.laneHeight;
 
     const perspectiveFactor = 1 - (laneIndex / numberOfLanes) * 0.2;
@@ -25,12 +26,12 @@ class WorldTransform {
     yPos += scaledLaneHeight / 2;
 
     const worldPixelWidth = w * 4;
-    const cameraPixelX = camera.target.x / 100 * worldPixelWidth;
+    const cameraPixelX = camera ? (camera.target.x / 100 * worldPixelWidth) : 0;
 
-    const screenX = (worldX / 100 * worldPixelWidth - cameraPixelX) * camera.zoom + w / 2;
-    const screenY = (yPos - trackCenterY) * camera.zoom + (canvasHeight / camera.dpr) / 2;
+    const screenX = (worldX / 100 * worldPixelWidth - cameraPixelX) * (camera ? camera.zoom : 1) + w / 2;
+    const screenY = (yPos - trackCenterY) * (camera ? camera.zoom : 1) + (canvasHeight / dpr) / 2;
 
-    return { x: screenX, y: screenY, scale: perspectiveFactor * camera.zoom };
+    return { x: screenX, y: screenY, scale: perspectiveFactor * (camera ? camera.zoom : 1) };
   }
 }
 
