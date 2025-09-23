@@ -1,5 +1,3 @@
-
-```javascript
 class FerretFactory {
   static _hash(str) {
     let h = 2166136261;
