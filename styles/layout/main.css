@@ -372,7 +372,7 @@ li .historyRacerPlacingContainer .racerName {
     grid-template-columns: 320px 1fr;
     gap: 20px;
     padding: 20px;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 160px);
     overflow: hidden;
 }
 
@@ -469,3 +469,4 @@ li .historyRacerPlacingContainer .racerName {
         filter: blur(10px);
     }
 }
+
