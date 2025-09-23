@@ -14,7 +14,8 @@ class RacerRenderer {
 
       this.screenPositions.push({ rid, x: screen.x, y: screen.y, r: 25 * screen.scale });
 
-      this.drawBlob(ctx, screen.x, screen.y, racer, time, screen.scale);
+      // Replace blob drawing with ferret drawing
+      this.drawFerret(ctx, screen.x, screen.y, racer, time, screen.scale);
 
       if (racer.isBoosting && Math.random() < 0.3) {
         // Emit boost particles from the racer's position
@@ -52,100 +53,104 @@ class RacerRenderer {
     }
   }
 
-  drawBlob(ctx, x, y, racer, time, scale = 1) {
-    const blob = racer.blobData;
-    const breathing = Math.sin(time * 2) * 3;
-
-    let scaleX = 1;
-    let scaleY = 1;
-    if (racer.isBoosting) {
-        const boostEffect = Math.sin(time * 20) * 0.1;
-        scaleX = 1.2 + boostEffect;
-        scaleY = 0.8 - boostEffect;
-    } else {
-        const wobble = Math.sin(time * 5 + blob.controlPoints[0].wobblePhase) * 0.05;
-        scaleX = 1 + wobble;
-        scaleY = 1 - wobble;
-    }
+  drawFerret(ctx, x, y, racer, time, scale = 1) {
+    const ferret = racer.ferret;
+    const colors = racer.colors.map(c => racerColors[c]);
 
     ctx.save();
     ctx.translate(x, y);
-    ctx.scale(scaleX * scale, scaleY * scale);
+    ctx.scale(scale, scale);
 
+    // Ferret body proportions
+    const bodyLength = ferret.body.length * 30;
+    const bodyHeight = ferret.body.height * 20;
+    const stockiness = ferret.body.stockiness;
+
+    // Draw body (elongated ellipse)
     ctx.beginPath();
-    const points = blob.controlPoints;
-    const N = points.length;
-
-    for (let i = 0; i < N; i++) {
-      const p = points[i];
-      const next = points[(i + 1) % N];
-      const prev = points[(i - 1 + N) % N];
-
-      const wobble = Math.sin(time * 2 + p.wobblePhase) * (blob.baseRadius * 0.05);
-      const radius = p.rad + breathing + wobble;
-      const px = Math.cos(p.ang) * radius;
-      const py = Math.sin(p.ang) * radius;
-
-      if (i === 0) {
-        ctx.moveTo(px, py);
-      } else {
-        const cpx = (px + Math.cos(prev.ang) * (prev.rad + breathing)) / 2;
-        const cpy = (py + Math.sin(prev.ang) * (prev.rad + breathing)) / 2;
-        ctx.quadraticCurveTo(cpx, cpy, px, py);
-      }
-    }
-    ctx.closePath();
-
-    const col = racerColors[racer.colors[0]];
-    ctx.fillStyle = col;
+    ctx.ellipse(0, 0, bodyLength/2, bodyHeight/2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = colors[0];
     ctx.fill();
-
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    this.drawEyes(ctx, blob, time);
-    this.drawMouth(ctx, blob);
-
-    ctx.restore();
-  }
-
-  drawEyes(ctx, blob, time) {
-    const eyeOffset = blob.baseRadius * 0.3;
-    const eyeSize = blob.baseRadius * 0.15;
-
+    // Draw head (circle at front of body)
+    const headX = bodyLength/2 - 8;
+    const headY = 0;
+    const headSize = 12 * ferret.head.earSize;
+    
     ctx.beginPath();
-    ctx.arc(-eyeOffset, -eyeOffset, eyeSize, 0, Math.PI * 2);
+    ctx.arc(headX, headY, headSize, 0, Math.PI * 2);
+    ctx.fillStyle = colors[0];
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw nose/snout
+    const noseLength = ferret.head.noseLength * 8;
+    ctx.beginPath();
+    ctx.ellipse(headX + noseLength, headY, noseLength/2, 4, 0, 0, Math.PI * 2);
+    ctx.fillStyle = colors[1];
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw eye (single eye visible from side view)
+    const eyeX = headX - 2;
+    const eyeY = headY - 4;
+    const eyeSize = 3;
+    
+    // Eye background
+    ctx.beginPath();
+    ctx.arc(eyeX, eyeY, eyeSize, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
     ctx.fill();
-
+    
+    // Pupil
     ctx.beginPath();
-    ctx.arc(eyeOffset, -eyeOffset, eyeSize, 0, Math.PI * 2);
-    ctx.fill();
-
-    const pupilOffset = Math.sin(time * 0.5) * 2;
-    ctx.beginPath();
-    ctx.arc(-eyeOffset + pupilOffset, -eyeOffset, eyeSize * 0.5, 0, Math.PI * 2);
-    ctx.arc(eyeOffset + pupilOffset, -eyeOffset, eyeSize * 0.5, 0, Math.PI * 2);
+    ctx.arc(eyeX + ferret.eye.pupil.x, eyeY + ferret.eye.pupil.y, eyeSize/2, 0, Math.PI * 2);
     ctx.fillStyle = '#000';
     ctx.fill();
 
-    if (Math.sin(time * 8) > 0.9) {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(-eyeOffset - eyeSize, -eyeOffset - eyeSize/2, eyeSize * 2, eyeSize);
-      ctx.fillRect(eyeOffset - eyeSize, -eyeOffset - eyeSize/2, eyeSize * 2, eyeSize);
-    }
-  }
-
-  drawMouth(ctx, blob) {
-    const mouthY = blob.baseRadius * 0.2;
-    const mouthWidth = blob.baseRadius * 0.4;
-
+    // Draw tail (curved line extending from back of body)
+    const tailStartX = -bodyLength/2;
+    const tailStartY = 0;
+    const tailLength = ferret.tail.length * 25;
+    const tailFluffiness = ferret.tail.fluffiness;
+    
     ctx.beginPath();
-    ctx.arc(0, mouthY, mouthWidth, 0, Math.PI);
-    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-    ctx.lineWidth = 3;
+    ctx.moveTo(tailStartX, tailStartY);
+    ctx.quadraticCurveTo(
+      tailStartX - tailLength/2, 
+      tailStartY - tailFluffiness * 10, 
+      tailStartX - tailLength, 
+      tailStartY - tailFluffiness * 5
+    );
+    ctx.lineWidth = 6 * tailFluffiness;
+    ctx.strokeStyle = colors[2];
+    ctx.lineCap = 'round';
     ctx.stroke();
+
+    // Draw legs (simple lines for now)
+    const legLength = ferret.legs.length * 15;
+    const legThickness = ferret.legs.thickness;
+    
+    // Front legs
+    ctx.beginPath();
+    ctx.moveTo(bodyLength/4, bodyHeight/4);
+    ctx.lineTo(bodyLength/4, bodyHeight/4 + legLength);
+    ctx.lineWidth = 3 * legThickness;
+    ctx.strokeStyle = colors[1];
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    
+    // Back legs
+    ctx.beginPath();
+    ctx.moveTo(-bodyLength/4, bodyHeight/4);
+    ctx.lineTo(-bodyLength/4, bodyHeight/4 + legLength);
+    ctx.lineWidth = 3 * legThickness;
+    ctx.stroke();
+
+    ctx.restore();
   }
 
   getScreenPositions() {
