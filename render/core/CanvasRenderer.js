@@ -108,8 +108,8 @@ class CanvasRenderer {
     const deltaTime = (now - this.lastTime) / 1000;
     this.lastTime = now;
 
-    const trackRenderer = new TrackRenderer();
-    trackRenderer.render(ctx, this.race, this.props, this.camera);
+    window.trackRenderer = window.trackRenderer || new TrackRenderer();
+    window.trackRenderer.render(ctx, this.race, this.props, this.camera);
 
     this.particleSystem.update(deltaTime);
     this.particleSystem.render(ctx);
