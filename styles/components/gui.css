@@ -6,21 +6,6 @@
     padding: 15px;
 }
 
-/* Make the sidebar content scrollable independently */
-#left-panel {
-    max-height: calc(100vh - 120px); /* Account for header height */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-#sidebarTabs {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
 .race-week-container {
     margin: 10px 0;
     padding: 15px;
@@ -28,7 +13,6 @@
     border: 1px solid #444;
     background: rgba(0,0,0,0.3);
     transition: all 0.3s ease;
-    min-height: fit-content;
 }
 
 .race-week-container.current-week {
@@ -126,46 +110,3 @@
 .tab-content { position: relative; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
-
-/* Make the betting panel content scrollable */
-#bettingPanel {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-/* Make the history panel scrollable */
-#raceHistory {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-/* Make the settings panel scrollable */
-.debugui {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-/* Make the race week info sections scrollable */
-#raceWeekContainer {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    margin-top: 90px;
-}
-
-/* Ensure racers list doesn't cause overflow */
-.racers-list {
-    max-height: 200px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-/* History list scrollable */
-#historyList {
-    max-height: 300px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
