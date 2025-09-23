@@ -15,11 +15,11 @@ class Racer {
         this.speedHistory = [];
         this.speedThisRace = [];
         this.baseBettingOdds = 1.5;
-        this.generateStats();
         this.shadowDistance = 0;
         this.visual = {
             finished: false
         };
+        this.didNotFinish = false; // New DNF flag
     }
 
     generateStats() {
@@ -126,6 +126,7 @@ class Racer {
         this.speedThisRace = [];
         this.shadowDistance = 0;
         this.visual.finished = false;
+        this.didNotFinish = false; // Reset DNF flag
     }
 
     /**
@@ -247,7 +248,8 @@ class Racer {
             this.performance[condition] = {
                 totalSpeed: 0,
                 races: 0,
-                wins: 0
+                wins: 0,
+                dnfs: 0 // Track DNFs
             }
         }
 
@@ -257,6 +259,8 @@ class Racer {
         if (result === 'win') {
             this.performance[condition].wins += 1;
             this.wins += 1;
+        } else if (result === 'dnf') {
+            this.performance[condition].dnfs += 1;
         }
 
         this.performanceHistory.push({ condition, speed, result });

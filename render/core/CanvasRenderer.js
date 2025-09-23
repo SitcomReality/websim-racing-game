@@ -15,6 +15,7 @@ class CanvasRenderer {
     this.nameplate = new Nameplate();
     this.animationLoop = new AnimationLoop();
     this.camera.damping = (gameState.settings?.render?.camera?.smoothing) || 0.15;
+    this.raceEndCountdown = null;
   }
 
   setCanvas(canvas) {
@@ -137,6 +138,40 @@ class CanvasRenderer {
     this.hitIndex.update(racerRenderer.getScreenPositions());
 
     this.nameplate.render(ctx);
+    
+    // Render countdown if active
+    if (this.raceEndCountdown && this.raceEndCountdown.active) {
+      this.renderCountdown(ctx);
+    }
+  }
+
+  renderCountdown(ctx) {
+    const w = ctx.canvas.width / (window.devicePixelRatio || 1);
+    const h = ctx.canvas.height / (window.devicePixelRatio || 1);
+    const timeLeft = Math.max(0, Math.ceil((this.raceEndCountdown.endTime - performance.now()) / 1000));
+    
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+    ctx.fillRect(0, 0, w, h);
+    
+    ctx.fillStyle = '#ff4444';
+    ctx.font = 'bold 72px Orbitron';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(timeLeft.toString(), w/2, h/2);
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '24px Orbitron';
+    ctx.fillText('Race ending soon!', w/2, h/2 + 80);
+    ctx.restore();
+    
+    if (timeLeft <= 0) {
+      this.endRaceEarly();
+    }
+  }
+
+  endRaceEarly() {
+    // Handle race ending early logic
   }
 }
 

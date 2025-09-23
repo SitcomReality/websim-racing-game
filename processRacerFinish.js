@@ -15,4 +15,14 @@ function processRacerFinish(racerId) {
 	gameState.racers[racerId].addRaceResult(gameState.currentRace.weather, 20, winLoseResult);
 	
 	gameState.racers[racerId].updateRacerHistory(gameState.currentRace.id, gameState.currentRace.results.length);
+	
+	// Start countdown after 3rd racer finishes
+	if (gameState.currentRace.results.length === 3) {
+		if (window.canvasRenderer) {
+			window.canvasRenderer.raceEndCountdown = {
+				active: true,
+				endTime: performance.now() + 30000 // 30 seconds from now
+			};
+		}
+	}
 }

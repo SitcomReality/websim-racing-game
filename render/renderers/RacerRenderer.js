@@ -37,6 +37,11 @@ class RacerRenderer {
           );
         }
       }
+
+      // Check if we should show the countdown timer
+      if (window.canvasRenderer && window.canvasRenderer.raceEndCountdown && window.canvasRenderer.raceEndCountdown.active) {
+        window.canvasRenderer.renderCountdown(ctx);
+      }
     }
 
     const leaderList = document.getElementById('leaderList');
