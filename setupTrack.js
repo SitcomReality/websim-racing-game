@@ -41,8 +41,18 @@ function setupTrack(track) {
     gameState.currentRace.liveLocations = [];
     
     DOMUtils.updateTrackDetails();
-    // Use the current race's selected racers (IDs) so the UI entrants match the actual race participants
-    const selectedRacers = (gameState.currentRace.racers || []).slice(0, gameState.settings.trackProperties.numberOfLanes);
+    
+    // Get racers from the current race week if available
+    let selectedRacers = [];
+    if (gameState.raceWeek && gameState.raceWeek.races[gameState.currentRaceIndex - 1]) {
+        const currentRaceWeek = gameState.raceWeek.races[gameState.currentRaceIndex - 1];
+        selectedRacers = currentRaceWeek.racers.map(racer => racer.id);
+    } else {
+        // Fallback to selected racers from race week
+        selectedRacers = gameState.raceWeek && gameState.raceWeek.selectedRacers ? 
+            gameState.raceWeek.selectedRacers.slice(0, gameState.settings.trackProperties.numberOfLanes) : [];
+    }
+    
     const arrangedRacers = arrangeRacersByPerformance(selectedRacers, gameState);
     
     for (let i = 0; i < gameState.settings.trackProperties.numberOfLanes; i++) {
@@ -50,6 +60,11 @@ function setupTrack(track) {
         if(thisRacerID === undefined) continue;
 
         const thisRacer = gameState.racers[thisRacerID];
+        if (!thisRacer) {
+            console.warn(`Racer ${thisRacerID} not found in gameState.racers`);
+            continue;
+        }
+        
         gameState.currentRace.racers[i] = thisRacerID;
         
         // Create blob data for this racer
