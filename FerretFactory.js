@@ -1,15 +1,15 @@
-
-```javascript
 class FerretFactory {
   static _hash(str) {
     let h = 2166136261;
-    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h += (h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24); }
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+    }
     return Math.abs(h >>> 0);
   }
-  static _rng(seed) { return () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 0xffffffff); }
   static create(racer) {
     const seedStr = `${racer.id}-${racer.name[0]}-${racer.name[1]}-${racer.colors.join('-')}`;
-    let seed = this._hash(seedStr); const rnd = this._rng(seed);
+    let seed = this._hash(seedStr); const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 0xffffffff);
     const pick = (min, max) => min + (max - min) * rnd();
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
