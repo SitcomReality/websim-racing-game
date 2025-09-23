@@ -25,6 +25,8 @@ class Racer {
         // Now we can safely access stats properties
         this.remainingEndurance = this.stats.endurance;
         this.remainingBoost = this.stats.boostDuration;
+        // Attach ferret anatomy data for future rendering/animation
+        this.ferret = FerretFactory.create(this);
     }
 
     generateStats() {
