@@ -1,5 +1,3 @@
-
-```javascript
 export class RacerRenderer {
   constructor() {
     this.screenPositions = [];

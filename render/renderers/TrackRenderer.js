@@ -1,5 +1,3 @@
-
-```javascript
 import { TextureManager } from '../core/TextureManager.js';
 
 export class TrackRenderer {
