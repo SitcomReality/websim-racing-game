@@ -1,5 +1,3 @@
-
-```javascript
 class TextureManager {
   constructor() {
     this.patterns = new Map();
@@ -9,6 +7,7 @@ class TextureManager {
   }
 
   loadTextures(textureMap) {
+    // Create procedural textures for different ground types
     this.createAsphaltTexture();
     this.createGrassTexture();
     this.createDirtTexture();
@@ -125,4 +124,5 @@ class TextureManager {
     return colors[name] || '#303030';
   }
 }
+
 window.TextureManager = TextureManager;

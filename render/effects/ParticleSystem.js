@@ -1,5 +1,3 @@
-
-```javascript
 class ParticleSystem {
   constructor() {
     this.particles = [];
@@ -58,4 +56,5 @@ class ParticleSystem {
     ctx.restore();
   }
 }
+
 window.ParticleSystem = ParticleSystem;

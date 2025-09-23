@@ -35,4 +35,5 @@ class Camera {
     }
   }
 }
+
 window.Camera = Camera;
