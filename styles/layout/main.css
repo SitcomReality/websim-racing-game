@@ -134,6 +134,11 @@
     border-top: 2px solid #725b82;
     border-bottom: 2px solid #725b82;
     position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.lane:last-child {
+    border-bottom: 2px solid #725b82;
 }
 
 .segment {
@@ -469,6 +474,3 @@ li .historyRacerPlacingContainer .racerName {
         filter: blur(10px);
     }
 }
-
-
-

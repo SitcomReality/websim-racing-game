@@ -27,7 +27,25 @@ class TrackRenderer {
     const segs = race.segments.length;
     const segW = worldPixelWidth / Math.max(1, segs);
 
+    // Draw lane separators
     let currentY = 0;
+    for (let l = 0; l < props.numberOfLanes; l++) {
+      const perspectiveFactor = 1 - (l / props.numberOfLanes) * 0.2;
+      const laneH = laneHeight * perspectiveFactor;
+      
+      if (l > 0) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, currentY);
+        ctx.lineTo(worldPixelWidth, currentY);
+        ctx.stroke();
+      }
+      
+      currentY += laneH;
+    }
+
+    currentY = 0;
     for (let l = 0; l < props.numberOfLanes; l++) {
       const perspectiveFactor = 1 - (l / props.numberOfLanes) * 0.2;
       const laneH = laneHeight * perspectiveFactor;
