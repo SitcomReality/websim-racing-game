@@ -23,7 +23,9 @@ class TrackRenderer {
     ctx.translate(-cameraPixelX, 0);
 
     const segs = race.segments.length;
+    // use logical (device-independent) pixel values then align to integer canvas pixels
     const segW = worldPixelWidth / Math.max(1, segs);
+    const dpr = (window.devicePixelRatio || 1);
 
     // Draw lane backgrounds first
     let currentY = 0;
@@ -42,10 +44,16 @@ class TrackRenderer {
       currentY += laneH;
     }
 
-    // Draw segment textures
+    // Draw segment textures with integer-aligned pixel boundaries to avoid subpixel gaps
     currentY = 0;
     for (let i = 0; i < segs; i++) {
-      const x = i * segW;
+      const x0 = i * segW;
+      const x1 = (i + 1) * segW;
+      // convert to device pixels and align to integer to prevent seams
+      const px0 = Math.floor(x0 * dpr) / dpr;
+      const px1 = Math.ceil(x1 * dpr) / dpr;
+      const drawW = Math.max(1, px1 - px0);
+
       const segmentType = race.segments[i];
       const pattern = this.textureManager.getPattern(segmentType, ctx);
       if (this.seamAligned.has(segmentType)) {
@@ -55,11 +63,13 @@ class TrackRenderer {
         }
       }
       ctx.fillStyle = pattern;
-      ctx.fillRect(x, 0, segW, totalHeight);
+      ctx.fillRect(px0, 0, drawW, totalHeight);
 
+      // draw subtle separators every 3 segments (aligned similarly)
       if ((i + 1) % 3 === 0 && i < segs - 1) {
+        const sepX = px1;
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
-        ctx.fillRect(x + segW - 1, 0, 1, totalHeight);
+        ctx.fillRect(sepX - (1 / dpr), 0, (1 / dpr), totalHeight);
       }
     }
 
