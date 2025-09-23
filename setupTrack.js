@@ -41,7 +41,8 @@ function setupTrack(track) {
     gameState.currentRace.liveLocations = [];
     
     DOMUtils.updateTrackDetails();
-    const selectedRacers = gameState.raceWeek.selectedRacers.slice(0, gameState.settings.trackProperties.numberOfLanes);
+    // Use the current race's selected racers (IDs) so the UI entrants match the actual race participants
+    const selectedRacers = (gameState.currentRace.racers || []).slice(0, gameState.settings.trackProperties.numberOfLanes);
     const arrangedRacers = arrangeRacersByPerformance(selectedRacers, gameState);
     
     for (let i = 0; i < gameState.settings.trackProperties.numberOfLanes; i++) {
