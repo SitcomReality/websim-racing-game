@@ -1,3 +1,5 @@
+
+```javascript
 class TrackRenderer {
   constructor() {
     this.textureManager = new TextureManager();
@@ -41,8 +43,9 @@ class TrackRenderer {
         ctx.fillStyle = l % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
       }
       ctx.fillRect(0, currentY, worldPixelWidth, laneH - 2);
-      // add separator line between lanes
-      if (l < props.numberOfLanes - 1) { ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.fillRect(0, currentY + laneH - 1, worldPixelWidth, 1); }
+      // add lane separator line
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillRect(0, currentY + laneH - 1, worldPixelWidth, 1);
       currentY += laneH;
     }
 
