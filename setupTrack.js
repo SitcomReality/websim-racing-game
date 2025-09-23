@@ -5,12 +5,16 @@ function setupTrack(track) {
     
     // Save the leaderboard before clearing
     const leaderboard = document.getElementById('liveLeaderboard');
+    const weatherOverlay = document.getElementById('overlayWeather');
     
     trackDom.innerHTML = '';
     
     // Restore the leaderboard after clearing
     if (leaderboard) {
         trackDom.appendChild(leaderboard);
+    }
+    if (weatherOverlay) {
+        trackDom.appendChild(weatherOverlay);
     }
     
     const canvas = document.createElement('canvas');
@@ -29,7 +33,8 @@ function setupTrack(track) {
         gameState.currentRace.segments.push(track.sections[section]);
     }
     gameState.currentRace.segments.push("finishLine");
-    gameState.currentRace.weather = gameState.settings.worldProperties.weatherTypes[Math.floor(Math.random() * gameState.settings.worldProperties.weatherTypes.length)] || 'Sunny';
+    const weekRace = gameState.raceWeek && gameState.raceWeek.races[gameState.currentRaceIndex - 1];
+    gameState.currentRace.weather = gameState.currentRace.weather || (weekRace && weekRace.weather) || gameState.settings.worldProperties.weatherTypes[Math.floor(Math.random()*gameState.settings.worldProperties.weatherTypes.length)];
     gameState.currentRace.racers = [];
     gameState.currentRace.results = [];
     gameState.currentRace.winner = null;
@@ -99,6 +104,8 @@ function setupTrack(track) {
     }
     
     window.canvasRenderer.setData(gameState.currentRace, gameState.settings.trackProperties);
+    const icon = ({sunny:'☀️',rainy:'🌧️',windy:'💨',cloudy:'☁️',dusty:'🌫️',stormy:'⛈️',snowy:'❄️',foggy:'🌁'})[gameState.currentRace.weather] || '⛅';
+    const ow = document.getElementById('overlayWeather'); if (ow) ow.textContent = `${icon} ${gameState.currentRace.weather}`;
     window.canvasRenderer.resizeToContainer();
     window.canvasRenderer.start();
 }

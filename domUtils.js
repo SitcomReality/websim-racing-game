@@ -96,56 +96,25 @@ class DOMUtils {
         name.className = 'racer-name';
         name.textContent = getRacerNameString(thisRacer);
         info.appendChild(name);
-        
-        // Add weather indicator if this is the current race
-        if (gameState.currentRace && gameState.currentRace.weather) {
-            const weatherIndicator = this.createWeatherIndicator(gameState.currentRace.weather);
-            info.appendChild(weatherIndicator);
-        }
+
+        const flag = document.createElement('div');
+        flag.className = 'racer-flag';
+        const swatchPrimary = document.createElement('span');
+        swatchPrimary.className = 'swatch swatch-primary';
+        swatchPrimary.style.backgroundColor = racerColors[thisRacer.colors[0]];
+        const swatchSecondary = document.createElement('span');
+        swatchSecondary.className = 'swatch swatch-secondary';
+        swatchSecondary.style.backgroundColor = racerColors[thisRacer.colors[1]];
+        flag.appendChild(swatchPrimary);
+        flag.appendChild(swatchSecondary);
+        info.appendChild(flag);
 
         card.appendChild(info);
         return card;
     }
 
-    static createWeatherIndicator(weather) {
-        const indicator = document.createElement('div');
-        indicator.className = `weather-indicator weather-${weather.toLowerCase()}`;
-        
-        const icon = document.createElement('span');
-        icon.className = 'weather-icon';
-        icon.textContent = this.getWeatherIcon(weather);
-        
-        const text = document.createElement('span');
-        text.textContent = weather;
-        
-        indicator.appendChild(icon);
-        indicator.appendChild(text);
-        
-        return indicator;
-    }
-
-    static getWeatherIcon(weather) {
-        const icons = {
-            sunny: '☀️',
-            rainy: '🌧️',
-            windy: '💨',
-            cloudy: '☁️',
-            dusty: '🌪️',
-            stormy: '⛈️',
-            snowy: '❄️',
-            foggy: '🌫️'
-        };
-        return icons[weather.toLowerCase()] || '🌤️';
-    }
-
     static updateTrackDetails() {
         document.getElementById("trackNameDisplay").innerHTML = gameState.currentRace.trackName;
-        const weatherDisplay = document.getElementById("weatherDisplay");
-        weatherDisplay.innerHTML = '';
-        
-        if (gameState.currentRace.weather) {
-            const weatherIndicator = this.createWeatherIndicator(gameState.currentRace.weather);
-            weatherDisplay.appendChild(weatherIndicator);
-        }
+        document.getElementById("weatherDisplay").innerHTML = gameState.currentRace.weather;
     }
 }

@@ -123,6 +123,12 @@ class CanvasRenderer {
     window.trackRenderer = window.trackRenderer || new TrackRenderer();
     window.trackRenderer.render(ctx, this.race, this.props, this.camera);
 
+    const w = (this.race.weather || '').toLowerCase(), W = this.canvas.width/this.dpr, H = this.canvas.height/this.dpr;
+    if (w==='rainy'||w==='stormy'){ ctx.strokeStyle='rgba(180,180,255,0.35)'; ctx.lineWidth=1; for(let i=0;i<80;i++){ const x=Math.random()*W,y=Math.random()*H; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+10,y+20); ctx.stroke(); } }
+    else if (w==='snowy'){ ctx.fillStyle='rgba(255,255,255,0.85)'; for(let i=0;i<60;i++){ const x=Math.random()*W,y=Math.random()*H,r=1+Math.random()*2; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); } }
+    else if (w==='foggy'||w==='cloudy'){ ctx.fillStyle='rgba(200,200,200,0.12)'; ctx.fillRect(0,0,W,H); }
+    else if (w==='dusty'){ ctx.fillStyle='rgba(160,120,80,0.12)'; ctx.fillRect(0,0,W,H); }
+
     this.particleSystem.update(deltaTime);
     this.particleSystem.render(ctx);
 
