@@ -78,6 +78,31 @@ class RacerRenderer {
     // Calculate stride length based on speed
     const strideLength = ferret.gait.stride * (10 + speedRatio * 5);
 
+    // Handle stumbling/crash animation
+    let bodyRotation = 0;
+    let bodyOffsetY = 0;
+    if (ferret.isStumbling) {
+        // Update crash animation phase
+        ferret.crashPhase += 0.2;
+        
+        // Tumbling rotation effect
+        bodyRotation = Math.sin(ferret.crashPhase * 3) * 0.8;
+        
+        // Bouncing/hitting ground effect
+        const bouncePhase = Math.sin(ferret.crashPhase * 4);
+        bodyOffsetY = Math.max(0, bouncePhase * 8);
+        
+        // Reset crash when stumble ends
+        if (racer.remainingStumble <= 1) {
+            ferret.isStumbling = false;
+            ferret.crashPhase = 0;
+        }
+    }
+
+    // Apply crash transformation
+    ctx.rotate(bodyRotation);
+    ctx.translate(0, bodyOffsetY);
+
     // Update independent eye behavior
     this.updateFerretEye(ferret, racer, time);
 
@@ -117,7 +142,9 @@ class RacerRenderer {
     const tailStartY = -bodyHeight/4;
     const tailLength = ferret.tail.length * 25;
     const tailFluffiness = ferret.tail.fluffiness;
-    const tailSway = Math.sin(ferret.gait.cyclePhase * 2) * 3;
+    const tailSway = ferret.isStumbling ? 
+        Math.sin(ferret.crashPhase * 5) * 8 : // Erratic tail movement when stumbling
+        Math.sin(ferret.gait.cyclePhase * 2) * 3; // Normal tail sway
     
     ctx.beginPath();
     ctx.moveTo(tailStartX, tailStartY);
@@ -132,63 +159,51 @@ class RacerRenderer {
     ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Draw legs with running animation
+    // Draw legs with running animation or crash animation
     const legLength = ferret.legs.length * 15;
     const legThickness = ferret.legs.thickness;
-    const strideOffset = Math.sin(ferret.gait.cyclePhase) * strideLength;
-    const strideOffset2 = Math.sin(ferret.gait.cyclePhase + Math.PI) * strideLength;
     
-    // Front legs (alternating stride)
-    ctx.beginPath();
-    ctx.moveTo(bodyLength/3, bodyHeight/4);
-    ctx.lineTo(bodyLength/3 + strideOffset, bodyHeight/4 + legLength);
-    ctx.lineWidth = 3 * legThickness;
-    ctx.strokeStyle = colors[1];
-    ctx.lineCap = 'round';
-    ctx.stroke();
+    let legPositions;
+    if (ferret.isStumbling) {
+        // Scrambling/crashing leg positions
+        const scramblePhase = ferret.crashPhase * 6;
+        legPositions = [
+            { x: bodyLength/3 + Math.sin(scramblePhase) * 8, y: bodyHeight/4 + Math.cos(scramblePhase * 1.3) * 4 },
+            { x: bodyLength/3 - 5 + Math.sin(scramblePhase + 1) * 6, y: bodyHeight/4 + Math.cos(scramblePhase * 1.1) * 3 },
+            { x: -bodyLength/4 + Math.sin(scramblePhase + 2) * 7, y: bodyHeight/4 + Math.cos(scramblePhase * 0.9) * 5 },
+            { x: -bodyLength/4 - 5 + Math.sin(scramblePhase + 3) * 5, y: bodyHeight/4 + Math.cos(scramblePhase * 1.2) * 4 }
+        ];
+    } else {
+        // Normal running stride
+        const strideOffset = Math.sin(ferret.gait.cyclePhase) * strideLength;
+        const strideOffset2 = Math.sin(ferret.gait.cyclePhase + Math.PI) * strideLength;
+        
+        legPositions = [
+            { x: bodyLength/3 + strideOffset, y: bodyHeight/4 },
+            { x: bodyLength/3 - 5 + strideOffset2, y: bodyHeight/4 },
+            { x: -bodyLength/4 + strideOffset2, y: bodyHeight/4 },
+            { x: -bodyLength/4 - 5 + strideOffset, y: bodyHeight/4 }
+        ];
+    }
     
-    // Other front leg
-    ctx.beginPath();
-    ctx.moveTo(bodyLength/3 - 5, bodyHeight/4);
-    ctx.lineTo(bodyLength/3 - 5 + strideOffset2, bodyHeight/4 + legLength);
-    ctx.lineWidth = 3 * legThickness;
-    ctx.stroke();
-    
-    // Back legs (also alternating)
-    ctx.beginPath();
-    ctx.moveTo(-bodyLength/4, bodyHeight/4);
-    ctx.lineTo(-bodyLength/4 + strideOffset2, bodyHeight/4 + legLength);
-    ctx.lineWidth = 3 * legThickness;
-    ctx.stroke();
-    
-    // Other back leg
-    ctx.beginPath();
-    ctx.moveTo(-bodyLength/4 - 5, bodyHeight/4);
-    ctx.lineTo(-bodyLength/4 - 5 + strideOffset, bodyHeight/4 + legLength);
-    ctx.lineWidth = 3 * legThickness;
-    ctx.stroke();
-
-    // Draw small paws/footpads
-    const pawSize = 3;
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    
-    // Front paws
-    ctx.beginPath();
-    ctx.arc(bodyLength/3 + strideOffset, bodyHeight/4 + legLength, pawSize, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.beginPath();
-    ctx.arc(bodyLength/3 - 5 + strideOffset2, bodyHeight/4 + legLength, pawSize, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Back paws
-    ctx.beginPath();
-    ctx.arc(-bodyLength/4 + strideOffset2, bodyHeight/4 + legLength, pawSize, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.beginPath();
-    ctx.arc(-bodyLength/4 - 5 + strideOffset, bodyHeight/4 + legLength, pawSize, 0, Math.PI * 2);
-    ctx.fill();
+    // Draw all four legs
+    legPositions.forEach((pos, i) => {
+        ctx.beginPath();
+        const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
+        ctx.moveTo(startX, bodyHeight/4);
+        ctx.lineTo(pos.x, pos.y + legLength);
+        ctx.lineWidth = 3 * legThickness;
+        ctx.strokeStyle = colors[1];
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        
+        // Draw paw
+        const pawSize = ferret.isStumbling ? 2 : 3; // Smaller paws when stumbling
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y + legLength, pawSize, 0, Math.PI * 2);
+        ctx.fill();
+    });
 
     ctx.restore();
   }

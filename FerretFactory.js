@@ -1,3 +1,5 @@
+
+```javascript
 class FerretFactory {
   static _hash(str) {
     let h = 2166136261;
@@ -49,7 +51,11 @@ class FerretFactory {
       footfall: ['FL','FR','BL','BR'] // order reference
     };
 
-    return { body, legs, tail, head, eye, gait, seed };
+    return { 
+      body, legs, tail, head, eye, gait, seed,
+      isStumbling: false,
+      crashPhase: 0
+    };
   }
 }
 window.FerretFactory = FerretFactory;

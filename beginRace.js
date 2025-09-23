@@ -29,6 +29,12 @@ function beginRace() {
 
         if (thisRacer.remainingStumble > 1) {
             thisRacer.remainingStumble -= 1;
+            // Keep ferret in crash/recovery animation during stumble
+            if (thisRacer.ferret) {
+                thisRacer.ferret.isStumbling = true;
+                thisRacer.ferret.gait.stride = 0.2; // Very minimal movement while stumbling
+                thisRacer.ferret.gait.cyclePhase += 0.3; // Erratic movement
+            }
         } else {
             if (thisRacer.stats.stumbleChance < Math.random()) {
                 // Handle boost logic
@@ -65,6 +71,7 @@ function beginRace() {
                   const baseSpeed = gameState.settings.racerProperties.speedBase;
                   const speedRatio = currentSpeed / baseSpeed;
                   thisRacer.ferret.gait.cyclePhase += speedRatio * 0.02;
+                  thisRacer.ferret.isStumbling = false; // Normal running
                 }
                 
                 if (!thisRacer.isExhausted) {
@@ -78,17 +85,24 @@ function beginRace() {
                   }
                 }
             } else {
+                // Ferret stumbles - trigger crash animation and particles
                 thisRacer.remainingStumble = thisRacer.stats.stumbleDuration;
-                // Reset stride during stumble
+                
                 if (thisRacer.ferret) {
-                  thisRacer.ferret.gait.stride = 0.5; // Minimal movement
+                    thisRacer.ferret.isStumbling = true;
+                    thisRacer.ferret.crashPhase = 0; // Start crash animation
+                    thisRacer.ferret.gait.stride = 0.1; // Almost no forward movement
                 }
+                
                 const laneIndex = gameState.currentRace.racers.indexOf(racerId);
                 const color = getGroundParticleColor(segmentType, 0.25);
                 if (window.canvasRenderer && laneIndex >= 0) {
                   const screen = window.canvasRenderer.worldToScreen(currentMarginLeft, laneIndex);
-                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, 0, 180, 24, color, { spread: 1.0, forwardBoost: 0.8 });
-                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, Math.PI, 110, 6, color, { spread: 0.7, forwardBoost: 0.3 });
+                  // Enhanced particle effects for ferret crash
+                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, 0, 200, 32, color, { spread: 1.5, forwardBoost: 0.9 });
+                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, Math.PI, 140, 8, color, { spread: 0.8, forwardBoost: 0.4 });
+                  // Add some debris particles
+                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, -Math.PI/4, 120, 6, 'rgba(139,69,19,0.8)', { spread: 0.6, forwardBoost: 0.3 });
                 }
             }
         }
