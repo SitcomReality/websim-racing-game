@@ -76,27 +76,15 @@ function setupTrack(track) {
         // Add mouse interaction
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            const hits = window.canvasRenderer.hitIndex.getUnderPoint(x, y);
-            
-            // Clear all nameplates first
-            window.canvasRenderer.nameplate.visibleNames.clear();
-            
-            // Show nameplate for hit racers
-            hits.forEach(rid => {
-                const racer = gameState.racers[rid];
-                if (racer && racer.blobData) {
-                    const laneIndex = gameState.currentRace.racers.indexOf(parseInt(rid));
-                    const pos = gameState.currentRace.liveLocations[rid] || 0;
-                    const screenPos = window.canvasRenderer.worldToScreen(pos, laneIndex);
-                    window.canvasRenderer.nameplate.show(rid, screenPos.x, screenPos.y);
-                }
-            });
+            if (window.canvasRenderer) {
+                const lane = window.canvasRenderer.screenToLaneIndex(y);
+                window.canvasRenderer.setHoveredLane(lane);
+            }
         });
         canvas.addEventListener('mouseleave', () => {
             if (window.canvasRenderer) {
-                window.canvasRenderer.nameplate.visibleNames.clear();
+                window.canvasRenderer.setHoveredLane(null);
             }
         });
     } else {
