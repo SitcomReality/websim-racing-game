@@ -105,8 +105,6 @@ class TextureManager {
       cx.moveTo(Math.random()*size, 0); cx.lineTo(Math.random()*size, size); cx.stroke();
     }
     this.images.set('marble', c);
-    // Mark this texture as needing edge-repeat behavior
-    this.images.set('marble_edgeRepeat', true);
   }
 
   getPattern(name, ctx) {

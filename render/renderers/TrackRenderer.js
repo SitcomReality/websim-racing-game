@@ -2,6 +2,7 @@ class TrackRenderer {
   constructor() {
     this.textureManager = new TextureManager();
     this.textureManager.loadTextures();
+    this.seamAligned = new Set(['marble']);
   }
 
   render(ctx, race, props, camera) {
@@ -47,31 +48,14 @@ class TrackRenderer {
       const x = i * segW;
       const segmentType = race.segments[i];
       const pattern = this.textureManager.getPattern(segmentType, ctx);
-
-      // Check if this texture needs edge-repeat
-      const needsEdgeRepeat = this.textureManager.images.has(segmentType + '_edgeRepeat');
-      if (needsEdgeRepeat) {
-        // Draw texture per-lane with edge repeat
-        for (let l = 0; l < props.numberOfLanes; l++) {
-          const laneTop = currentY + l * laneHeight;
-          const laneBottom = laneTop + laneHeight;
-          
-          // Create pattern with repeat-x only for this lane
-          ctx.save();
-          ctx.beginPath();
-          ctx.rect(x, laneTop, segW, laneHeight);
-          ctx.clip();
-          
-          ctx.fillStyle = pattern;
-          ctx.fillRect(x, laneTop, segW, laneHeight);
-          
-          ctx.restore();
+      if (this.seamAligned.has(segmentType)) {
+        const img = this.textureManager.images.get(segmentType);
+        if (img && pattern && typeof pattern.setTransform === 'function') {
+          pattern.setTransform(new DOMMatrix().scale(1, laneHeight / img.height));
         }
-      } else {
-        // Draw normally across all lanes
-        ctx.fillStyle = pattern;
-        ctx.fillRect(x, 0, segW, totalHeight);
       }
+      ctx.fillStyle = pattern;
+      ctx.fillRect(x, 0, segW, totalHeight);
 
       if ((i + 1) % 3 === 0 && i < segs - 1) {
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
