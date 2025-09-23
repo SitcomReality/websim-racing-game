@@ -95,11 +95,6 @@
 .racer-card .racer-info { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .racer-card .racer-name { font-weight: 700; font-size: 14px; color: var(--text-primary); text-shadow: 0px 1px 3px black; }
 
-.racer-card .racer-flag { display: inline-flex; gap: 2px; }
-.racer-card .swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.25); }
-.racer-card .swatch-primary { /* color applied inline */ }
-.racer-card .swatch-secondary { /* color applied inline */ }
-
 /* Compact list variant (when inside lists or explicitly flagged) */
 .racers-list li .racer-card,
 #historyList li .racer-card,
@@ -122,8 +117,8 @@
   font-size: 12px;
 }
 
-.racers-list li .swatch,
-#historyList li .swatch,
+.racers-list li .racer-card .swatch,
+#historyList li .racer-card .swatch,
 .racer-card.this-racer-is-in-a-list .swatch {
   width: 10px; height: 10px;
 }
