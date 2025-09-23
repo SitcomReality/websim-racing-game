@@ -17,9 +17,9 @@ class RacerRenderer {
       this.drawBlob(ctx, screen.x, screen.y, racer, time, screen.scale);
 
       if (racer.isBoosting && Math.random() < 0.3) {
-        // Emit boost particles behind the racer
-        const boostPos = worldTransform.worldToScreen(
-          (race.liveLocations[rid] || 0) - 5, // 5 units behind
+        // Emit boost particles from the racer's position
+        const screen = worldTransform.worldToScreen(
+          race.liveLocations[rid] || 0,
           idx,
           window.canvasRenderer ? window.canvasRenderer.camera : null,
           window.canvasRenderer ? window.canvasRenderer.canvas.width : 800,
@@ -28,8 +28,8 @@ class RacerRenderer {
         );
         if (window.canvasRenderer && window.canvasRenderer.particleSystem) {
           window.canvasRenderer.particleSystem.emit(
-            boostPos.x, 
-            boostPos.y, 
+            screen.x, 
+            screen.y, 
             Math.PI, // angle pointing left (behind)
             80 * screen.scale, 
             2, 
