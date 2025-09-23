@@ -48,8 +48,30 @@ class TrackRenderer {
       const segmentType = race.segments[i];
       const pattern = this.textureManager.getPattern(segmentType, ctx);
 
-      ctx.fillStyle = pattern;
-      ctx.fillRect(x, 0, segW, totalHeight);
+      // Check if this texture needs edge-repeat
+      const needsEdgeRepeat = this.textureManager.images.has(segmentType + '_edgeRepeat');
+      if (needsEdgeRepeat) {
+        // Draw texture per-lane with edge repeat
+        for (let l = 0; l < props.numberOfLanes; l++) {
+          const laneTop = currentY + l * laneHeight;
+          const laneBottom = laneTop + laneHeight;
+          
+          // Create pattern with repeat-x only for this lane
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(x, laneTop, segW, laneHeight);
+          ctx.clip();
+          
+          ctx.fillStyle = pattern;
+          ctx.fillRect(x, laneTop, segW, laneHeight);
+          
+          ctx.restore();
+        }
+      } else {
+        // Draw normally across all lanes
+        ctx.fillStyle = pattern;
+        ctx.fillRect(x, 0, segW, totalHeight);
+      }
 
       if ((i + 1) % 3 === 0 && i < segs - 1) {
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
