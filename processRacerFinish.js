@@ -21,7 +21,8 @@ function processRacerFinish(racerId) {
 		if (window.canvasRenderer) {
 			window.canvasRenderer.raceEndCountdown = {
 				active: true,
-				endTime: performance.now() + 30000 // 30 seconds from now
+				endTime: performance.now() + 30000, // 30 seconds from now
+				startTime: performance.now()
 			};
 		}
 	}

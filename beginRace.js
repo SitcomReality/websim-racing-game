@@ -48,7 +48,7 @@ function beginRace() {
                 const distanceToTravel = updateRacerPosition(racerId, currentSegment, percentRaceComplete);
                 let nextPosition = currentMarginLeft + distanceToTravel;
                 
-                // Update live location for canvas rendering - this is the key change
+                // Update live location for canvas rendering
                 gameState.currentRace.liveLocations[racerId] = nextPosition;
                 
                 if (!thisRacer.isExhausted) {
@@ -63,9 +63,7 @@ function beginRace() {
                 const color = getGroundParticleColor(segmentType, 0.25);
                 if (window.canvasRenderer && laneIndex >= 0) {
                     const screen = window.canvasRenderer.worldToScreen(currentMarginLeft, laneIndex);
-                    // Strong forward (right) burst with slight spread and speed bias
                     window.canvasRenderer.particleSystem.emit(screen.x, screen.y, 0, 180, 24, color, { spread: 1.0, forwardBoost: 0.8 });
-                    // Small backward splash for impact feel
                     window.canvasRenderer.particleSystem.emit(screen.x, screen.y, Math.PI, 110, 6, color, { spread: 0.7, forwardBoost: 0.3 });
                 }
             }
@@ -73,6 +71,15 @@ function beginRace() {
     }
 
     function race() {
+        // Check if race should end early
+        if (window.canvasRenderer && window.canvasRenderer.raceEndCountdown && window.canvasRenderer.raceEndCountdown.active) {
+            const timeLeft = Math.max(0, Math.ceil((window.canvasRenderer.raceEndCountdown.endTime - performance.now()) / 1000));
+            if (timeLeft <= 0) {
+                // Race should end, don't continue updating positions
+                return;
+            }
+        }
+
         gameState.currentRace.racers.forEach(racerId => {
             const totalSegments = gameState.currentRace.segments.length;
             const currentMarginLeft = gameState.currentRace.liveLocations[racerId] || 0;

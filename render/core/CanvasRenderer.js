@@ -150,28 +150,70 @@ class CanvasRenderer {
     const h = ctx.canvas.height / (window.devicePixelRatio || 1);
     const timeLeft = Math.max(0, Math.ceil((this.raceEndCountdown.endTime - performance.now()) / 1000));
     
+    // Subtle countdown in top center instead of full overlay
     ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,0.8)';
-    ctx.fillRect(0, 0, w, h);
     
-    ctx.fillStyle = '#ff4444';
-    ctx.font = 'bold 72px Orbitron';
+    // Semi-transparent background bar
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(w/2 - 120, 20, 240, 40);
+    
+    // Border
+    ctx.strokeStyle = '#ff4444';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(w/2 - 120, 20, 240, 40);
+    
+    // Timer text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 20px Orbitron';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(timeLeft.toString(), w/2, h/2);
+    ctx.fillText(`Race ends in: ${timeLeft}s`, w/2, 40);
     
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '24px Orbitron';
-    ctx.fillText('Race ending soon!', w/2, h/2 + 80);
+    // Progress bar showing time remaining
+    const totalTime = 30000; // 30 seconds
+    const elapsed = performance.now() - this.raceEndCountdown.startTime;
+    const progress = Math.max(0, 1 - (elapsed / totalTime));
+    const barWidth = 200;
+    const barHeight = 4;
+    const barX = w/2 - barWidth/2;
+    const barY = 55;
+    
+    // Background of progress bar
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fillRect(barX, barY, barWidth, barHeight);
+    
+    // Filled portion
+    ctx.fillStyle = progress > 0.3 ? '#44ff44' : '#ff4444';
+    ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+    
     ctx.restore();
     
     if (timeLeft <= 0) {
-      this.endRaceEarly();
+        this.endRaceEarly();
     }
   }
 
   endRaceEarly() {
-    // Handle race ending early logic
+    // Stop the race and handle DNFs
+    gameState.running = false;
+    this.raceEndCountdown.active = false;
+    
+    // Handle racers who didn't finish (DNF)
+    const finishedRacers = new Set(gameState.currentRace.results);
+    const allRacers = gameState.currentRace.racers;
+    
+    for (const racerId of allRacers) {
+        if (!finishedRacers.has(racerId)) {
+            // Mark as DNF and add to results based on current position
+            const position = gameState.currentRace.results.length + 1;
+            gameState.currentRace.results.push(racerId);
+            gameState.racers[racerId].didNotFinish = true;
+            gameState.racers[racerId].updateRacerHistory(gameState.currentRace.id, position);
+        }
+    }
+    
+    // Process race finish
+    processRaceFinish();
   }
 }
 
