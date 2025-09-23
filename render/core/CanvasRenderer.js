@@ -1,5 +1,5 @@
 class CanvasRenderer {
-  constructor(canvas) {
+  constructor() {
     this.setCanvas(canvas);
     this.dpr = 1;
     this.lastTime = performance.now();
@@ -16,7 +16,10 @@ class CanvasRenderer {
     this.animationLoop = new AnimationLoop();
     this.camera.damping = (gameState.settings?.render?.camera?.smoothing) || 0.15;
     this.raceEndCountdown = null;
-    this.hoveredLane = null; this.banner = {active:false, lane:null, x:-1000, targetX:-1000, opacity:0, text:''};
+    this.hoveredLane = null; 
+    this.banners = new Map(); // Track individual banners for each lane
+    this.currentHoveredLane = null;
+    this.previousHoveredLane = null;
   }
 
   setCanvas(canvas) {
@@ -140,24 +143,91 @@ class CanvasRenderer {
 
     this.nameplate.render(ctx);
     
-    // Lane hover name banner
-    if (this.banner.lane != null) {
-      const w = this.canvas.width / this.dpr, laneH = this.laneHeight, totalH = laneH * this.props.numberOfLanes;
-      const laneY = (this.banner.lane * laneH + laneH/2 - totalH/2) * this.camera.zoom + (this.canvas.height/this.dpr)/2;
-      this.banner.x += (this.banner.targetX - this.banner.x) * 0.18;
-      const targetOpacity = this.banner.active ? 1 : 0;
-      this.banner.opacity += (targetOpacity - this.banner.opacity) * 0.15;
-      ctx.save(); ctx.globalAlpha = Math.max(0, Math.min(1, this.banner.opacity));
-      ctx.fillStyle='rgba(0,0,0,0.65)'; const pad=14; ctx.font='700 28px Orbitron'; const tw=ctx.measureText(this.banner.text).width;
-      ctx.fillRect(this.banner.x- pad, laneY-28, tw+pad*2, 38); ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.strokeRect(this.banner.x- pad, laneY-28, tw+pad*2, 38);
-      ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=10; ctx.textBaseline='middle'; ctx.fillStyle='#fff'; ctx.fillText(this.banner.text, this.banner.x, laneY-9);
-      ctx.restore();
-      if (!this.banner.active && this.banner.opacity < 0.02 && Math.abs(this.banner.x - this.banner.targetX) < 2) { this.banner.lane=null; }
-    }
+    // Render lane hover name banners - each animates independently
+    this.renderLaneBanners(ctx);
     
     // Render countdown if active
     if (this.raceEndCountdown && this.raceEndCountdown.active) {
       this.renderCountdown(ctx);
+    }
+  }
+
+  renderLaneBanners(ctx) {
+    const w = ctx.canvas.width / (window.devicePixelRatio || 1);
+    const h = ctx.canvas.height / (window.devicePixelRatio || 1);
+    const laneH = this.laneHeight;
+    const totalH = laneH * this.props.numberOfLanes;
+
+    // Update banner states based on hover changes
+    if (this.currentHoveredLane !== this.previousHoveredLane) {
+      // Hide previous banner
+      if (this.previousHoveredLane !== null && this.banners.has(this.previousHoveredLane)) {
+        const prevBanner = this.banners.get(this.previousHoveredLane);
+        prevBanner.active = false;
+        prevBanner.targetX = -600;
+      }
+      
+      // Show new banner
+      if (this.currentHoveredLane !== null) {
+        const rid = this.race.racers[this.currentHoveredLane];
+        const racer = gameState.racers[rid];
+        if (racer) {
+          if (!this.banners.has(this.currentHoveredLane)) {
+            this.banners.set(this.currentHoveredLane, {
+              lane: this.currentHoveredLane,
+              text: getRacerNameString(racer),
+              x: -600,
+              targetX: 60,
+              opacity: 0,
+              active: true
+            });
+          } else {
+            const banner = this.banners.get(this.currentHoveredLane);
+            banner.active = true;
+            banner.targetX = 60;
+            if (banner.x < -500) banner.x = -600;
+            banner.opacity = Math.max(banner.opacity, 0.1);
+          }
+        }
+      }
+      
+      this.previousHoveredLane = this.currentHoveredLane;
+    }
+
+    // Render all banners with independent animations
+    for (const [laneIndex, banner] of this.banners.entries()) {
+      if (!banner || (!banner.active && banner.opacity <= 0.02)) continue;
+
+      // Update animation
+      banner.x += (banner.targetX - banner.x) * 0.18;
+      const targetOpacity = banner.active ? 1 : 0;
+      banner.opacity += (targetOpacity - banner.opacity) * 0.15;
+
+      if (!banner.active && banner.opacity < 0.02 && Math.abs(banner.x - banner.targetX) < 2) {
+        this.banners.delete(laneIndex);
+        continue;
+      }
+
+      const laneY = (laneIndex * laneH + laneH/2 - totalH/2) * this.camera.zoom + (this.canvas.height/this.dpr)/2;
+
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, banner.opacity));
+      ctx.fillStyle = 'rgba(0,0,0,0.65)';
+      ctx.font = '700 28px Orbitron';
+      const tw = ctx.measureText(banner.text).width;
+      const pad = 14;
+
+      ctx.fillRect(banner.x - pad, laneY - 28, tw + pad * 2, 38);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(banner.x - pad, laneY - 28, tw + pad * 2, 38);
+
+      ctx.shadowColor = 'rgba(0,0,0,0.6)';
+      ctx.shadowBlur = 10;
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(banner.text, banner.x, laneY - 9);
+      ctx.restore();
     }
   }
 
@@ -240,11 +310,7 @@ class CanvasRenderer {
   }
 
   setHoveredLane(lane) {
-    if (lane == null) { this.banner.active=false; this.banner.targetX = -600; return; }
-    if (this.banner.lane !== lane) {
-      const rid = this.race.racers[lane]; const r = gameState.racers[rid]; this.banner.text = r ? getRacerNameString(r) : '';
-      this.banner.lane = lane; this.banner.active = true; this.banner.targetX = 60; if (this.banner.x < -500) this.banner.x = -600; this.banner.opacity = Math.max(this.banner.opacity, 0.1);
-    } else { this.banner.active = true; this.banner.targetX = 60; }
+    this.currentHoveredLane = lane;
   }
 }
 
