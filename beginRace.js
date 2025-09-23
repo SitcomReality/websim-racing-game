@@ -33,16 +33,24 @@ function beginRace() {
             if (thisRacer.stats.stumbleChance < Math.random()) {
                 // Handle boost logic
                 if (!thisRacer.isBoosting && thisRacer.remainingBoost > 0 && percentRaceComplete > thisRacer.stats.boostActivationPercent) {
-                    if (Math.random() > 0.4) {
-                        thisRacer.activateBoost();
+                  if (Math.random() > 0.4) {
+                    thisRacer.activateBoost();
+                    // Update animation for boost state
+                    if (thisRacer.ferret) {
+                      thisRacer.ferret.gait.stride *= 1.3; // Longer stride during boost
                     }
+                  }
                 }
 
                 if (thisRacer.isBoosting) {
-                    thisRacer.reduceRemainingBoost(1);
-                    if (thisRacer.remainingBoost < 1) {
-                        thisRacer.deactivateBoost();
+                  thisRacer.reduceRemainingBoost(1);
+                  if (thisRacer.remainingBoost < 1) {
+                    thisRacer.deactivateBoost();
+                    // Reset stride length after boost
+                    if (thisRacer.ferret) {
+                      thisRacer.ferret.gait.stride /= 1.3;
                     }
+                  }
                 }
 
                 const distanceToTravel = updateRacerPosition(racerId, currentSegment, percentRaceComplete);
@@ -51,20 +59,36 @@ function beginRace() {
                 // Update live location for canvas rendering
                 gameState.currentRace.liveLocations[racerId] = nextPosition;
                 
+                // Update animation cycle for this ferret
+                if (thisRacer.ferret) {
+                  const currentSpeed = thisRacer.calculateSpeed(thisRacer.formThisWeek, percentRaceComplete, segmentType, gameState.currentRace.weather);
+                  const baseSpeed = gameState.settings.racerProperties.speedBase;
+                  const speedRatio = currentSpeed / baseSpeed;
+                  thisRacer.ferret.gait.cyclePhase += speedRatio * 0.02;
+                }
+                
                 if (!thisRacer.isExhausted) {
-                    thisRacer.reduceRemainingEndurance((thisRacer.stats.ground[segmentType] * distanceToTravel) * gameState.settings.racerProperties.enduranceDrainMultiplier);
-                    if (thisRacer.remainingEndurance < 1) {
-                        thisRacer.makeExhausted();
+                  thisRacer.reduceRemainingEndurance((thisRacer.stats.ground[segmentType] * distanceToTravel) * gameState.settings.racerProperties.enduranceDrainMultiplier);
+                  if (thisRacer.remainingEndurance < 1) {
+                    thisRacer.makeExhausted();
+                    // Reduce stride when exhausted
+                    if (thisRacer.ferret) {
+                      thisRacer.ferret.gait.stride *= 0.7;
                     }
+                  }
                 }
             } else {
                 thisRacer.remainingStumble = thisRacer.stats.stumbleDuration;
+                // Reset stride during stumble
+                if (thisRacer.ferret) {
+                  thisRacer.ferret.gait.stride = 0.5; // Minimal movement
+                }
                 const laneIndex = gameState.currentRace.racers.indexOf(racerId);
                 const color = getGroundParticleColor(segmentType, 0.25);
                 if (window.canvasRenderer && laneIndex >= 0) {
-                    const screen = window.canvasRenderer.worldToScreen(currentMarginLeft, laneIndex);
-                    window.canvasRenderer.particleSystem.emit(screen.x, screen.y, 0, 180, 24, color, { spread: 1.0, forwardBoost: 0.8 });
-                    window.canvasRenderer.particleSystem.emit(screen.x, screen.y, Math.PI, 110, 6, color, { spread: 0.7, forwardBoost: 0.3 });
+                  const screen = window.canvasRenderer.worldToScreen(currentMarginLeft, laneIndex);
+                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, 0, 180, 24, color, { spread: 1.0, forwardBoost: 0.8 });
+                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, Math.PI, 110, 6, color, { spread: 0.7, forwardBoost: 0.3 });
                 }
             }
         }

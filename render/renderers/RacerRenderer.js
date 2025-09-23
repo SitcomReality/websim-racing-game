@@ -66,9 +66,21 @@ class RacerRenderer {
     const bodyHeight = ferret.body.height * 20;
     const stockiness = ferret.body.stockiness;
 
+    // Calculate running animation based on current speed
+    const currentSpeed = racer.speedThisRace[racer.speedThisRace.length - 1] || 10;
+    const baseSpeed = gameState.settings.racerProperties.speedBase;
+    const speedRatio = currentSpeed / baseSpeed;
+    
+    // Update gait cycle based on movement speed
+    ferret.gait.cyclePhase += speedRatio * 0.15;
+    if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
+    
+    // Calculate stride length based on speed
+    const strideLength = ferret.gait.stride * (10 + speedRatio * 5);
+
     // Draw body (elongated ellipse)
     ctx.beginPath();
-    ctx.ellipse(0, 0, bodyLength/2, bodyHeight/2, 0, 0, Math.PI * 2);
+    ctx.ellipse(-5, 0, bodyLength/2, bodyHeight/2, 0, 0, Math.PI * 2);
     ctx.fillStyle = colors[0];
     ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
@@ -105,50 +117,89 @@ class RacerRenderer {
     ctx.fillStyle = '#fff';
     ctx.fill();
     
-    // Pupil
+    // Pupil with tracking
     ctx.beginPath();
     ctx.arc(eyeX + ferret.eye.pupil.x, eyeY + ferret.eye.pupil.y, eyeSize/2, 0, Math.PI * 2);
     ctx.fillStyle = '#000';
     ctx.fill();
 
     // Draw tail (curved line extending from back of body)
-    const tailStartX = -bodyLength/2;
-    const tailStartY = 0;
+    const tailStartX = -bodyLength/2 - 5;
+    const tailStartY = -bodyHeight/4;
     const tailLength = ferret.tail.length * 25;
     const tailFluffiness = ferret.tail.fluffiness;
+    const tailSway = Math.sin(ferret.gait.cyclePhase * 2) * 3;
     
     ctx.beginPath();
     ctx.moveTo(tailStartX, tailStartY);
     ctx.quadraticCurveTo(
       tailStartX - tailLength/2, 
-      tailStartY - tailFluffiness * 10, 
+      tailStartY - tailFluffiness * 10 + tailSway, 
       tailStartX - tailLength, 
-      tailStartY - tailFluffiness * 5
+      tailStartY - tailFluffiness * 5 + tailSway
     );
     ctx.lineWidth = 6 * tailFluffiness;
     ctx.strokeStyle = colors[2];
     ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Draw legs (simple lines for now)
+    // Draw legs with running animation
     const legLength = ferret.legs.length * 15;
     const legThickness = ferret.legs.thickness;
+    const strideOffset = Math.sin(ferret.gait.cyclePhase) * strideLength;
+    const strideOffset2 = Math.sin(ferret.gait.cyclePhase + Math.PI) * strideLength;
     
-    // Front legs
+    // Front legs (alternating stride)
     ctx.beginPath();
-    ctx.moveTo(bodyLength/4, bodyHeight/4);
-    ctx.lineTo(bodyLength/4, bodyHeight/4 + legLength);
+    ctx.moveTo(bodyLength/3, bodyHeight/4);
+    ctx.lineTo(bodyLength/3 + strideOffset, bodyHeight/4 + legLength);
     ctx.lineWidth = 3 * legThickness;
     ctx.strokeStyle = colors[1];
     ctx.lineCap = 'round';
     ctx.stroke();
     
-    // Back legs
+    // Other front leg
     ctx.beginPath();
-    ctx.moveTo(-bodyLength/4, bodyHeight/4);
-    ctx.lineTo(-bodyLength/4, bodyHeight/4 + legLength);
+    ctx.moveTo(bodyLength/3 - 5, bodyHeight/4);
+    ctx.lineTo(bodyLength/3 - 5 + strideOffset2, bodyHeight/4 + legLength);
     ctx.lineWidth = 3 * legThickness;
     ctx.stroke();
+    
+    // Back legs (also alternating)
+    ctx.beginPath();
+    ctx.moveTo(-bodyLength/4, bodyHeight/4);
+    ctx.lineTo(-bodyLength/4 + strideOffset2, bodyHeight/4 + legLength);
+    ctx.lineWidth = 3 * legThickness;
+    ctx.stroke();
+    
+    // Other back leg
+    ctx.beginPath();
+    ctx.moveTo(-bodyLength/4 - 5, bodyHeight/4);
+    ctx.lineTo(-bodyLength/4 - 5 + strideOffset, bodyHeight/4 + legLength);
+    ctx.lineWidth = 3 * legThickness;
+    ctx.stroke();
+
+    // Draw small paws/footpads
+    const pawSize = 3;
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    
+    // Front paws
+    ctx.beginPath();
+    ctx.arc(bodyLength/3 + strideOffset, bodyHeight/4 + legLength, pawSize, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(bodyLength/3 - 5 + strideOffset2, bodyHeight/4 + legLength, pawSize, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Back paws
+    ctx.beginPath();
+    ctx.arc(-bodyLength/4 + strideOffset2, bodyHeight/4 + legLength, pawSize, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(-bodyLength/4 - 5 + strideOffset, bodyHeight/4 + legLength, pawSize, 0, Math.PI * 2);
+    ctx.fill();
 
     ctx.restore();
   }
