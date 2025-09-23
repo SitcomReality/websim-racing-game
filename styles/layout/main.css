@@ -380,6 +380,73 @@ li .historyRacerPlacingContainer .racerName {
     gap: 20px;
 }
 
+#left-panel {
+    max-height: 100vh;
+    overflow: hidden;
+}
+
+#sidebarTabs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-panel {
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-panel.active {
+    display: flex;
+    flex-direction: column;
+}
+
+#raceWeekContainer {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+#raceHistory {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+#settings {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+#bettingPanel {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+#game-container {
+    max-height: calc(100vh - 120px);
+    overflow: hidden;
+}
+
+#right-panel {
+    max-height: 100%;
+}
+
+.track-container {
+    flex: 1;
+    min-height: 0;
+}
+
 .smoke {
     width: 100px;
     height: 20px;

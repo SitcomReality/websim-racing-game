@@ -15,6 +15,10 @@
     transition: all 0.3s ease;
 }
 
+.race-week-container:last-child {
+    margin-bottom: 0;
+}
+
 .race-week-container.current-week {
     border-color: var(--accent-color);
     background: linear-gradient(135deg, rgba(0,123,255,0.1) 0%, rgba(0,0,0,0.3) 100%);
