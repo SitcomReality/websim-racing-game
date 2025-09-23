@@ -1,5 +1,5 @@
 class CanvasRenderer {
-  constructor() {
+  constructor(canvas) {
     this.setCanvas(canvas);
     this.dpr = 1;
     this.lastTime = performance.now();
