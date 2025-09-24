@@ -13,6 +13,7 @@ import { ProgressionManager } from './game/progression/ProgressionManager.js';
 import '../ui/components/settingsPanel.js';
 import '../ui/components/tabs.js';
 import '../ui/eventHandlers.js';
+import { initGame } from '../init.js';
 
 // Initialize the application
 class Application {
@@ -28,6 +29,8 @@ class Application {
     
     // Make gameState available globally for compatibility
     window.gameState = this.gameState.state;
+    window.eventBus = this.eventBus;
+    window.initGame = initGame;
     
     // Setup event listeners
     this.setupEventListeners();
@@ -85,6 +88,17 @@ class Application {
     this.eventBus.on('race:finish', (raceData) => {
       this.bettingManager.settleBets(raceData.results);
       this.checkAchievements('race:finish', raceData);
+    });
+    
+    this.eventBus.on('game:initialize', () => {
+      initGame();
+      if (window.HUD) {
+        HUD.setStep(1, 'done');
+        HUD.setStep(2, 'active');
+        HUD.setStatus('Racers and tracks generated. Start Race Week.');
+      }
+      const intro = document.getElementById('introScreen');
+      if (intro) intro.remove();
     });
   }
 

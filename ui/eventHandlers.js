@@ -3,7 +3,11 @@ class EventHandlers {
         const initGameBtn = document.getElementById('initGame');
         if (initGameBtn) {
             initGameBtn.addEventListener('click', function() {
-                initGame();
+                if (window.eventBus && typeof window.eventBus.emit === 'function') {
+                    window.eventBus.emit('game:initialize');
+                } else if (typeof window.initGame === 'function') {
+                    window.initGame();
+                }
                 HUD.setStep(1, 'done'); 
                 HUD.setStep(2, 'active');
                 HUD.setStatus('Racers and tracks generated. Start Race Week.');
@@ -94,4 +98,3 @@ class EventHandlers {
 }
 
 window.EventHandlers = EventHandlers;
-

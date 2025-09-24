@@ -35,7 +35,4 @@ function initGame() {
 	document.getElementById('introScreen').remove();
 }
 
-
-
-
-
+export { initGame };
