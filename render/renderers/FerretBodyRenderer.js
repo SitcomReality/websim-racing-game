@@ -145,8 +145,8 @@ class FerretBodyRenderer {
       ];
     }
 
-    // Draw legs based on farSideOnly flag
-    // legs 0 (front near),1 (front far),2 (rear near),3 (rear far)
+    // Decide which legs to draw this pass:
+    // legs 0 (front near),1 (front far),2 (rear near),3 (rear far) - we'll treat indices 1 and 3 as far-side.
     const farIndices = [1, 3];
     const nearIndices = [0, 2];
     const indicesToDraw = farSideOnly ? farIndices : nearIndices;
@@ -157,6 +157,8 @@ class FerretBodyRenderer {
       const finalLegLength = legLength - pos.lift;
 
       const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
+      // Skip any leg that doesn't have horizontal stride (removes duplicate "up–down only" legs)
+      if (Math.abs(pos.x - startX) < 1) return;
 
       ctx.beginPath();
       ctx.moveTo(startX + (farSideOnly ? -sideOffset : sideOffset), bodyHeight/4);
