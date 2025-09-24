@@ -22,7 +22,7 @@ class FerretBodyRenderer {
     }
   }
 
-  renderHead(ctx, ferret, colors) {
+  renderHead(ctx, ferret, colors, time, racer) {
     const headX = ferret.body.length * 15 - 8;
     const headY = 0;
     const headSize = 12 * (ferret.head.headType === 'rounded' ? 1.1 : 0.9) * ferret.head.earSize;
@@ -37,7 +37,7 @@ class FerretBodyRenderer {
     this.renderEars(ctx, ferret, colors, headX, headY, headSize);
 
     // Nose
-    this.renderNose(ctx, ferret, colors, headX, headY);
+    this.renderNose(ctx, ferret, colors, headX, headY, time, racer);
 
     // Underbite
     this.renderUnderbite(ctx, ferret, headX, headY, headSize);
@@ -61,9 +61,9 @@ class FerretBodyRenderer {
     }
   }
 
-  renderNose(ctx, ferret, colors, headX, headY) {
+  renderNose(ctx, ferret, colors, headX, headY, time, racer) {
     const noseLength = ferret.head.noseLength * 8;
-    const noseTwitch = ferret.isStumbling ? 0 : Math.sin(time * 10 + racer.id) * 0.8;
+    const noseTwitch = ferret.isStumbling ? 0 : Math.sin(time * 10 + (racer?.id || 0)) * 0.8;
 
     ctx.beginPath();
     ctx.ellipse(headX + noseLength + noseTwitch, headY, noseLength/2, 4, 0, 0, Math.PI * 2);
@@ -90,7 +90,7 @@ class FerretBodyRenderer {
     const tailFluffiness = ferret.tail.fluffiness;
     const tailSway = ferret.isStumbling
       ? Math.sin(ferret.crashPhase * 5) * 8
-      : Math.sin(ferret.gait.cyclePhase * 2) * (3 + Math.min(4, speedRatio * 3));
+      : Math.sin(ferret.gait.cyclePhase * 2) * (3 + Math.min(4, ferret.gait.stride * 3));
 
     ctx.beginPath();
     ctx.moveTo(tailStartX, tailStartY);
@@ -108,6 +108,7 @@ class FerretBodyRenderer {
 
   renderLegs(ctx, ferret, colors) {
     const bodyLength = ferret.body.length * 30;
+    const bodyHeight = ferret.body.height * 20 * ferret.body.stockiness;
     const legLength = ferret.legs.length * 15;
     const legThickness = ferret.legs.thickness;
 
@@ -123,7 +124,7 @@ class FerretBodyRenderer {
       ];
     } else {
       // Normal running stride
-      const strideLength = ferret.gait.stride * (10 + speedRatio * 5) * styleFactor;
+      const strideLength = ferret.gait.stride * 10;
       const strideOffset = Math.sin(ferret.gait.cyclePhase) * strideLength;
       const strideOffset2 = Math.sin(ferret.gait.cyclePhase + Math.PI) * strideLength * (ferret.legs.length > 1 ? 1.05 : 0.95);
 

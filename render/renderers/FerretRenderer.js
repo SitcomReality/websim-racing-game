@@ -18,7 +18,7 @@ class FerretRenderer {
 
     // Render ferret components
     this.bodyRenderer.renderBody(ctx, ferret, racer.colors);
-    this.bodyRenderer.renderHead(ctx, ferret, racer.colors);
+    this.bodyRenderer.renderHead(ctx, ferret, racer.colors, time, racer);
     this.bodyRenderer.renderTail(ctx, ferret, racer.colors);
     this.bodyRenderer.renderLegs(ctx, ferret, racer.colors);
 
