@@ -197,8 +197,8 @@ class Application {
     const introScreen = document.getElementById('introScreen');
     if (introScreen) introScreen.style.display = 'block';
 
-    // Initialize legacy UI components
-    if (window.SettingsPanel) SettingsPanel.refresh();
+    // Initialize legacy UI components with gameState
+    if (window.SettingsPanel) SettingsPanel.refresh(this.gameStateManager);
     if (window.Tabs) Tabs.initialize();
     if (window.EventHandlers) EventHandlers.initializeAll();
   }
