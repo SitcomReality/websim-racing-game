@@ -1,16 +1,14 @@
-# Race System Refactoring Guide
+## Current Status
+The refactor is progressing well. We've established a module-based architecture with an `Application` class at its core, managing a central `GameState`, `EventBus`, and various game logic managers. Legacy UI scripts are being phased out in favor of this new, more robust system.
+# Post-Refactor Cleanup, Maintenance, and Debugging Guide
+ 
+This guide outlines the fastest path to make the refactor stable, remove redundancy, and get “New Game → Race Week → Setup → Start Race” working with the module architecture.
+@@ -118,3 +118,5 @@
+ - Prefer moving files to match imports (keeps import statements stable) over peppering relative paths.
+ - Keep temporary global bridges minimal and documented; schedule their removal once SaveGame and any legacy consumers are updated.
+ - Make small commits per step; run the smoke test checklist after each milestone.
++
++## Critical Issue: Component System Initialization
++The component system initialization is failing because `RacerPerformance` is trying to call `getStat` on the stats component before it's properly initialized. This is a timing issue in the component creation process.
 
-## Current State Analysis
-
-The codebase is in a transitional state between legacy global functions and a modern ES6 module architecture. The race week functionality is broken due to several architectural inconsistencies:
-
-### Key Issues Identified:
-
-1. **Fragmented Race Logic**: Race setup and execution logic is scattered across 10+ root-level files
-2. **Legacy/Modern Hybrid**: Mix of global functions and ES6 classes causing dependency confusion  
-3. **Import/Export Mismatches**: Missing or incorrect imports breaking the module system
-4. **Data Flow Disconnection**: ProgressionManager generates data but UI update functions can't access it properly
-5. **Circular Dependencies**: Some modules importing each other creating initialization timing issues
-
-### Current Race-Related Files:
 
