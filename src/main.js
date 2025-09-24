@@ -88,6 +88,8 @@ class Application {
     this.isLoading = true;
     this.loadingProgress = 0;
     this.eventBus.emit('loading:started');
+    // Show loading overlay immediately
+    this.loadingManager?.show();
   }
 
   /**
@@ -99,6 +101,8 @@ class Application {
       progress: this.loadingProgress, 
       message: message || 'Loading...' 
     });
+    // Update visual progress bar if available
+    this.loadingManager?.updateProgress(this.loadingProgress, message);
   }
 
   /**
@@ -108,6 +112,8 @@ class Application {
     this.isLoading = false;
     this.loadingProgress = 100;
     this.eventBus.emit('loading:completed');
+    // Hide loading overlay when finished
+    this.loadingManager?.hide();
   }
 
   /**
@@ -117,6 +123,9 @@ class Application {
     this.isLoading = false;
     this.loadingProgress = 0;
     this.eventBus.emit('loading:failed', { error: errorMessage });
+    // Show overlay (if not already) and display failure message
+    this.loadingManager?.show();
+    this.loadingManager?.updateProgress(0, `Failed: ${errorMessage}`);
   }
 
   /**
