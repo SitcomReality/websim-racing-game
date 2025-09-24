@@ -45,27 +45,29 @@ class FerretBodyRenderer {
 
   renderEars(ctx, ferret, colors, headX, headY, headSize) {
     ctx.fillStyle = colors[2];
-    const earBaseL = { x: headX - headSize * 0.4, y: headY - headSize * 0.6 };
-    const earBaseR = { x: headX + headSize * 0.4, y: earBaseL.y };
-    // directionFactor ranges smoothly -1..1; when positive ear points up, when negative ear inverts and points down
+    // Only draw the back ear (left side from our perspective)
+    const earBaseX = headX - headSize * 0.4;
+    const earBaseY = headY - headSize * 0.6;
+    
+    // Smooth transition between up and down using sine wave
     const directionFactor = Math.sin(ferret.gait.cyclePhase * 3) * (ferret.isStumbling ? 0.9 : 0.8);
+    
+    // Apply easing to make the transition smoother
+    const easedDirection = Math.sin(directionFactor * Math.PI * 0.5);
+    
     const baseLen = Math.max(3, headSize * 0.5);
-    const lenL = baseLen * (1 + 0.15 * Math.abs(directionFactor));
-    const lenR = lenL;
-    const tipOffsetL = lenL * Math.sign(directionFactor); // positive => tip above base.y, negative => tip below base.y
-    const tipOffsetR = lenR * Math.sign(directionFactor);
+    const len = baseLen * (1 + 0.15 * Math.abs(easedDirection));
+    const tipOffset = len * Math.sign(easedDirection);
     const w = Math.max(2, headSize * 0.18);
-    const drawEar = (base, tipOffset) => {
-      ctx.beginPath();
-      ctx.moveTo(base.x - w, base.y); // left corner of base (anchored)
-      ctx.lineTo(base.x + w, base.y); // right corner of base (anchored)
-      ctx.lineTo(base.x, base.y - tipOffset); // tip flips above/below base depending on tipOffset sign
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    };
-    drawEar(earBaseL, tipOffsetL);
-    drawEar(earBaseR, tipOffsetR);
+    
+    // Draw single ear (back ear only)
+    ctx.beginPath();
+    ctx.moveTo(earBaseX - w, earBaseY);
+    ctx.lineTo(earBaseX + w, earBaseY);
+    ctx.lineTo(earBaseX, earBaseY - tipOffset);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   }
 
   renderNose(ctx, ferret, colors, headX, headY, time, racer) {
