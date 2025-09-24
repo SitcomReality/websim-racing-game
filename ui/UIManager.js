@@ -8,6 +8,7 @@ export class UIManager {
     this.screens = new Map();
     this.activeScreen = null;
     this.isInitialized = false;
+    this.root = document.getElementById('app') || null;
   }
 
   /** 
@@ -39,15 +40,17 @@ export class UIManager {
       console.warn(`Screen ${name} not found`);
       return;
     }
+    if (!this.root) this.root = document.getElementById('app');
 
     // Hide current screen
     if (this.activeScreen) {
       this.activeScreen.hide?.();
+      if (this.root) this.root.innerHTML = '';
     }
 
     // Show new screen
     this.activeScreen = screen;
-    screen.show?.(data);
+    screen.show?.({ ...data, container: this.root });
     this.eventBus.emit('screen:changed', { name, data });
   }
 
@@ -58,6 +61,7 @@ export class UIManager {
     if (this.activeScreen) {
       this.activeScreen.hide?.();
       this.activeScreen = null;
+      if (this.root) this.root.innerHTML = '';
       this.eventBus.emit('screen:hidden');
     }
   }

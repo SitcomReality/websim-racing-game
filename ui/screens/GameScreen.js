@@ -86,6 +86,7 @@ export class GameScreen {
 
         <div id="right-panel">
           <div class="track track-container" id="raceTrack">
+            <canvas id="raceCanvas"></canvas>
             <div id="liveLeaderboard" class="overlay-leaderboard">
               <h5>Leaders</h5>
               <ol id="leaderList"></ol>
@@ -165,12 +166,9 @@ export class GameScreen {
   }
 
   show(data = {}) {
-    document.body.appendChild(this.element);
+    (data?.container || document.getElementById('app') || document.body).appendChild(this.element);
     
-    // Initialize tabs if available
-    if (window.Tabs) {
-      Tabs.initialize();
-    }
+    if (window.Tabs?.initialize) window.Tabs.initialize();
   }
 
   hide() {
