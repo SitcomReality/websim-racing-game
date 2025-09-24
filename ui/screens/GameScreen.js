@@ -1,3 +1,5 @@
+import { RacerCardComponent } from '../components/RacerCardComponent.js';
+
 /** 
  * GameScreen - Main game screen
  */
@@ -14,6 +16,7 @@ export class GameScreen {
     this.createElement();
     this.setupComponents();
     this.bindEvents();
+    this.eventBus.on('race:finish', (raceData) => this.updateRaceHistory(raceData));
   }
 
   createElement() {
@@ -120,7 +123,7 @@ export class GameScreen {
     // Bind header button events
     const startRaceWeekBtn = this.element.querySelector('#startRaceWeek');
     const setupRaceBtn = this.element.querySelector('#setupRace');
-    const startRaceBtn = this.element.querySelector('#startRace');
+    const startBtn = this.element.querySelector('#startRace');
 
     if (startRaceWeekBtn) {
       startRaceWeekBtn.addEventListener('click', () => {
@@ -134,14 +137,40 @@ export class GameScreen {
       });
     }
 
-    if (startRaceBtn) {
-      startRaceBtn.addEventListener('click', () => {
+    if (startBtn) {
+      startBtn.addEventListener('click', () => {
         this.eventBus.emit('race:start');
       });
     }
 
     // Bind tab events
     this.bindTabEvents();
+  }
+
+  updateRaceHistory(raceData) {
+    if (!raceData || !raceData.results || !raceData.race) return;
+
+    const historyList = this.element.querySelector('#historyList');
+    if (!historyList) return;
+
+    const newListItem = document.createElement('li');
+    const raceTitle = document.createElement('h6');
+    raceTitle.textContent = `Race ${raceData.race.id} - ${raceData.race.track.name}`;
+    newListItem.appendChild(raceTitle);
+
+    const resultsContainer = document.createElement('div');
+    resultsContainer.className = 'd-grid grid-cols-2 gap-2';
+
+    raceData.results.forEach((racerId, index) => {
+        const racer = window.app.gameState.racers.find(r => r.id === racerId);
+        if (racer) {
+            const racerCard = new RacerCardComponent(racer, { index: index, compact: true });
+            resultsContainer.appendChild(racerCard.createElement());
+        }
+    });
+
+    newListItem.appendChild(resultsContainer);
+    historyList.insertBefore(newListItem, historyList.firstChild);
   }
 
   bindTabEvents() {

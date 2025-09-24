@@ -16,9 +16,6 @@ import '../ui/components/tabs.js';
 // ui/eventHandlers.js is deprecated and will be removed.
 // import '../ui/eventHandlers.js'; 
 import { initGame } from '../init.js';
-// removed obsolete legacy module imports that cause 404s
-// import '../setupRace.js';
-// import '../setupTrack.js';
 // remove legacy domUtils import
 
 // Initialize the application
@@ -99,6 +96,7 @@ class Application {
     this.eventBus.on('race:finish', (raceData) => {
       this.bettingManager.settleBets(raceData.results);
       this.checkAchievements('race:finish', raceData);
+      this.gameState.raceHistory.push(raceData);
     });
     
     this.eventBus.on('game:initialize', () => {

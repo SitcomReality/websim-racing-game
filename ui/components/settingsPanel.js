@@ -29,10 +29,10 @@ export class SettingsPanel extends BaseComponent {
 
                     if (isGroundType || isWeatherType || isThirdType) {
                         html += `<label for="${fullKey}">${finalTerm}:</label>`;
-                        html += `<input class="settings-input" type="text" id="${fullKey}" value="${value}" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">`;
+                        html += `<input class="settings-input" type="text" id="${fullKey}" value="${value}" autocomplete="off" tabindex="${tabCount}">`;
                     } else {
                         html += `<label for="${fullKey}">${finalTerm}:</label>`;
-                        html += `<input class="settings-input" type="number" id="${fullKey}" value="${value}" step="1" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">`;
+                        html += `<input class="settings-input" type="number" id="${fullKey}" value="${value}" step="1" autocomplete="off" tabindex="${tabCount}">`;
                     }
                     html += `</div>`;
                     tabCount++;
@@ -55,18 +55,6 @@ export class SettingsPanel extends BaseComponent {
         if (settingsContainer) {
             settingsContainer.innerHTML = SettingsPanel.generateSettingsHTML(gameState);
         }
-
-        var categoryToggles = document.querySelectorAll('.category-toggle');
-
-        categoryToggles.forEach(function(toggle) {
-            toggle.addEventListener('click', function() {
-                var category = toggle.parentNode;
-                var items = category.querySelectorAll('.ui-item');
-                items.forEach(function(item) {
-                    item.style.display = (item.style.display === 'none') ? 'block' : 'none';
-                });
-            });
-        });
     }
 }
 
