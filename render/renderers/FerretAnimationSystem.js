@@ -1,6 +1,13 @@
-class FerretAnimationSystem {
+/**
+ * FerretAnimationSystem - Handles ferret animation and movement
+ */
+export class FerretAnimationSystem {
+  constructor() {
+    // Animation state will be managed per ferret instance
+  }
+
   update(ferret, racer, time) {
-    const liveX = (gameState.currentRace?.liveLocations?.[racer.id]) || 0;
+    const liveX = (window.gameState?.currentRace?.liveLocations?.[racer.id]) || 0;
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
     const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
 
@@ -30,7 +37,7 @@ class FerretAnimationSystem {
   }
 
   updateEyeTracking(ferret, racer, time) {
-    const currentRace = gameState.currentRace;
+    const currentRace = window.gameState?.currentRace;
     if (!currentRace || !currentRace.racers) return;
 
     const myLaneIndex = currentRace.racers.indexOf(racer.id);
@@ -85,5 +92,3 @@ class FerretAnimationSystem {
     ferret.eye.lowerLid = 0.05 + Math.cos(moodTimer * 0.7) * 0.02;
   }
 }
-
-window.FerretAnimationSystem = FerretAnimationSystem;

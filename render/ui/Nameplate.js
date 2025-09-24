@@ -1,4 +1,7 @@
-class Nameplate {
+/**
+ * Nameplate - Manages racer name display
+ */
+export class Nameplate {
   constructor() {
     this.visibleNames = new Map();
   }
@@ -15,7 +18,7 @@ class Nameplate {
     const now = performance.now();
 
     for (const [racerId, data] of this.visibleNames.entries()) {
-      const racer = gameState.racers[racerId];
+      const racer = window.gameState?.racers[racerId];
       if (!racer) continue;
 
       const age = now - data.time;
@@ -32,7 +35,7 @@ class Nameplate {
       ctx.strokeStyle = 'rgba(255,255,255,0.6)';
       ctx.lineWidth = 1;
 
-      const name = getRacerNameString(racer);
+      const name = this.getRacerNameString(racer);
       ctx.font = '12px Orbitron';
       const width = ctx.measureText(name).width + 10;
       const height = 20;
@@ -46,6 +49,27 @@ class Nameplate {
       ctx.restore();
     }
   }
-}
-window.Nameplate = Nameplate;
 
+  getRacerNameString(racer) {
+    if (!racer || !racer.name) return "Unknown Racer";
+
+    const prefix = window.racerNamePrefixes?.[racer.name[0]];
+    const suffix = window.racerNameSuffixes?.[racer.name[1]];
+
+    let prefixStr, suffixStr;
+
+    if (typeof prefix === 'function') {
+      prefixStr = racer._evaluatedPrefix || (racer._evaluatedPrefix = prefix());
+    } else {
+      prefixStr = prefix;
+    }
+
+    if (typeof suffix === 'function') {
+      suffixStr = racer._evaluatedSuffix || (racer._evaluatedSuffix = suffix());
+    } else {
+      suffixStr = suffix;
+    }
+
+    return `${prefixStr} ${suffixStr}`;
+  }
+}

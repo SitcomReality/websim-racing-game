@@ -1,4 +1,7 @@
-class FerretRenderer {
+/**
+ * FerretRenderer - Renders individual ferret racers
+ */
+export class FerretRenderer {
   constructor() {
     this.animationSystem = new FerretAnimationSystem();
     this.bodyRenderer = new FerretBodyRenderer();
@@ -6,7 +9,7 @@ class FerretRenderer {
   }
 
   render(ctx, x, y, racer, time, scale = 1) {
-    const ferret = racer.ferret;
+    const ferret = racer?.ferret;
     if (!ferret) return;
 
     ctx.save();
@@ -17,7 +20,7 @@ class FerretRenderer {
     this.animationSystem.update(ferret, racer, time);
 
     // Resolve color indices to hex strings
-    const colors = racer.colors.map(c => (typeof c === 'string' ? c : racerColors[c]));
+    const colors = racer.colors.map(c => (typeof c === 'string' ? c : window.racerColors?.[c] || '#000'));
 
     // Render ferret components
     // Draw far-side legs first so they appear behind the body
@@ -34,5 +37,3 @@ class FerretRenderer {
     ctx.restore();
   }
 }
-
-window.FerretRenderer = FerretRenderer;

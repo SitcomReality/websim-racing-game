@@ -1,4 +1,11 @@
-class FerretEyeRenderer {
+/**
+ * FerretEyeRenderer - Renders ferret eyes with blinking and tracking
+ */
+export class FerretEyeRenderer {
+  constructor() {
+    // Eye rendering state managed per ferret instance
+  }
+
   render(ctx, ferret, colors) {
     const headX = ferret.body.length * 15 - 2;
     const headY = -4;
@@ -58,5 +65,3 @@ class FerretEyeRenderer {
     }
   }
 }
-
-window.FerretEyeRenderer = FerretEyeRenderer;

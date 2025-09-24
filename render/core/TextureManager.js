@@ -1,4 +1,7 @@
-class TextureManager {
+/**
+ * TextureManager - Manages procedural textures for different ground types
+ */
+export class TextureManager {
   constructor() {
     this.patterns = new Map();
     this.images = new Map();
@@ -6,7 +9,7 @@ class TextureManager {
     this.ctx = this.canvas.getContext('2d');
   }
 
-  loadTextures(textureMap) {
+  loadTextures() {
     // Create procedural textures for different ground types
     this.createAsphaltTexture();
     this.createGrassTexture();
@@ -124,5 +127,3 @@ class TextureManager {
     return colors[name] || '#303030';
   }
 }
-
-window.TextureManager = TextureManager;

@@ -1,4 +1,7 @@
-class TrackRenderer {
+/**
+ * TrackRenderer - Renders the racing track with segments and textures
+ */
+export class TrackRenderer {
   constructor() {
     this.textureManager = new TextureManager();
     this.textureManager.loadTextures();
@@ -15,8 +18,8 @@ class TrackRenderer {
 
     const laneHeight = 40;
     const totalHeight = laneHeight * props.numberOfLanes;
-    const trackCenterOffsetY = totalHeight / 2;
-    ctx.translate(0, -trackCenterOffsetY);
+    const trackCenterY = totalHeight / 2;
+    ctx.translate(0, -trackCenterY);
 
     const worldPixelWidth = w * 4;
     const cameraPixelX = camera.target.x / 100 * worldPixelWidth;
@@ -35,14 +38,14 @@ class TrackRenderer {
       const laneH = laneHeight;
 
       const rid = race.racers[l];
-      const racer = gameState.racers[rid];
+      const racer = window.gameState?.racers[rid];
 
       if (racer && racer.visual.finished) {
-          ctx.fillStyle = this.getPlacingColor(race.results.indexOf(rid) + 1);
+        ctx.fillStyle = this.getPlacingColor(race.results.indexOf(rid) + 1);
       } else {
         ctx.fillStyle = l % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
       }
-      ctx.fillRect(0, currentY, worldPixelWidth, laneH - 2);
+      ctx.fillRect(0, currentY, laneH - 2, laneH);
       currentY += laneH;
     }
 
@@ -94,12 +97,10 @@ class TrackRenderer {
 
   getPlacingColor(place) {
     switch(place) {
-        case 1: return '#FFC273';
-        case 2: return '#778B95';
-        case 3: return '#824229';
-        default: return 'rgba(17,17,17,0.85)';
+      case 1: return '#FFC273';
+      case 2: return '#778B95';
+      case 3: return '#824229';
+      default: return 'rgba(17,17,17,0.85)';
     }
   }
 }
-
-window.TrackRenderer = TrackRenderer;

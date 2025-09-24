@@ -1,4 +1,7 @@
-class RacerRenderer {
+/**
+ * RacerRenderer - Renders all racers with their ferret representations
+ */
+export class RacerRenderer {
   constructor() {
     this.screenPositions = [];
     this.ferretRenderer = new FerretRenderer();
@@ -9,7 +12,7 @@ class RacerRenderer {
 
     for (let idx = 0; idx < race.racers.length; idx++) {
       const rid = race.racers[idx];
-      const racer = gameState.racers[rid];
+      const racer = window.gameState?.racers[rid];
       const worldX = race.liveLocations[rid] || 0;
       const screen = worldTransform.worldToScreen(worldX, idx);
 
@@ -26,7 +29,7 @@ class RacerRenderer {
   }
 
   renderBoostEffects(ctx, racer, screen, laneIndex, worldTransform) {
-    if (racer.isBoosting && Math.random() < 0.3) {
+    if (racer?.isBoosting && Math.random() < 0.3) {
       const screen = worldTransform.worldToScreen(
         racer.liveLocations || 0,
         laneIndex,
@@ -52,21 +55,42 @@ class RacerRenderer {
   updateLeaderboard(race) {
     const leaderList = document.getElementById('leaderList');
     if (leaderList && race && Array.isArray(race.racers)) {
-      const sorted = race.racers.slice().sort((a,b)=> (race.liveLocations[b]||0)-(race.liveLocations[a]||0));
+      const sorted = race.racers.slice().sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       leaderList.innerHTML = '';
-      sorted.slice(0,5).forEach((rid,i)=>{ 
-        const r = gameState.racers[rid]; 
-        if(!r) return; 
+      sorted.slice(0, 5).forEach((rid, i) => { 
+        const r = window.gameState?.racers[rid]; 
+        if (!r) return; 
         const li = document.createElement('li'); 
-        li.textContent = `${i+1}. ${getRacerNameString(r)}`; 
+        li.textContent = `${i + 1}. ${this.getRacerNameString(r)}`; 
         leaderList.appendChild(li); 
       });
     }
+  }
+
+  getRacerNameString(racer) {
+    if (!racer || !racer.name) return "Unknown Racer";
+
+    const prefix = window.racerNamePrefixes?.[racer.name[0]];
+    const suffix = window.racerNameSuffixes?.[racer.name[1]];
+
+    let prefixStr, suffixStr;
+
+    if (typeof prefix === 'function') {
+      prefixStr = racer._evaluatedPrefix || (racer._evaluatedPrefix = prefix());
+    } else {
+      prefixStr = prefix;
+    }
+
+    if (typeof suffix === 'function') {
+      suffixStr = racer._evaluatedSuffix || (racer._evaluatedSuffix = suffix());
+    } else {
+      suffixStr = suffix;
+    }
+
+    return `${prefixStr} ${suffixStr}`;
   }
 
   getScreenPositions() {
     return this.screenPositions;
   }
 }
-
-window.RacerRenderer = RacerRenderer;
