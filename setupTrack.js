@@ -67,10 +67,10 @@ function setupTrack(track) {
         
         gameState.currentRace.racers[i] = thisRacerID;
         
-        // Create blob data for this racer
-        if (!thisRacer.blobData) {
-            thisRacer.blobData = BlobFactory.create(thisRacer);
-        }
+        // Remove blob data creation since we're using ferret rendering
+        // if (!thisRacer.blobData) {
+        //     thisRacer.blobData = BlobFactory.create(thisRacer);
+        // }
         
         // Initialize live location - key change
         gameState.currentRace.liveLocations[thisRacerID] = 0;
