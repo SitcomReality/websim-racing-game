@@ -1,3 +1,5 @@
+import { BaseComponent } from './BaseComponent.js';
+
 /** 
  * BettingComponent - Betting interface component
  */ 

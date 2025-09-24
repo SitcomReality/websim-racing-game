@@ -6,6 +6,9 @@ import { RaceManager } from './game/RaceManager.js';
 import { BettingManager } from './game/betting/BettingManager.js';
 import { ProgressionManager } from './game/progression/ProgressionManager.js';
 import { HUDComponent } from '../ui/components/HUDComponent.js';
+import { BettingComponent } from '../ui/components/BettingComponent.js';
+import { GameScreen } from '../ui/screens/GameScreen.js';
+import { UIManager } from '../ui/UIManager.js';
 // Ensure legacy UI helpers are available
 import '../ui/components/settingsPanel.js';
 import '../ui/components/tabs.js';
@@ -26,11 +29,13 @@ class Application {
     this.progressionManager = new ProgressionManager(this.eventBus, this.gameStateManager);
     
     // UI Components
+    this.uiManager = new UIManager(this.eventBus);
     this.hud = new HUDComponent(document.getElementById('hud'));
     
     // Make gameState available globally for compatibility
     window.eventBus = this.eventBus;
     window.gameState = this.gameState;
+    window.app = this;
     
     // Setup event listeners
     this.setupEventListeners();
