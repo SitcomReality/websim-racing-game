@@ -20,10 +20,13 @@ class FerretRenderer {
     const colors = racer.colors.map(c => (typeof c === 'string' ? c : racerColors[c]));
 
     // Render ferret components
+    // Draw far-side legs first so they appear behind the body
+    this.bodyRenderer.renderLegs(ctx, ferret, colors, /*farSideOnly=*/true);
     this.bodyRenderer.renderBody(ctx, ferret, colors);
     this.bodyRenderer.renderHead(ctx, ferret, colors, time, racer);
     this.bodyRenderer.renderTail(ctx, ferret, colors);
-    this.bodyRenderer.renderLegs(ctx, ferret, colors);
+    // Draw near-side legs on top of body
+    this.bodyRenderer.renderLegs(ctx, ferret, colors, /*farSideOnly=*/false);
 
     // Render eyes with independent tracking
     this.eyeRenderer.render(ctx, ferret, colors);
