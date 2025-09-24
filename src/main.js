@@ -71,7 +71,12 @@ class Application {
   setupEventListeners() {
     // Race events
     this.eventBus.on('race:startWeek', () => {
-      this.progressionManager.startNewRaceWeek();
+      const week = this.progressionManager.startNewRaceWeek();
+      this.eventBus.emit('progression:weekStarted', {
+        weekNumber: this.gameState.raceWeekCounter,
+        season: this.progressionManager.currentSeason,
+        weekInSeason: this.progressionManager.weekInSeason
+      });
     });
     
     this.eventBus.on('race:setup', () => {

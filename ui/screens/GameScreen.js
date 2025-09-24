@@ -1,4 +1,7 @@
 import { RacerCardComponent } from '../components/RacerCardComponent.js';
+import { HUDComponent } from '../components/HUDComponent.js';
+import { BettingComponent } from '../components/BettingComponent.js';
+import { RenderManager } from '../../render/RenderManager.js';
 
 /** 
  * GameScreen - Main game screen
@@ -9,14 +12,25 @@ export class GameScreen {
     this.eventBus = null;
     this.hudComponent = null;
     this.bettingComponent = null;
+    this.renderManager = null;
   }
 
   initialize(eventBus) {
     this.eventBus = eventBus;
     this.createElement();
+    
+    this.renderManager = new RenderManager(this.element.querySelector('#raceCanvas'));
+    this.renderManager.initialize();
+    
     this.setupComponents();
     this.bindEvents();
-    this.eventBus.on('race:finish', (raceData) => this.updateRaceHistory(raceData));
+
+    // Game State -> UI events
+    this.eventBus.on('race:weekStarted', (data) => this.onRaceWeekStarted(data));
+    this.eventBus.on('race:setup', (data) => this.onRaceSetup(data));
+    this.eventBus.on('race:start', (data) => this.onRaceStart(data));
+    this.eventBus.on('race:finish', (raceData) => this.onRaceFinish(raceData));
+    this.eventBus.on('bets:settled', () => this.updatePlayerBalance());
   }
 
   createElement() {
@@ -128,23 +142,81 @@ export class GameScreen {
     if (startRaceWeekBtn) {
       startRaceWeekBtn.addEventListener('click', () => {
         this.eventBus.emit('race:startWeek');
+        startRaceWeekBtn.disabled = true;
+        setupRaceBtn.disabled = false;
       });
     }
 
     if (setupRaceBtn) {
       setupRaceBtn.addEventListener('click', () => {
         this.eventBus.emit('race:setup');
+        setupRaceBtn.disabled = true;
+        startBtn.disabled = false;
       });
     }
 
     if (startBtn) {
       startBtn.addEventListener('click', () => {
         this.eventBus.emit('race:start');
+        startBtn.disabled = true;
       });
     }
 
     // Bind tab events
     this.bindTabEvents();
+  }
+
+  onRaceWeekStarted(data) {
+    this.hudComponent.setStep(1, 'done');
+    this.hudComponent.setStep(2, 'done');
+    this.hudComponent.setStep(3, 'active');
+    this.hudComponent.setStatus(`Race Week ${data.weekNumber} started. Setup the next race.`);
+    this.updateRaceNumbers();
+  }
+
+  onRaceSetup(data) {
+    this.hudComponent.setStep(3, 'done');
+    this.hudComponent.setStep(4, 'active');
+    this.hudComponent.setStatus('Race is set up. Place your bets and start the race!');
+    this.updateRaceNumbers();
+    
+    const { race } = data;
+    this.renderManager.setRace(race, {
+      numberOfLanes: race.racers.length
+    });
+    // Initial render of the track and racers at starting line
+    this.renderManager.tick(performance.now());
+  }
+
+  onRaceStart(data) {
+    this.hudComponent.setStep(4, 'done');
+    this.hudComponent.setStatus('The race is on!');
+    this.renderManager.start();
+  }
+  
+  onRaceFinish(raceData) {
+    this.renderManager.stop();
+    this.hudComponent.setStep(3, 'active'); // Ready for next race setup
+    this.hudComponent.setStep(4, ''); 
+    this.hudComponent.setStatus('Race finished! View results in History. Setup the next race.');
+
+    this.updateRaceHistory(raceData);
+    
+    // Re-enable buttons for the next race in the week
+    const setupRaceBtn = this.element.querySelector('#setupRace');
+    const startBtn = this.element.querySelector('#startRace');
+    const startRaceWeekBtn = this.element.querySelector('#startRaceWeek');
+    
+    const gameState = window.app.gameState;
+    if (gameState.currentRaceIndex >= gameState.raceWeek.races.length) {
+      // End of week
+      this.hudComponent.setStatus('Race week complete! Start a new week.');
+      setupRaceBtn.disabled = true;
+      startRaceWeekBtn.disabled = false;
+    } else {
+      setupRaceBtn.disabled = false;
+    }
+    startBtn.disabled = true;
   }
 
   updateRaceHistory(raceData) {
@@ -193,9 +265,33 @@ export class GameScreen {
       });
     });
   }
+  
+  updatePlayerBalance() {
+    const balanceEl = this.element.querySelector('#playerBalance');
+    if (balanceEl) {
+      balanceEl.textContent = `$${window.app.gameState.player.balance.toFixed(2)}`;
+    }
+  }
+
+  updateRaceNumbers() {
+    const raceWeekNumberEl = this.element.querySelector('#raceWeekNumber');
+    const raceNumberThisWeekEl = this.element.querySelector('#raceNumberThisWeek');
+    const raceNumberEl = this.element.querySelector('#raceNumber');
+    const gameState = window.app.gameState;
+    
+    if (raceWeekNumberEl) raceWeekNumberEl.textContent = gameState.raceWeekCounter;
+    if (raceNumberThisWeekEl) raceNumberThisWeekEl.textContent = gameState.currentRaceIndex + 1;
+    if (raceNumberEl) raceNumberEl.textContent = gameState.raceHistory.length + 1;
+  }
 
   show(data = {}) {
     (data?.container || document.getElementById('app') || document.body).appendChild(this.element);
+    
+    // Initial UI state update
+    this.hudComponent.setStep(1, 'done');
+    this.hudComponent.setStep(2, 'active');
+    this.hudComponent.setStatus('Game initialized. Start the first Race Week.');
+    this.updatePlayerBalance();
     
     if (window.Tabs?.initialize) window.Tabs.initialize();
   }
@@ -222,6 +318,7 @@ export class GameScreen {
   cleanup() {
     this.hudComponent?.cleanup();
     this.bettingComponent?.cleanup();
+    this.renderManager?.cleanup();
     this.element = null;
     this.eventBus = null;
   }

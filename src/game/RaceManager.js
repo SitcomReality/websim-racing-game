@@ -28,7 +28,8 @@ export class RaceManager {
    */
   setupRace() {
     if (!this.gameState.raceWeek) {
-      this.startRaceWeek();
+      // This path shouldn't be hit if UI flow is correct, but as a safeguard:
+      this.eventBus.emit('race:startWeek');
     }
 
     const raceIndex = this.gameState.currentRaceIndex || 0;
@@ -42,7 +43,7 @@ export class RaceManager {
 
     this.eventBus.emit('race:setup', {
       raceIndex: raceIndex,
-      race: raceData
+      race: this.gameState.currentRace
     });
   }
 
@@ -53,6 +54,7 @@ export class RaceManager {
     if (!this.currentRace) {
       this.setupRace();
     }
+    if (!this.currentRace) return; // setupRace might have determined week is over
 
     this.gameState.running = true;
     this.startRaceTimer();
