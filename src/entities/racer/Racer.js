@@ -21,7 +21,10 @@ export class Racer {
     // Create ferret anatomy data for rendering
     this.ferret = window.FerretFactory ? window.FerretFactory.create(this) : null;
 
-    // Initialize components
+    // Initialize components - FIX: ensure components is initialized first
+    this.components = new Map();
+    
+    // Then create component instances
     this.components = racerComponents.createComponents(this, config);
 
     // Initialize component-based properties
@@ -54,6 +57,10 @@ export class Racer {
    * Get a component by name
    */
   getComponent(name) {
+    // Ensure components exists before accessing it
+    if (!this.components) {
+      this.components = new Map();
+    }
     return this.components.get(name);
   }
 
