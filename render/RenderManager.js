@@ -288,48 +288,11 @@ export class RenderManager {
   updateCameraTarget() {
     if (!this.currentRace || !this.currentRace.racers || this.currentRace.racers.length === 0) return;
 
-    const loc = this.currentRace.liveLocations;
-    const xs = this.currentRace.racers.map(rid => loc[rid] || 0);
-    const avg = xs.reduce((a, b) => a + b, 0) / xs.length;
-    const minX = Math.max(0, Math.min(...xs));
-    const maxX = Math.min(100, Math.max(...xs));
+    const { desiredX, desiredZoom } = this.camera.calculateDesiredState(this.currentRace, this.gameState);
 
-    let desiredX = avg, desiredZoom = this.camera.zoom || 1;
-
-    if (this.camera.mode === 'single' && this.currentRace.racers[0] != null) {
-      desiredX = avg;
-    } else if (this.camera.mode === 'leaders') {
-      desiredX = Math.max(...xs);
-    } else if (this.camera.mode === 'average') {
-      desiredX = avg;
-    } else if (this.camera.mode === 'fitAll') {
-      const dims = this.canvasAdapter.getDimensions();
-      const worldPixelWidth = dims.width * 4;
-      const worldUnitsVisibleAtZoom1 = (dims.width * 100) / worldPixelWidth;
-      const marginUnits = 5;
-      const span = Math.max(5, (maxX - minX) + marginUnits * 2);
-      const zMin = 0.5;
-      const zMax = 2.0;
-      const zoomH = worldUnitsVisibleAtZoom1 / span;
-      const totalH = this.worldTransform.laneHeight * this.renderProps.numberOfLanes;
-      const marginPx = 30;
-      const zoomV = (dims.height - marginPx * 2) / Math.max(1, totalH);
-      desiredZoom = Math.max(zMin, Math.min(zMax, Math.min(zoomH, zoomV)));
-
-      const leaderX = Math.max(...xs);
-      const visibleWorldUnits = worldUnitsVisibleAtZoom1 / desiredZoom;
-      const minVisibleX = leaderX - visibleWorldUnits + marginUnits;
-      const maxVisibleX = leaderX + marginUnits;
-      const idealCenter = (minX + maxX) / 2;
-      const minAllowedCenter = minVisibleX + (visibleWorldUnits / 2);
-      const maxAllowedCenter = maxVisibleX - (visibleWorldUnits / 2);
-      desiredX = Math.max(minAllowedCenter, Math.min(maxAllowedCenter, idealCenter));
-    }
-
-    this.camera.update(this.currentRace, this.gameState);
-
+    // Apply damping for smooth camera movement
     this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
-    this.camera.zoom += ((desiredZoom || 1) - (this.camera.zoom || 1)) * this.camera.damping;
+    this.camera.zoom += (desiredZoom - this.camera.zoom) * this.camera.damping;
   }
 
   /**

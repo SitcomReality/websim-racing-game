@@ -12,36 +12,40 @@ class Camera {
     if (opts.target) this.target = { x: opts.target.x || 0, y: opts.target.y || 0 };
   }
   
-  update(race, gameState) {
-    if (!race || !race.racers || race.racers.length === 0) return;
+  calculateDesiredState(race, gameState) {
+    if (!race || !race.racers || race.racers.length === 0) {
+      return { desiredX: this.target.x, desiredZoom: this.zoom };
+    }
     
-    // Get gameState from the app instance
-    if (!gameState) return;
+    if (!gameState) {
+      return { desiredX: this.target.x, desiredZoom: this.zoom };
+    }
     
     const loc = race.liveLocations;
     const xs = race.racers.map(rid => loc[rid] || 0);
-    const avg = xs.reduce((a,b)=>a+b,0) / xs.length;
+    const avg = xs.reduce((a, b) => a + b, 0) / xs.length;
     const minX = Math.max(0, Math.min(...xs));
     const maxX = Math.min(100, Math.max(...xs));
     
-    // simple modes
+    let desiredX = this.target.x;
+    let desiredZoom = this.zoom;
+
     if (this.mode === 'single' && race.racers[0] != null) {
-      this.target.x = avg;
+      desiredX = avg;
     } else if (this.mode === 'leaders') {
       const lead = Math.max(...xs);
-      this.target.x = lead;
+      desiredX = lead;
     } else if (this.mode === 'average') {
-      this.target.x = avg;
+      desiredX = avg;
     } else if (this.mode === 'fitAll') {
-      // Calculate zoom to fit all racers with comfortable margins
-      const margin = 15; // Add 15% margin on each side
+      const margin = 15;
       const span = Math.max(30, (maxX - minX) + margin * 2);
-      this.target.x = (minX + maxX) / 2;
-      // Clamp zoom within reasonable bounds
+      desiredX = (minX + maxX) / 2;
       const zMin = (gameState.settings?.render?.camera?.zoomMin) || 0.5;
       const zMax = (gameState.settings?.render?.camera?.zoomMax) || 2.0;
-      this.zoom = Math.max(zMin, Math.min(zMax, 100 / span));
+      desiredZoom = Math.max(zMin, Math.min(zMax, 100 / span));
     }
+    return { desiredX, desiredZoom };
   }
 }
 
