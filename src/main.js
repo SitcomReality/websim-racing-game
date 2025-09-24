@@ -207,7 +207,7 @@ class Application {
 
     // Register screens
     this.uiManager.registerScreen('intro', new IntroScreen());
-    this.uiManager.registerScreen('game', new GameScreen());
+    this.uiManager.registerScreen('game', new GameScreen(this.gameStateManager));
 
     // Show the intro screen
     this.uiManager.showScreen('intro', { gameState: this.gameState });

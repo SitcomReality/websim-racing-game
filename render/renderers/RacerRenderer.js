@@ -5,6 +5,7 @@ export class RacerRenderer {
   constructor() {
     this.screenPositions = [];
     this.ferretRenderer = new FerretRenderer();
+    this.renderManager = null;
   }
 
   render(ctx, race, worldTransform, time) {
@@ -12,7 +13,7 @@ export class RacerRenderer {
 
     for (let idx = 0; idx < race.racers.length; idx++) {
       const rid = race.racers[idx];
-      const racer = window.gameState?.racers.find(r => r.id === rid);
+      const racer = this.renderManager?.gameState?.racers.find(r => r.id === rid);
       const worldX = race.liveLocations[rid] || 0;
       const screen = worldTransform.worldToScreen(worldX, idx);
 
@@ -30,21 +31,21 @@ export class RacerRenderer {
 
   renderBoostEffects(ctx, racer, screen, laneIndex, worldTransform) {
     if (racer?.isBoosting && Math.random() < 0.3) {
-      const screen = worldTransform.worldToScreen(
+      const scr = worldTransform.worldToScreen(
         racer.liveLocations || 0,
         laneIndex,
-        window.renderManager ? window.renderManager.camera : null,
-        window.renderManager ? window.renderManager.canvas.width : 800,
-        window.renderManager ? window.renderManager.canvas.height : 520,
-        window.renderManager && window.renderManager.renderProps ? window.renderManager.renderProps.numberOfLanes : 10
+        this.renderManager ? this.renderManager.camera : null,
+        this.renderManager ? this.renderManager.canvas.width : 800,
+        this.renderManager ? this.renderManager.canvas.height : 520,
+        this.renderManager && this.renderManager.renderProps ? this.renderManager.renderProps.numberOfLanes : 10
       );
       
-      if (window.renderManager && window.renderManager.particleSystem) {
-        window.renderManager.particleSystem.emit(
-          screen.x, 
-          screen.y, 
-          Math.PI,
-          80 * screen.scale, 
+      if (this.renderManager && this.renderManager.particleSystem) {
+        this.renderManager.particleSystem.emit(
+          scr.x, 
+          scr.y, 
+          Math.PI, 
+          80 * scr.scale, 
           2, 
           'rgba(255,255,255,0.8)'
         );
@@ -58,7 +59,7 @@ export class RacerRenderer {
       const sorted = race.racers.slice().sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       leaderList.innerHTML = '';
       sorted.slice(0, 5).forEach((rid, i) => { 
-        const r = window.gameState?.racers.find(r => r.id === rid); 
+        const r = this.renderManager?.gameState?.racers.find(r => r.id === rid); 
         if (!r) return; 
         const li = document.createElement('li'); 
         li.textContent = `${i + 1}. ${this.getRacerNameString(r)}`; 

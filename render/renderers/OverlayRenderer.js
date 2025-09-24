@@ -24,7 +24,7 @@ export class OverlayRenderer {
 
     if (currentLane !== null) {
       const rid = this.renderManager.currentRace.racers[currentLane];
-      const racer = window.gameState?.racers[rid];
+      const racer = this.renderManager.gameState?.racers[rid];
 
       if (racer) {
         this.createHoverBanner(racer, currentLane, w);
@@ -72,7 +72,7 @@ export class OverlayRenderer {
 
   renderSingleBanner(ctx, banner, w, h, laneH, laneIndex) {
     const rid = this.renderManager.currentRace.racers[laneIndex];
-    const racer = window.gameState?.racers[rid];
+    const racer = this.renderManager.gameState?.racers[rid];
     if (!racer) return;
 
     const color1 = window.racerColors[racer.colors[0]];

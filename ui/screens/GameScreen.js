@@ -7,19 +7,20 @@ import { RenderManager } from '../../render/RenderManager.js';
  * GameScreen - Main game screen
  */
 export class GameScreen {
-  constructor() {
+  constructor(gameState = null) {
     this.element = null;
     this.eventBus = null;
     this.hudComponent = null;
     this.bettingComponent = null;
     this.renderManager = null;
+    this.gameState = gameState;
   }
 
   initialize(eventBus) {
     this.eventBus = eventBus;
     this.createElement();
     
-    this.renderManager = new RenderManager(this.element.querySelector('#raceCanvas'));
+    this.renderManager = new RenderManager(this.element.querySelector('#raceCanvas'), this.gameState);
     this.renderManager.initialize();
     
     this.setupComponents();
@@ -216,7 +217,7 @@ export class GameScreen {
     const startBtn = this.element.querySelector('#startRace');
     const startRaceWeekBtn = this.element.querySelector('#startRaceWeek');
     
-    const gameState = window.app.gameState;
+    const gameState = this.gameState;
     if (gameState.currentRaceIndex >= gameState.raceWeek.races.length) {
       // End of week
       this.hudComponent.setStatus('Race week complete! Start a new week.');
@@ -278,7 +279,7 @@ export class GameScreen {
   updatePlayerBalance() {
     const balanceEl = this.element.querySelector('#playerBalance');
     if (balanceEl) {
-      balanceEl.textContent = `$${window.app.gameState.player.balance.toFixed(2)}`;
+      balanceEl.textContent = `$${this.gameState.player.balance.toFixed(2)}`;
     }
   }
 
@@ -286,7 +287,7 @@ export class GameScreen {
     const raceWeekNumberEl = this.element.querySelector('#raceWeekNumber');
     const raceNumberThisWeekEl = this.element.querySelector('#raceNumberThisWeek');
     const raceNumberEl = this.element.querySelector('#raceNumber');
-    const gameState = window.app.gameState;
+    const gameState = this.gameState;
     
     if (raceWeekNumberEl) raceWeekNumberEl.textContent = gameState.raceWeekCounter;
     if (raceNumberThisWeekEl) raceNumberThisWeekEl.textContent = gameState.currentRaceIndex + 1;

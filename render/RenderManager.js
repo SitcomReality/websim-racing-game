@@ -16,12 +16,13 @@ import { OverlayRenderer } from './renderers/OverlayRenderer.js';
  * Manages all rendering systems and coordinates render pipeline
  */
 export class RenderManager {
-  constructor(canvas) {
+  constructor(canvas, gameState) {
     this.animationLoop = new AnimationLoop();
     this.canvasAdapter = new CanvasAdapter(canvas);
     this.canvas = canvas;
     this.ctx = this.canvasAdapter.getContext();
     this.dpr = this.canvasAdapter.dpr;
+    this.gameState = gameState;
     
     // Core rendering systems
     this.camera = new window.Camera();
@@ -47,7 +48,7 @@ export class RenderManager {
     this.raceEndCountdown = null;
     
     // Initialize camera
-    this.camera.damping = (gameState.settings?.render?.camera?.smoothing) || 0.15;
+    this.camera.damping = (this.gameState?.settings?.render?.camera?.smoothing) || 0.15;
     this.camera.setMode('fitAll');
   }
 
@@ -56,6 +57,11 @@ export class RenderManager {
    */
   initialize() {
     this.canvasAdapter.resizeToContainer();
+    // Legacy compatibility for modules still referencing window.renderManager
+    window.renderManager = this;
+    // Provide gameState to renderers
+    this.trackRenderer.gameState = this.gameState;
+    this.racerRenderer.renderManager = this;
   }
 
   /**
@@ -141,7 +147,7 @@ export class RenderManager {
    * Render debug information
    */
   renderDebug(time, deltaTime) {
-    if (!gameState.settings.render.debug) return;
+    if (!this.gameState.settings.render.debug) return;
 
     const fps = 1 / deltaTime;
     this.ctx.fillStyle = 'rgba(0,0,0,0.7)';
@@ -328,18 +334,18 @@ export class RenderManager {
    * End race early (moved from OverlayRenderer for better cohesion)
    */
   endRaceEarly() {
-    gameState.running = false;
+    this.gameState.running = false;
     this.raceEndCountdown.active = false;
 
-    const finishedRacers = new Set(gameState.currentRace.results);
-    const allRacers = gameState.currentRace.racers;
+    const finishedRacers = new Set(this.gameState.currentRace.results);
+    const allRacers = this.gameState.currentRace.racers;
 
     for (const racerId of allRacers) {
       if (!finishedRacers.has(racerId)) {
-        const position = gameState.currentRace.results.length + 1;
-        gameState.currentRace.results.push(racerId);
-        gameState.racers[racerId].didNotFinish = true;
-        gameState.racers[racerId].updateRacerHistory(gameState.currentRace.id, position);
+        const position = this.gameState.currentRace.results.length + 1;
+        this.gameState.currentRace.results.push(racerId);
+        this.gameState.racers[racerId].didNotFinish = true;
+        this.gameState.racers[racerId].updateRacerHistory(this.gameState.currentRace.id, position);
       }
     }
 

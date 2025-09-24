@@ -6,6 +6,7 @@ export class TrackRenderer {
     this.textureManager = new TextureManager();
     this.textureManager.loadTextures();
     this.seamAligned = new Set(['marble']);
+    this.gameState = null;
   }
 
   render(ctx, race, props, camera) {
@@ -39,7 +40,7 @@ export class TrackRenderer {
       const laneH = laneHeight;
 
       const rid = race.racers[l];
-      const racer = window.gameState?.racers.find(r => r.id === rid);
+      const racer = (this.gameState?.racers || []).find(r => r.id === rid);
 
       if (racer && racer.visual.finished) {
         ctx.fillStyle = this.getPlacingColor(race.results.indexOf(rid) + 1);
