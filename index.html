@@ -146,67 +146,14 @@
             </div>
         </div>
     </main>
-    <script src="loadXmlWordlists.js"></script>
-    <script src="domUtils.js"></script>
-    <script src="helper_functions.js"></script>
-    <script src="preInit.js"></script>
-    <script src="gameState.js"></script>
-    <script src="init.js"></script>
-    <script src="FerretFactory.js"></script>
-    <script src="Racer.js"></script>
-    <script src="HitTestIndex.js"></script>
-    <script src="Camera.js"></script>
-    <script src="TextureManager.js"></script>
-    <script src="BlobFactory.js"></script>
-    <script src="ParticleSystem.js"></script>
-    <script src="Nameplate.js"></script>
-    <script src="render/core/TextureManager.js"></script>
-    <script src="render/renderers/TrackRenderer.js"></script>
-    <script src="render/renderers/FerretAnimationSystem.js"></script>
-    <script src="render/renderers/FerretBodyRenderer.js"></script>
-    <script src="render/renderers/FerretEyeRenderer.js"></script>
-    <script src="render/renderers/FerretRenderer.js"></script>
-    <script src="render/renderers/RacerRenderer.js"></script>
-    <script src="render/core/CanvasRenderer.js"></script>
-    <script src="render/core/AnimationLoop.js"></script>
-    <script src="render/core/WorldTransform.js"></script>
-    <script src="arrangeRacersByPerformance.js"></script>
-    <script src="setupTrack.js"></script>
-    <script src="Track.js"></script>
-    <script src="Race.js"></script>
-    <script src="RaceWeek.js"></script>
-    <script src="createNewRaceWeek.js"></script>
-    <script src="wordlist/const_colors.js"></script>
-    <script src="wordlist/const_locationSuffixes.js"></script>
-    <script src="setPaletteCSS.js"></script>
-    <script src="generateRacers.js"></script>
-    <script src="advanceToNextRace.js"></script>
-    <script src="updateLivePositionDisplay.js"></script>
-    <script src="beginRace.js"></script>
-    <script src="processRacerFinish.js"></script>
-    <script src="processRaceFinish.js"></script>
-    <script src="updateHistory.js"></script>
-    <script src="ui/core/settings.js"></script>
-    <script src="ui/components/settingsPanel.js"></script>
-    <script src="ui/components/hud.js"></script>
-    <script src="ui/components/tabs.js"></script>
-    <script src="ui/eventHandlers.js"></script>
-    <script src="ui/initialization.js"></script>
-    <script src="scripts.js"></script>
-    <script>
-        // Load XML wordlists before initializing the game
-        loadXmlWordlists().then(() => {
-            console.log('XML wordlists loaded successfully');
-        }).catch(error => {
-            console.error('Failed to load XML wordlists:', error);
-        });
-        
-        window.onload = function() {
-            const m = document.getElementById('no-js');
-            if (m) {
-                m.remove();
-            }
-        }
+    
+    <!-- ES6 Module Entry Point -->
+    <script type="module" src="src/main.js"></script>
+    
+    <!-- Fallback for browsers without ES6 module support -->
+    <script nomodule>
+        document.getElementById('no-js').innerHTML = '<h2 style="color:red;">Browser Not Supported</h2><p style="font-weight:bold;">Your browser does not support ES6 modules.</p><p>Please upgrade to a modern browser to play this game.</p>';
+        document.getElementById('no-js').style.display = 'block';
     </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
