@@ -9,6 +9,9 @@ class Application {
     this.moduleLoader = new ModuleLoader();
     this.gameState = new GameState();
     this.eventBus = new EventBus();
+    
+    // Make gameState available globally for compatibility
+    window.gameState = this.gameState.state;
   }
 
   async initialize() {
