@@ -1,6 +1,13 @@
-class SettingsPanel {
-    static generateSettingsHTML() {
-        let html = '<div id=\"settingsPanelInner\">';
+import { BaseComponent } from './BaseComponent.js';
+
+export class SettingsPanel extends BaseComponent {
+    constructor(element, options = {}) {
+        super(element, options);
+        this.gameState = options.gameState;
+    }
+
+    static generateSettingsHTML(gameState) {
+        let html = '<div id="settingsPanelInner">';
         let tabCount = 0;
 
         function generateCategoryHTML(categoryObj, parentKey = '') {
@@ -10,22 +17,22 @@ class SettingsPanel {
                 const terms = fullKey.split('.');
                 const finalTerm = terms[terms.length - 1];
                 if (typeof value === 'object') {
-                    html += `<div class=\"ui-section\">`;
-                    html += `<h3 class=\"category-toggle\">${finalTerm}</h3>`;
+                    html += `<div class="ui-section">`;
+                    html += `<h3 class="category-toggle">${finalTerm}</h3>`;
                     generateCategoryHTML(value, fullKey);
                     html += `</div>`;
                 } else {
-                    html += `<div class=\"ui-item\">`;
+                    html += `<div class="ui-item">`;
                     const isGroundType = parentKey.includes('groundProperties');
                     const isWeatherType = parentKey.includes('weatherProperties');
                     const isThirdType = parentKey.includes('thirdProperties');
 
                     if (isGroundType || isWeatherType || isThirdType) {
-                        html += `<label for=\"${fullKey}\">${finalTerm}:</label>`;
-                        html += `<input class=\"settings-input\" type=\"text\" id=\"${fullKey}\" value=\"${value}\" autocomplete=\"off\" onchange=\"updateSetting('${fullKey}', this.value)\" tabindex=\"${tabCount}\">`;
+                        html += `<label for="${fullKey}">${finalTerm}:</label>`;
+                        html += `<input class="settings-input" type="text" id="${fullKey}" value="${value}" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">`;
                     } else {
-                        html += `<label for=\"${fullKey}\">${finalTerm}:</label>`;
-                        html += `<input class=\"settings-input\" type=\"number\" id=\"${fullKey}\" value=\"${value}\" step=\"1\" autocomplete=\"off\" onchange=\"updateSetting('${fullKey}', this.value)\" tabindex=\"${tabCount}\">`;
+                        html += `<label for="${fullKey}">${finalTerm}:</label>`;
+                        html += `<input class="settings-input" type="number" id="${fullKey}" value="${value}" step="1" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">`;
                     }
                     html += `</div>`;
                     tabCount++;
@@ -39,8 +46,8 @@ class SettingsPanel {
         return html;
     }
 
-    static refresh() {
-        document.getElementById('introSettings').innerHTML = SettingsPanel.generateSettingsHTML();
+    static refresh(gameState) {
+        document.getElementById('introSettings').innerHTML = SettingsPanel.generateSettingsHTML(gameState);
 
         var categoryToggles = document.querySelectorAll('.category-toggle');
 
@@ -56,4 +63,5 @@ class SettingsPanel {
     }
 }
 
+// Legacy compatibility
 window.SettingsPanel = SettingsPanel;
