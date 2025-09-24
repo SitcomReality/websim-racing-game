@@ -16,14 +16,17 @@ class FerretRenderer {
     // Update animation state
     this.animationSystem.update(ferret, racer, time);
 
+    // Resolve color indices to hex strings
+    const colors = racer.colors.map(c => (typeof c === 'string' ? c : racerColors[c]));
+
     // Render ferret components
-    this.bodyRenderer.renderBody(ctx, ferret, racer.colors);
-    this.bodyRenderer.renderHead(ctx, ferret, racer.colors, time, racer);
-    this.bodyRenderer.renderTail(ctx, ferret, racer.colors);
-    this.bodyRenderer.renderLegs(ctx, ferret, racer.colors);
+    this.bodyRenderer.renderBody(ctx, ferret, colors);
+    this.bodyRenderer.renderHead(ctx, ferret, colors, time, racer);
+    this.bodyRenderer.renderTail(ctx, ferret, colors);
+    this.bodyRenderer.renderLegs(ctx, ferret, colors);
 
     // Render eyes with independent tracking
-    this.eyeRenderer.render(ctx, ferret, racer.colors);
+    this.eyeRenderer.render(ctx, ferret, colors);
 
     ctx.restore();
   }
