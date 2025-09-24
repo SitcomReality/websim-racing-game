@@ -25,11 +25,11 @@ export class RenderManager {
     this.gameState = gameState;
     
     // Core rendering systems
-    this.camera = new window.Camera();
-    this.worldTransform = new window.WorldTransform();
+    this.camera = new Camera();
+    this.worldTransform = new WorldTransform();
     this.particleSystem = new ParticleSystem();
     this.nameplate = new Nameplate();
-    this.hitIndex = new window.HitTestIndex();
+    this.hitIndex = new HitTestIndex();
     
     // Renderer instances
     this.trackRenderer = new TrackRenderer();
@@ -129,7 +129,7 @@ export class RenderManager {
     this.ctx.save();
     this.renderWeatherEffects();
     this.hitIndex.update(this.racerRenderer.getScreenPositions());
-    this.nameplate.render(this.ctx);
+    this.nameplate.render(this.ctx, this.gameState);
     this.ctx.restore();
   }
 
@@ -326,6 +326,8 @@ export class RenderManager {
       desiredX = Math.max(minAllowedCenter, Math.min(maxAllowedCenter, idealCenter));
     }
 
+    this.camera.update(this.currentRace, this.gameState);
+
     this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
     this.camera.zoom += ((desiredZoom || 1) - (this.camera.zoom || 1)) * this.camera.damping;
   }
@@ -371,7 +373,8 @@ export class RenderManager {
       this.camera,
       this.canvas.width,
       this.canvas.height,
-      this.renderProps?.numberOfLanes
+      this.renderProps?.numberOfLanes,
+      this.gameState
     );
   }
 

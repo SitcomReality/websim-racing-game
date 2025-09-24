@@ -14,11 +14,11 @@ export class Nameplate {
     this.visibleNames.delete(racerId);
   }
 
-  render(ctx) {
+  render(ctx, gameState) {
     const now = performance.now();
 
     for (const [racerId, data] of this.visibleNames.entries()) {
-      const racer = window.gameState?.racers[racerId];
+      const racer = gameState?.racers[racerId];
       if (!racer) continue;
 
       const age = now - data.time;

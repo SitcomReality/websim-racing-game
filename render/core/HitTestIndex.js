@@ -17,4 +17,4 @@ class HitTestIndex {
     return hits;
   }
 }
-window.HitTestIndex = HitTestIndex;
+export { HitTestIndex };

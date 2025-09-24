@@ -15,7 +15,7 @@ export class RacerRenderer {
       const rid = race.racers[idx];
       const racer = this.renderManager?.gameState?.racers.find(r => r.id === rid);
       const worldX = race.liveLocations[rid] || 0;
-      const screen = worldTransform.worldToScreen(worldX, idx);
+      const screen = worldTransform.worldToScreen(worldX, idx, this.renderManager.camera, this.renderManager.canvas.width, this.renderManager.canvas.height, race.racers.length, this.renderManager.gameState);
 
       this.screenPositions.push({ rid, x: screen.x, y: screen.y, r: 25 * screen.scale });
 

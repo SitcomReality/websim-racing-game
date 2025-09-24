@@ -13,4 +13,3 @@ export class RaceWeek {
   }
 }
 window.RaceWeek = RaceWeek;
-

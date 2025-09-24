@@ -15,8 +15,7 @@ export class IntroScreen {
     this.createElement();
     this.bindEvents();
     this.settingsPanel = new SettingsPanel(this.element.querySelector('#introSettings'), {
-      eventBus: this.eventBus,
-      gameState: window.app.gameState
+      eventBus: this.eventBus
     });
   }
 

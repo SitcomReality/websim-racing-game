@@ -12,11 +12,10 @@ class Camera {
     if (opts.target) this.target = { x: opts.target.x || 0, y: opts.target.y || 0 };
   }
   
-  update(race) {
+  update(race, gameState) {
     if (!race || !race.racers || race.racers.length === 0) return;
     
     // Get gameState from the app instance
-    const gameState = window.app?.gameState;
     if (!gameState) return;
     
     const loc = race.liveLocations;
@@ -46,4 +45,4 @@ class Camera {
   }
 }
 
-window.Camera = Camera;
+export { Camera };

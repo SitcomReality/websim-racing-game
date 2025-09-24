@@ -5,7 +5,7 @@ import { Track } from './src/models/Track.js';
 // Import locationSuffixes from the constants file
 import { locationSuffixes } from './wordlist/const_locationSuffixes.js';
 
-// window.Track = Track; // for save/load compatibility
+// window.Track = Track; // DEPRECATED: No longer needed for save/load
 
 function initGame(gameState) {
 	const avgSpeed = 
