@@ -145,8 +145,8 @@ class FerretBodyRenderer {
       ];
     }
 
-    // Decide which legs to draw this pass:
-    // legs 0 (front near),1 (front far),2 (rear near),3 (rear far) - we'll treat indices 1 and 3 as far-side.
+    // Draw legs based on farSideOnly flag
+    // legs 0 (front near),1 (front far),2 (rear near),3 (rear far)
     const farIndices = [1, 3];
     const nearIndices = [0, 2];
     const indicesToDraw = farSideOnly ? farIndices : nearIndices;
