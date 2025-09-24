@@ -290,18 +290,31 @@ export class RenderManager {
     } else if (this.camera.mode === 'average') {
       desiredX = avg;
     } else if (this.camera.mode === 'fitAll') {
-      // Calculate zoom to fit all racers with comfortable margins
-      const margin = 15; // Add 15% margin on each side
-      const span = Math.max(30, (maxX - minX) + margin * 2);
-      desiredX = (minX + maxX) / 2;
-      // Clamp zoom within reasonable bounds
+      const dims = this.canvasAdapter.getDimensions();
+      const worldPixelWidth = dims.width * 4;
+      const worldUnitsVisibleAtZoom1 = (dims.width * 100) / worldPixelWidth;
+      const marginUnits = 5;
+      const span = Math.max(5, (maxX - minX) + marginUnits * 2);
       const zMin = 0.5;
       const zMax = 2.0;
-      desiredZoom = Math.max(zMin, Math.min(zMax, 100 / span));
+      const zoomH = worldUnitsVisibleAtZoom1 / span;
+      const totalH = this.worldTransform.laneHeight * this.renderProps.numberOfLanes;
+      const marginPx = 30;
+      const zoomV = (dims.height - marginPx * 2) / Math.max(1, totalH);
+      desiredZoom = Math.max(zMin, Math.min(zMax, Math.min(zoomH, zoomV)));
+
+      const leaderX = Math.max(...xs);
+      const visibleWorldUnits = worldUnitsVisibleAtZoom1 / desiredZoom;
+      const minVisibleX = leaderX - visibleWorldUnits + marginUnits;
+      const maxVisibleX = leaderX + marginUnits;
+      const idealCenter = (minX + maxX) / 2;
+      const minAllowedCenter = minVisibleX + (visibleWorldUnits / 2);
+      const maxAllowedCenter = maxVisibleX - (visibleWorldUnits / 2);
+      desiredX = Math.max(minAllowedCenter, Math.min(maxAllowedCenter, idealCenter));
     }
 
     this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
-    this.camera.zoom += (desiredZoom || 1) - (this.camera.zoom || 1) * this.camera.damping;
+    this.camera.zoom += ((desiredZoom || 1) - (this.camera.zoom || 1)) * this.camera.damping;
   }
 
   /**
