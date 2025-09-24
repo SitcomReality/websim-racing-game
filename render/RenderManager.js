@@ -1,11 +1,11 @@
-import { Camera } from './systems/Camera.js';
-import { WorldTransform } from './systems/WorldTransform.js';
+import './core/Camera.js';
+import './core/WorldTransform.js';
+import './core/HitTestIndex.js';
 import { ParticleSystem } from './systems/ParticleSystem.js';
 import { Nameplate } from './ui/Nameplate.js';
 import { TrackRenderer } from './renderers/TrackRenderer.js';
 import { RacerRenderer } from './renderers/RacerRenderer.js';
 import { AnimationLoop } from './systems/AnimationLoop.js';
-import { HitTestIndex } from './core/HitTestIndex.js';
 import { RenderPipeline } from './systems/RenderPipeline.js';
 import { CanvasAdapter } from './core/CanvasAdapter.js';
 import { InteractionController } from './systems/InteractionController.js';
@@ -24,11 +24,11 @@ export class RenderManager {
     this.dpr = this.canvasAdapter.dpr;
     
     // Core rendering systems
-    this.camera = new Camera();
-    this.worldTransform = new WorldTransform();
+    this.camera = new window.Camera();
+    this.worldTransform = new window.WorldTransform();
     this.particleSystem = new ParticleSystem();
     this.nameplate = new Nameplate();
-    this.hitIndex = new HitTestIndex();
+    this.hitIndex = new window.HitTestIndex();
     
     // Renderer instances
     this.trackRenderer = new TrackRenderer();
@@ -56,7 +56,6 @@ export class RenderManager {
    */
   initialize() {
     this.canvasAdapter.resizeToContainer();
-    this.textureManager.loadTextures();
   }
 
   /**
@@ -376,6 +375,16 @@ export class RenderManager {
   cleanup() {
     this.interactionController.cleanup();
     this.stop();
+  }
+
+  /**
+   * Set canvas
+   */
+  setCanvas(canvas) {
+    this.canvas = canvas;
+    this.canvasAdapter = new CanvasAdapter(canvas);
+    this.ctx = this.canvasAdapter.getContext();
+    this.dpr = this.canvasAdapter.dpr;
   }
 }
 

@@ -5,10 +5,14 @@ import { EventBus } from './core/EventBus.js';
 import { RaceManager } from './game/RaceManager.js';
 import { BettingManager } from './game/betting/BettingManager.js';
 import { ProgressionManager } from './game/progression/ProgressionManager.js';
-import { UIManager } from './ui/UIManager.js';
-import { GameScreen } from './ui/screens/GameScreen.js';
-import { BettingComponent } from './ui/components/BettingComponent.js';
-import { HUDComponent } from './ui/components/HUDComponent.js';
+// import { UIManager } from './ui/UIManager.js';
+// import { GameScreen } from './ui/screens/GameScreen.js';
+// import { BettingComponent } from './ui/components/BettingComponent.js';
+// import { HUDComponent } from './ui/components/HUDComponent.js';
+// Ensure legacy UI helpers are available
+import '../ui/components/settingsPanel.js';
+import '../ui/components/tabs.js';
+import '../ui/eventHandlers.js';
 
 // Initialize the application
 class Application {
@@ -21,9 +25,6 @@ class Application {
     this.raceManager = new RaceManager(this.eventBus, this.gameState);
     this.bettingManager = new BettingManager(this.eventBus, this.gameState);
     this.progressionManager = new ProgressionManager(this.eventBus, this.gameState);
-    
-    // Initialize UI manager
-    this.uiManager = new UIManager(this.eventBus);
     
     // Make gameState available globally for compatibility
     window.gameState = this.gameState.state;
@@ -164,44 +165,17 @@ class Application {
   }
 
   initializeUI() {
-    // Register UI components
-    this.uiManager.registerComponent('hud', new HUDComponent(document.querySelector('#hud')));
-    this.uiManager.registerComponent('betting', new BettingComponent(
-      document.querySelector('#bettingPanel'),
-      { eventBus: this.eventBus }
-    ));
-    
-    // Register screens
-    this.uiManager.registerScreen('game', new GameScreen());
-    
-    // Initialize UI
-    this.uiManager.initialize();
-    
-    // Show game screen
-    this.uiManager.showScreen('game');
-
-    // Initialize legacy UI components for compatibility
-    if (window.SettingsPanel) {
-      SettingsPanel.refresh();
-    }
-    if (window.Tabs) {
-      Tabs.initialize();
-    }
-    if (window.EventHandlers) {
-      EventHandlers.initializeAll();
-    }
-
-    // Hide the no-js message and show the game interface
+    // Legacy UI initialization: hide no-js and show intro
     const noJsDiv = document.getElementById('no-js');
-    if (noJsDiv) {
-      noJsDiv.style.display = 'none';
-    }
+    if (noJsDiv) noJsDiv.style.display = 'none';
 
-    // Show the intro screen with settings
     const introScreen = document.getElementById('introScreen');
-    if (introScreen) {
-      introScreen.style.display = 'block';
-    }
+    if (introScreen) introScreen.style.display = 'block';
+
+    // Initialize legacy UI components
+    if (window.SettingsPanel) SettingsPanel.refresh();
+    if (window.Tabs) Tabs.initialize();
+    if (window.EventHandlers) EventHandlers.initializeAll();
   }
 }
 

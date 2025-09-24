@@ -31,7 +31,6 @@ button {
     background-color: #0056b3;
     border-color: #0056b3;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transform: translateY(-2px);
 }
 
 .btn-secondary {
@@ -44,7 +43,6 @@ button {
     background-color: #545b62;
     border-color: #545b62;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transform: translateY(-2px);
 }
 
 .btn-outline {
@@ -57,5 +55,4 @@ button {
     background-color: var(--accent-color);
     color: white;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transform: translateY(-2px);
 }
