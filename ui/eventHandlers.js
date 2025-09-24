@@ -20,17 +20,17 @@ class EventHandlers {
                 const setupRaceBtn = document.getElementById('setupRace');
                 if (setupRaceBtn) { setupRaceBtn.disabled = false; }
                 
-                // Call the new progression manager
-                window.app.progressionManager.startNewRaceWeek();
-                
-                // Also call the legacy UI update function to display the race week info
-                if (typeof createNewRaceWeek === 'function') {
-                    createNewRaceWeek();
+                // Use eventBus to trigger race week start
+                if (window.eventBus) {
+                    window.eventBus.emit('race:startWeek');
                 }
-
-                window.app.hud.setStep(2, 'done'); 
-                window.app.hud.setStep(3, 'active');
-                window.app.hud.setStatus('Race Week created. Setup the next race.');
+                
+                // Update HUD through eventBus or app instance
+                if (window.app && window.app.hud) {
+                    window.app.hud.setStep(2, 'done'); 
+                    window.app.hud.setStep(3, 'active');
+                    window.app.hud.setStatus('Race Week created. Setup the next race.');
+                }
             });
         }
     }
@@ -39,11 +39,17 @@ class EventHandlers {
         const setupRaceBtn = document.getElementById('setupRace');
         if (setupRaceBtn) {
             setupRaceBtn.addEventListener('click', function() {
-                setupRace();
-                // setupBettingOptions(); // Betting component will handle this
-                window.app.hud.setStep(3, 'done'); 
-                window.app.hud.setStep(4, 'active');
-                window.app.hud.setStatus('Track prepared and racers on the grid. Start the race!');
+                // Use eventBus to trigger race setup
+                if (window.eventBus) {
+                    window.eventBus.emit('race:setup');
+                }
+                
+                // Update HUD
+                if (window.app && window.app.hud) {
+                    window.app.hud.setStep(3, 'done'); 
+                    window.app.hud.setStep(4, 'active');
+                    window.app.hud.setStatus('Track prepared and racers on the grid. Start the race!');
+                }
             });
         }
     }
@@ -52,12 +58,15 @@ class EventHandlers {
         const startRaceBtn = document.getElementById('startRace');
         if (startRaceBtn) {
             startRaceBtn.addEventListener('click', function() {
-                if (typeof window.startRace === 'function') {
-                    window.startRace();
-                } else if (window.app && window.app.raceManager) {
-                    window.app.raceManager.startRace();
+                // Use eventBus to trigger race start
+                if (window.eventBus) {
+                    window.eventBus.emit('race:start');
                 }
-                window.app.hud.setStatus('Race in progress... watch the leaderboard update live.');
+                
+                // Update HUD
+                if (window.app && window.app.hud) {
+                    window.app.hud.setStatus('Race in progress... watch the leaderboard update live.');
+                }
             });
         }
     }
@@ -81,7 +90,10 @@ class EventHandlers {
         const endRaceBtn = document.getElementById('endRace');
         if (endRaceBtn) {
             endRaceBtn.addEventListener('click', function() {
-                endRaceEarly();
+                // Use eventBus to trigger race end
+                if (window.eventBus) {
+                    window.eventBus.emit('race:end');
+                }
             });
         }
     }
@@ -90,7 +102,9 @@ class EventHandlers {
         const speedMultiplier = document.getElementById('speedMultiplier');
         if (speedMultiplier) {
             speedMultiplier.addEventListener('change', function() {
-                gameState.settings.racerProperties.speedMultiplier = document.getElementById('speedMultiplier').value;
+                if (window.gameState && window.gameState.settings) {
+                    window.gameState.settings.racerProperties.speedMultiplier = document.getElementById('speedMultiplier').value;
+                }
             });
         }
     }

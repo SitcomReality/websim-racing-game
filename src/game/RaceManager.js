@@ -8,6 +8,7 @@ export class RaceManager {
     this.currentRace = null;
     this.raceTimer = null;
     this.raceEndCountdown = null;
+    this.animationFrameId = null;
   }
 
   /**
