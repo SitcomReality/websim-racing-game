@@ -74,9 +74,8 @@ export class ProgressionManager {
       const track = selectedTracks[i % selectedTracks.length];
       const raceRacers = this.selectRaceRacers(selectedRacers);
       const weather = this.selectWeather();
-
-      const race = new Race(`${this.gameState.raceWeekCounter}-${i + 1}`, raceRacers, track);
-      race.weather = weather;
+      const race = new Race(`${this.gameState.raceWeekCounter}-${i + 1}`, raceRacers, track, weather);
+      race.initializeSegments(settings.trackProperties.segmentsPerSection);
       races.push(race);
     }
 

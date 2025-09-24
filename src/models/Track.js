@@ -1,5 +1,5 @@
 export class Track {
-  constructor(id, name, numberOfSections, groundTypes = []) {
+  constructor(id, name, numberOfSections = 3, groundTypes = []) {
     this.id = id;
     this.name = name;
     this.sections = [];
@@ -10,4 +10,5 @@ export class Track {
     }
   }
 }
+window.Track = Track;
 

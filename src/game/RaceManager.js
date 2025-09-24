@@ -66,16 +66,19 @@ export class RaceManager {
    * Prepare race data and initialize racers
    */
   prepareRace(raceData) {
+    const race = new Race(raceData.id, raceData.racers.map(r => r.id), raceData.track, raceData.weather);
+    race.initializeSegments(this.gameState.settings.trackProperties.segmentsPerSection);
+    race.startTime = Date.now();
     this.currentRace = {
-      id: raceData.id,
-      racers: raceData.racers.map(racer => racer.id),
-      track: raceData.track,
-      weather: raceData.weather,
-      segments: this.createTrackSegments(raceData.track),
+      id: race.id,
+      racers: race.racers,
+      track: race.track,
+      weather: race.weather,
+      segments: race.segments,
       results: [],
       liveLocations: {},
       livePositions: [],
-      startTime: Date.now()
+      startTime: race.startTime
     };
 
     // Initialize racer positions
