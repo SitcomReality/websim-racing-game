@@ -21,7 +21,20 @@ function setupTrack(track) {
     canvas.id = 'raceCanvas';
     trackDom.appendChild(canvas);
 
-    gameState.currentRace.trackName = track.name;
+    // Fix: Add validation for track parameter
+    if (!track) {
+        console.error('setupTrack: track parameter is undefined');
+        return;
+    }
+
+    // Fix: Validate track.sections exists and is an array
+    if (!track.sections || !Array.isArray(track.sections)) {
+        console.error('setupTrack: track.sections is missing or invalid', track);
+        // Create a default track structure
+        track.sections = ['asphalt', 'asphalt', 'asphalt'];
+    }
+
+    gameState.currentRace.trackName = track.name || 'Unknown Track';
     gameState.currentRace.sections = [];
     gameState.currentRace.segments = [];
     
@@ -67,12 +80,7 @@ function setupTrack(track) {
         
         gameState.currentRace.racers[i] = thisRacerID;
         
-        // Remove blob data creation since we're using ferret rendering
-        // if (!thisRacer.blobData) {
-        //     thisRacer.blobData = BlobFactory.create(thisRacer);
-        // }
-        
-        // Initialize live location - key change
+        // Initialize live location
         gameState.currentRace.liveLocations[thisRacerID] = 0;
         thisRacer.reset();
     }
