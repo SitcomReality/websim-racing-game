@@ -1,3 +1,5 @@
+import { FerretRenderer } from './FerretRenderer.js';
+
 /**
  * RacerRenderer - Renders all racers with their ferret representations
  */
@@ -39,7 +41,7 @@ export class RacerRenderer {
         this.renderManager ? this.renderManager.canvas.height : 520,
         this.renderManager && this.renderManager.renderProps ? this.renderManager.renderProps.numberOfLanes : 10
       );
-      
+
       if (this.renderManager && this.renderManager.particleSystem) {
         this.renderManager.particleSystem.emit(
           scr.x, 
