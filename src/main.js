@@ -2,6 +2,13 @@
 import { ModuleLoader } from './utils/moduleLoader.js';
 import { GameState } from './core/GameState.js';
 import { EventBus } from './core/EventBus.js';
+import { RaceManager } from './game/RaceManager.js';
+import { BettingManager } from './game/betting/BettingManager.js';
+import { ProgressionManager } from './game/progression/ProgressionManager.js';
+import { UIManager } from './ui/UIManager.js';
+import { GameScreen } from './ui/screens/GameScreen.js';
+import { BettingComponent } from './ui/components/BettingComponent.js';
+import { HUDComponent } from './ui/components/HUDComponent.js';
 
 // Initialize the application
 class Application {
@@ -10,8 +17,19 @@ class Application {
     this.gameState = new GameState();
     this.eventBus = new EventBus();
     
+    // Initialize game logic managers
+    this.raceManager = new RaceManager(this.eventBus, this.gameState);
+    this.bettingManager = new BettingManager(this.eventBus, this.gameState);
+    this.progressionManager = new ProgressionManager(this.eventBus, this.gameState);
+    
+    // Initialize UI manager
+    this.uiManager = new UIManager(this.eventBus);
+    
     // Make gameState available globally for compatibility
     window.gameState = this.gameState.state;
+    
+    // Setup event listeners
+    this.setupEventListeners();
   }
 
   async initialize() {
@@ -33,6 +51,47 @@ class Application {
       console.error('Failed to initialize application:', error);
       throw error;
     }
+  }
+
+  /**
+   * Setup event listeners for game logic
+   */
+  setupEventListeners() {
+    // Race events
+    this.eventBus.on('race:startWeek', () => {
+      this.raceManager.startRaceWeek();
+    });
+    
+    this.eventBus.on('race:setup', () => {
+      this.raceManager.setupRace();
+    });
+    
+    this.eventBus.on('race:start', () => {
+      this.raceManager.startRace();
+    });
+    
+    // Betting events
+    this.eventBus.on('bet:placed', (betData) => {
+      this.uiManager.refreshComponents();
+    });
+    
+    this.eventBus.on('bets:settled', (settlementData) => {
+      this.uiManager.refreshComponents();
+      this.checkAchievements('bet:won', settlementData);
+    });
+    
+    // Race finish
+    this.eventBus.on('race:finish', (raceData) => {
+      this.bettingManager.settleBets(raceData.results);
+      this.checkAchievements('race:finish', raceData);
+    });
+  }
+
+  /**
+   * Check and award achievements
+   */
+  checkAchievements(eventType, data) {
+    this.progressionManager.checkAchievements(eventType, data);
   }
 
   async loadXmlWordlists() {
@@ -105,7 +164,23 @@ class Application {
   }
 
   initializeUI() {
-    // Initialize UI components
+    // Register UI components
+    this.uiManager.registerComponent('hud', new HUDComponent(document.querySelector('#hud')));
+    this.uiManager.registerComponent('betting', new BettingComponent(
+      document.querySelector('#bettingPanel'),
+      { eventBus: this.eventBus }
+    ));
+    
+    // Register screens
+    this.uiManager.registerScreen('game', new GameScreen());
+    
+    // Initialize UI
+    this.uiManager.initialize();
+    
+    // Show game screen
+    this.uiManager.showScreen('game');
+
+    // Initialize legacy UI components for compatibility
     if (window.SettingsPanel) {
       SettingsPanel.refresh();
     }
