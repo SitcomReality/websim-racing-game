@@ -119,22 +119,29 @@ class FerretBodyRenderer {
       // Scrambling/crashing leg positions
       const scramblePhase = ferret.crashPhase * 6;
       legPositions = [
-        { x: bodyLength/3 + Math.sin(scramblePhase) * 8, y: bodyLength/4 + Math.cos(scramblePhase * 1.3) * 4 },
-        { x: bodyLength/3 - 5 + Math.sin(scramblePhase + 1) * 6, y: bodyLength/4 + Math.cos(scramblePhase * 1.1) * 3 },
-        { x: -bodyLength/4 + Math.sin(scramblePhase + 2) * 7, y: bodyLength/4 + Math.cos(scramblePhase * 0.9) * 5 },
-        { x: -bodyLength/4 - 5 + Math.sin(scramblePhase + 3) * 5, y: bodyLength/4 + Math.cos(scramblePhase * 1.2) * 4 }
+        { x: bodyLength/3 + Math.sin(scramblePhase) * 8, y: bodyLength/4 + Math.cos(scramblePhase * 1.3) * 4, lift: 0 },
+        { x: bodyLength/3 - 5 + Math.sin(scramblePhase + 1) * 6, y: bodyLength/4 + Math.cos(scramblePhase * 1.1) * 3, lift: 0 },
+        { x: -bodyLength/4 + Math.sin(scramblePhase + 2) * 7, y: bodyLength/4 + Math.cos(scramblePhase * 0.9) * 5, lift: 0 },
+        { x: -bodyLength/4 - 5 + Math.sin(scramblePhase + 3) * 5, y: bodyLength/4 + Math.cos(scramblePhase * 1.2) * 4, lift: 0 }
       ];
     } else {
       // Normal running stride
       const strideLength = ferret.gait.stride * 10;
-      const strideOffset = Math.sin(ferret.gait.cyclePhase) * strideLength;
-      const strideOffset2 = Math.sin(ferret.gait.cyclePhase + Math.PI) * strideLength * (ferret.legs.length > 1 ? 1.05 : 0.95);
+      const stridePhase = ferret.gait.cyclePhase;
+      const strideOffset = Math.sin(stridePhase) * strideLength;
+      const strideOffset2 = Math.sin(stridePhase + Math.PI) * strideLength * (ferret.legs.length > 1 ? 1.05 : 0.95);
+
+      // Determine foot lift. Lift happens when foot is moving forward (positive velocity)
+      const liftHeight = 8;
+      const cosPhase = Math.cos(stridePhase);
+      const liftAmount = cosPhase > 0 ? cosPhase * liftHeight : 0;
+      const liftAmount2 = -cosPhase > 0 ? -cosPhase * liftHeight : 0;
 
       legPositions = [
-        { x: bodyLength/3 + strideOffset, y: bodyHeight/4 },
-        { x: bodyLength/3 - 5 + strideOffset2, y: bodyHeight/4 },
-        { x: -bodyLength/4 + strideOffset2, y: bodyHeight/4 },
-        { x: -bodyLength/4 - 5 + strideOffset, y: bodyHeight/4 }
+        { x: bodyLength/3 + strideOffset, y: bodyHeight/4, lift: liftAmount },
+        { x: bodyLength/3 - 5 + strideOffset2, y: bodyHeight/4, lift: liftAmount2 },
+        { x: -bodyLength/4 + strideOffset2, y: bodyHeight/4, lift: liftAmount2 },
+        { x: -bodyLength/4 - 5 + strideOffset, y: bodyHeight/4, lift: liftAmount }
       ];
     }
 
@@ -147,13 +154,13 @@ class FerretBodyRenderer {
     indicesToDraw.forEach((i) => {
       const pos = legPositions[i];
       const sideOffset = farSideOnly ? 2 : 0; // subtle horizontal offset for depth
-      const depthY = farSideOnly ? 2 : 0; // push far legs a touch upward to read as behind
+      const finalLegLength = legLength - pos.lift;
 
       const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
 
       ctx.beginPath();
-      ctx.moveTo(startX + (farSideOnly ? -sideOffset : sideOffset), bodyHeight/4 + depthY);
-      ctx.lineTo(pos.x + (farSideOnly ? -sideOffset : sideOffset), pos.y + legLength + depthY);
+      ctx.moveTo(startX + (farSideOnly ? -sideOffset : sideOffset), bodyHeight/4);
+      ctx.lineTo(pos.x + (farSideOnly ? -sideOffset : sideOffset), pos.y + finalLegLength);
       ctx.lineWidth = 3 * legThickness;
       // far-side legs should be slightly dimmer to sell depth
       ctx.strokeStyle = farSideOnly ? shadeColor(colors[1] || '#000000', -25) : (colors[1] || '#000');
@@ -164,7 +171,7 @@ class FerretBodyRenderer {
       const pawSize = ferret.isStumbling ? 2 : 3;
       ctx.fillStyle = farSideOnly ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.4)';
       ctx.beginPath();
-      ctx.arc(pos.x + (farSideOnly ? -sideOffset : sideOffset), pos.y + legLength + depthY, pawSize, 0, Math.PI * 2);
+      ctx.arc(pos.x + (farSideOnly ? -sideOffset : sideOffset), pos.y + finalLegLength, pawSize, 0, Math.PI * 2);
       ctx.fill();
     });
   }
