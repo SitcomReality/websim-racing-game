@@ -17,8 +17,8 @@ import '../ui/components/tabs.js';
 // import '../ui/eventHandlers.js'; 
 import { initGame } from '../init.js';
 import { FerretFactory } from './entities/racer/FerretFactory.js';
-import { Racer } from './src/entities/racer/Racer.js';
-import { Track } from './src/models/Track.js';
+import { Racer } from './entities/racer/Racer.js';
+import { Track } from './models/Track.js';
 // remove legacy domUtils import
 
 // Initialize the application
