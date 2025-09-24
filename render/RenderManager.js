@@ -1,6 +1,6 @@
-import './core/Camera.js';
-import './core/WorldTransform.js';
-import './core/HitTestIndex.js';
+import { Camera } from './core/Camera.js';
+import { WorldTransform } from './core/WorldTransform.js';
+import { HitTestIndex } from './core/HitTestIndex.js';
 import { ParticleSystem } from './systems/ParticleSystem.js';
 import { Nameplate } from './ui/Nameplate.js';
 import { TrackRenderer } from './renderers/TrackRenderer.js';
