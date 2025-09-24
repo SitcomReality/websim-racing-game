@@ -59,7 +59,8 @@ export class RaceManager {
     this.gameState.running = true;
     this.startRaceTimer();
 
-    this.eventBus.emit('race:start', {
+    // Emit distinct event to avoid recursively triggering startRace listeners
+    this.eventBus.emit('race:started', {
       race: this.currentRace
     });
   }
