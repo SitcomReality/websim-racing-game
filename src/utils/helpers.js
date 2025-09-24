@@ -57,6 +57,30 @@ export function isValueExists(value, suppliedArray) {
     return suppliedArray.includes(value);
 }
 
+// Helper function to get a random multiplier with normal distribution
+export function getRandomMultiplier(multiplierVariation, maxVal = 0.9, minVal = 1.1) {
+    // Box-Muller transform to generate a random number following a normal distribution
+    function generateGaussianRandom() {
+        let u = 0, v = 0;
+        while(u === 0) u = Math.random(); // Convert [0,1) to (0,1)
+        while(v === 0) v = Math.random();
+        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    }
+
+    // Generate a form value
+    let mean = 1;
+    let standardDeviation = multiplierVariation;
+    let gaussianRandom = generateGaussianRandom();
+
+    // Calculate the form value
+    let multiplierValue = mean + gaussianRandom * standardDeviation;
+
+    // Ensure formValue is close to 1
+    multiplierValue = Math.max(0.9, Math.min(1.1, multiplierValue));
+
+    return multiplierValue;
+}
+
 // Helper function to shade a hex color
 export function shadeColor(color, percent) {
     let R = parseInt(color.substring(1,3),16);
@@ -105,4 +129,39 @@ export function calculateBasePropertyAverage(category) {
         }
     }
     return count > 0 ? sum / count : 0;
+}
+
+// Helper function to get racer name string (moved from helper_functions.js)
+export function getRacerNameString(racer) {
+    if (!racer || !racer.name) {
+        return "Unknown Racer";
+    }
+
+    const prefix = window.racerNamePrefixes?.[racer.name[0]];
+    const suffix = window.racerNameSuffixes?.[racer.name[1]];
+
+    // Check if this is a function (dynamic name) that needs to be evaluated once
+    let prefixStr, suffixStr;
+
+    if (typeof prefix === 'function') {
+        // Store the evaluated result if not already stored
+        if (!racer._evaluatedPrefix) {
+            racer._evaluatedPrefix = prefix();
+        }
+        prefixStr = racer._evaluatedPrefix;
+    } else {
+        prefixStr = prefix;
+    }
+
+    if (typeof suffix === 'function') {
+        // Store the evaluated result if not already stored
+        if (!racer._evaluatedSuffix) {
+            racer._evaluatedSuffix = suffix();
+        }
+        suffixStr = racer._evaluatedSuffix;
+    } else {
+        suffixStr = suffix;
+    }
+
+    return `${prefixStr} ${suffixStr}`;
 }

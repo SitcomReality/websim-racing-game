@@ -1,4 +1,4 @@
-import { calculateBasePropertyAverage, generateUniqueNumbers } from './src/utils/helpers.js';
+import { calculateBasePropertyAverage, generateUniqueNumbers, getRacerNameString } from './src/utils/helpers.js';
 import { Racer } from './src/entities/racer/Racer.js';
 import { Track } from './Track.js';
 
