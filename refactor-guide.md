@@ -115,14 +115,14 @@ With modular system in place, easily add:
    - `InteractionController` - Handles mouse interactions and hover effects
    - `CanvasAdapter` - Manages canvas operations and device pixel ratio
 
-### 🔄 In Progress
-2) **Remove redundant files**: Identified for cleanup
-   - `Racer.js` (legacy monolith) - Can be deleted
-   - `ParticleSystem.js` duplicates - Keep `render/systems/ParticleSystem.js`
-   - `Camera.js` and `WorldTransform.js` duplicates - Keep `render/core/` versions
-   - `HitTestIndex.js` duplicate - Keep `render/core/HitTestIndex.js`
+### ✅ Completed
+2) **Remove redundant files**: Completed successfully
+   - `Racer.js` (legacy monolith) - Deleted
+   - `ParticleSystem.js` duplicates - Removed, keeping `render/systems/ParticleSystem.js`
+   - `Camera.js` and `WorldTransform.js` duplicates - Removed, keeping `render/core/` versions
+   - `HitTestIndex.js` duplicate - Removed, keeping `render/core/HitTestIndex.js`
 
-### 📝 Next Steps
+### 🔄 In Progress
 3) **Update imports and verify functionality**:
    - Update all import statements to use new modular structure
    - Test race flow, particles, nameplates, camera, leaderboard, countdown
