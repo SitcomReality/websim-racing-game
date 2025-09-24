@@ -5,20 +5,28 @@ import { EventBus } from './core/EventBus.js';
 import { RaceManager } from './game/RaceManager.js';
 import { BettingManager } from './game/betting/BettingManager.js';
 import { ProgressionManager } from './game/progression/ProgressionManager.js';
-import { UIManager } from '../ui/UIManager.js';
-import { IntroScreen } from '../ui/screens/IntroScreen.js';
+import { HUDComponent } from '../ui/components/HUDComponent.js';
+import { BettingComponent } from '../ui/components/BettingComponent.js';
 import { GameScreen } from '../ui/screens/GameScreen.js';
+import { IntroScreen } from '../ui/screens/IntroScreen.js';
+import { UIManager } from '../ui/UIManager.js';
+import { SettingsPanel } from '../ui/components/settingsPanel.js';
+// Ensure legacy UI helpers are available
+import '../ui/components/tabs.js';
+// ui/eventHandlers.js is deprecated and will be removed.
+// import '../ui/eventHandlers.js'; 
 import { initGame } from '../init.js';
 import { FerretFactory } from './entities/racer/FerretFactory.js';
 import { Racer } from './entities/racer/Racer.js';
 import { Track } from './models/Track.js';
+// remove legacy domUtils import
 
 // Initialize the application
 class Application {
   constructor() {
     this.moduleLoader = new ModuleLoader();
     this.gameStateManager = new GameState();
-    this.gameState = this.gameStateManager;
+    this.gameState = this.gameStateManager; // Use the manager directly
     this.eventBus = new EventBus();
     
     // Initialize game logic managers
@@ -122,6 +130,7 @@ class Application {
   }
 
   async loadXmlWordlists() {
+    // Implementation moved from loadXmlWordlists.js
     try {
       const dynamicPrefixes = [
         () => `00${Math.floor(Math.random()*9)}: Licensed To`,
@@ -135,7 +144,7 @@ class Application {
 
       const dynamicSuffixes = [
         () => `V${Math.floor(Math.random()*10)}.${Math.floor(Math.random()*10)}`,
-        () => `'${Math.floor(10 + Math.random()*89)}` ,
+        () => `'${Math.floor(10 + Math.random()*89)}`,
         () => `${Math.floor(1 + Math.random()*9)}000`,
       ];
 
