@@ -70,13 +70,16 @@ class RacerRenderer {
     const currentSpeed = racer.speedThisRace[racer.speedThisRace.length - 1] || 10;
     const baseSpeed = gameState.settings.racerProperties.speedBase;
     const speedRatio = currentSpeed / baseSpeed;
+    /* Running style based on proportions */
+    const styleFactor = (ferret.body.stockiness > 1 ? 0.92 : 1.08) * (ferret.legs.length > 1 ? 1.08 : 0.96);
     
     // Update gait cycle based on movement speed
     ferret.gait.cyclePhase += speedRatio * 0.15;
     if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
     
     // Calculate stride length based on speed
-    const strideLength = ferret.gait.stride * (10 + speedRatio * 5);
+    const strideLength = ferret.gait.stride * (10 + speedRatio * 5) * styleFactor;
+    const headBob = Math.sin(ferret.gait.cyclePhase * 2) * (1 + speedRatio) * 1.2;
 
     // Handle stumbling/crash animation
     let bodyRotation = 0;
@@ -125,7 +128,7 @@ class RacerRenderer {
 
     // Draw head (circle at front of body)
     const headX = bodyLength/2 - 8;
-    const headY = 0;
+    let headY = 0; headY += headBob; // subtle head bob
     const headSize = 12 * (ferret.head.headType === 'rounded' ? 1.1 : 0.9) * ferret.head.earSize;
     
     ctx.beginPath();
@@ -137,22 +140,24 @@ class RacerRenderer {
     // Ears (shape/size variation)
     ctx.fillStyle = colors[2];
     const earR = Math.max(3, headSize * 0.35);
+    const earFlap = Math.sin(ferret.gait.cyclePhase * 3) * Math.min(6, 6 * speedRatio * (racer.isBoosting ? 1.4 : 1));
     if (ferret.head.earShape === 'pointy') {
-      [[-headSize*0.2,-headSize*0.9],[headSize*0.2,-headSize*0.9]].forEach(offset=>{
+      [[-headSize*0.2,-headSize*0.9 + earFlap],[headSize*0.2,-headSize*0.9 + earFlap]].forEach(offset=>{
         ctx.beginPath(); ctx.moveTo(headX+offset[0], headY+offset[1]);
         ctx.lineTo(headX+offset[0]-earR, headY+offset[1]+earR);
         ctx.lineTo(headX+offset[0]+earR, headY+offset[1]+earR); ctx.closePath(); ctx.fill(); ctx.stroke();
       });
     } else {
-      [[-headSize*0.3,-headSize*0.8],[headSize*0.3,-headSize*0.8]].forEach(offset=>{
+      [[-headSize*0.3,-headSize*0.8 + earFlap],[headSize*0.3,-headSize*0.8 + earFlap]].forEach(offset=>{
         ctx.beginPath(); ctx.arc(headX+offset[0], headY+offset[1], earR, 0, Math.PI*2); ctx.fill(); ctx.stroke();
       });
     }
 
     // Draw nose/snout
     const noseLength = ferret.head.noseLength * 8;
+    const noseTwitch = ferret.isStumbling ? 0 : Math.sin(time * 10 + racer.id) * 0.8;
     ctx.beginPath();
-    ctx.ellipse(headX + noseLength, headY, noseLength/2, 4, 0, 0, Math.PI * 2);
+    ctx.ellipse(headX + noseLength + noseTwitch, headY, noseLength/2, 4, 0, 0, Math.PI * 2);
     ctx.fillStyle = colors[1];
     ctx.fill();
     ctx.stroke();
@@ -174,9 +179,9 @@ class RacerRenderer {
     const tailStartY = -bodyHeight/4;
     const tailLength = ferret.tail.length * 25;
     const tailFluffiness = ferret.tail.fluffiness;
-    const tailSway = ferret.isStumbling ? 
-        Math.sin(ferret.crashPhase * 5) * 8 : // Erratic tail movement when stumbling
-        Math.sin(ferret.gait.cyclePhase * 2) * 3; // Normal tail sway
+    const tailSway = ferret.isStumbling
+      ? Math.sin(ferret.crashPhase * 5) * 8
+      : Math.sin(ferret.gait.cyclePhase * 2) * (3 + Math.min(4, speedRatio * 3));
     
     ctx.beginPath();
     ctx.moveTo(tailStartX, tailStartY);
@@ -208,7 +213,7 @@ class RacerRenderer {
     } else {
         // Normal running stride
         const strideOffset = Math.sin(ferret.gait.cyclePhase) * strideLength;
-        const strideOffset2 = Math.sin(ferret.gait.cyclePhase + Math.PI) * strideLength;
+        const strideOffset2 = Math.sin(ferret.gait.cyclePhase + Math.PI) * strideLength * (ferret.legs.length > 1 ? 1.05 : 0.95);
         
         legPositions = [
             { x: bodyLength/3 + strideOffset, y: bodyHeight/4 },
