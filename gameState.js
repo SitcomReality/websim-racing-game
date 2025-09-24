@@ -57,6 +57,7 @@ let gameState = {
             totalPoolSize: 36, 
         },
         render: {
+            debug: false,
             textures: {
                 enabled: true,
                 quality: 'medium',

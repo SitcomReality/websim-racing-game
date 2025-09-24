@@ -78,27 +78,25 @@ function setupTrack(track) {
     }
     
     // Initialize canvas renderer
-    if (!window.canvasRenderer) {
-        window.canvasRenderer = new CanvasRenderer(canvas);
+    if (!window.renderManager) {
+        window.renderManager = new RenderManager(canvas);
+        window.renderManager.initialize();
         
         // Add resize handler
         const resizeHandler = () => {
-            if (window.canvasRenderer) {
-                window.canvasRenderer.resizeToContainer();
+            if (window.renderManager) {
+                window.renderManager.resizeToContainer();
             }
         };
         window.addEventListener('resize', resizeHandler);
         
-        // remove mouse interaction listeners here; now handled in CanvasRenderer.setCanvas()
-        // canvas.addEventListener('mousemove', ...)
-        // canvas.addEventListener('mouseleave', ...)
     } else {
-        window.canvasRenderer.setCanvas(canvas);
+        window.renderManager.setCanvas(canvas);
     }
     
-    window.canvasRenderer.setData(gameState.currentRace, gameState.settings.trackProperties);
+    window.renderManager.setRace(gameState.currentRace, gameState.settings.trackProperties);
     const icon = ({sunny:'☀️',rainy:'🌧️',windy:'💨',cloudy:'☁️',dusty:'🌫️',stormy:'⛈️',snowy:'❄️',foggy:'🌁'})[gameState.currentRace.weather] || '⛅';
     const ow = document.getElementById('overlayWeather'); if (ow) ow.textContent = `${icon} ${gameState.currentRace.weather}`;
-    window.canvasRenderer.resizeToContainer();
-    window.canvasRenderer.start();
+    window.renderManager.resizeToContainer();
+    window.renderManager.start();
 }

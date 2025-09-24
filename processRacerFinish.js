@@ -18,8 +18,8 @@ function processRacerFinish(racerId) {
 	
 	// Start countdown after 3rd racer finishes
 	if (gameState.currentRace.results.length === 3) {
-		if (window.canvasRenderer) {
-			window.canvasRenderer.raceEndCountdown = {
+		if (window.renderManager) {
+			window.renderManager.raceEndCountdown = {
 				active: true,
 				endTime: performance.now() + 30000, // 30 seconds from now
 				startTime: performance.now()

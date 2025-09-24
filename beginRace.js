@@ -96,13 +96,13 @@ function beginRace() {
                 
                 const laneIndex = gameState.currentRace.racers.indexOf(racerId);
                 const color = getGroundParticleColor(segmentType, 0.25);
-                if (window.canvasRenderer && laneIndex >= 0) {
-                  const screen = window.canvasRenderer.worldToScreen(currentMarginLeft, laneIndex);
+                if (window.renderManager && laneIndex >= 0) {
+                  const screen = window.renderManager.worldToScreen(currentMarginLeft, laneIndex);
                   // Enhanced particle effects for ferret crash
-                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, 0, 200, 32, color, { spread: 1.5, forwardBoost: 0.9 });
-                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, Math.PI, 140, 8, color, { spread: 0.8, forwardBoost: 0.4 });
+                  window.renderManager.particleSystem.emit(screen.x, screen.y, 0, 200, 32, color, { spread: 1.5, forwardBoost: 0.9 });
+                  window.renderManager.particleSystem.emit(screen.x, screen.y, Math.PI, 140, 8, color, { spread: 0.8, forwardBoost: 0.4 });
                   // Add some debris particles
-                  window.canvasRenderer.particleSystem.emit(screen.x, screen.y, -Math.PI/4, 120, 6, 'rgba(139,69,19,0.8)', { spread: 0.6, forwardBoost: 0.3 });
+                  window.renderManager.particleSystem.emit(screen.x, screen.y, -Math.PI/4, 120, 6, 'rgba(139,69,19,0.8)', { spread: 0.6, forwardBoost: 0.3 });
                 }
             }
         }
@@ -110,8 +110,8 @@ function beginRace() {
 
     function race() {
         // Check if race should end early
-        if (window.canvasRenderer && window.canvasRenderer.raceEndCountdown && window.canvasRenderer.raceEndCountdown.active) {
-            const timeLeft = Math.max(0, Math.ceil((window.canvasRenderer.raceEndCountdown.endTime - performance.now()) / 1000));
+        if (window.renderManager && window.renderManager.raceEndCountdown && window.renderManager.raceEndCountdown.active) {
+            const timeLeft = Math.max(0, Math.ceil((window.renderManager.raceEndCountdown.endTime - performance.now()) / 1000));
             if (timeLeft <= 0) {
                 // Race should end, don't continue updating positions
                 return;

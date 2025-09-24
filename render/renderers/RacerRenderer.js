@@ -33,14 +33,14 @@ export class RacerRenderer {
       const screen = worldTransform.worldToScreen(
         racer.liveLocations || 0,
         laneIndex,
-        window.canvasRenderer ? window.canvasRenderer.camera : null,
-        window.canvasRenderer ? window.canvasRenderer.canvas.width : 800,
-        window.canvasRenderer ? window.canvasRenderer.canvas.height : 520,
-        window.canvasRenderer && window.canvasRenderer.props ? window.canvasRenderer.props.numberOfLanes : 10
+        window.renderManager ? window.renderManager.camera : null,
+        window.renderManager ? window.renderManager.canvas.width : 800,
+        window.renderManager ? window.renderManager.canvas.height : 520,
+        window.renderManager && window.renderManager.renderProps ? window.renderManager.renderProps.numberOfLanes : 10
       );
       
-      if (window.canvasRenderer && window.canvasRenderer.particleSystem) {
-        window.canvasRenderer.particleSystem.emit(
+      if (window.renderManager && window.renderManager.particleSystem) {
+        window.renderManager.particleSystem.emit(
           screen.x, 
           screen.y, 
           Math.PI,

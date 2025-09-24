@@ -26,10 +26,10 @@ function processRaceFinish() {
 		document.getElementById('startRace').disabled = true;
 		HUD.setStep(4,'done'); HUD.setStep(3,'active'); HUD.setStatus('Race finished. Setup the next race.');
 	}
-	if (window.canvasRenderer) {
-		if (window.canvasRenderer.raceEndCountdown) {
-			window.canvasRenderer.raceEndCountdown.active = false;
+	if (window.renderManager) {
+		if (window.renderManager.raceEndCountdown) {
+			window.renderManager.raceEndCountdown.active = false;
 		}
-		window.canvasRenderer.stop();
+		window.renderManager.stop();
 	}
 }

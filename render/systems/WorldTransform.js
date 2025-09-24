@@ -9,11 +9,11 @@ export class WorldTransform {
 
   worldToScreen(worldX, laneIndex, camera, canvasWidth, canvasHeight, numberOfLanes) {
     // Defaults for missing params
-    camera = camera || (window.canvasRenderer && window.canvasRenderer.camera) || null;
+    camera = camera || (window.renderManager && window.renderManager.camera) || null;
     const dpr = (window.devicePixelRatio || 1);
-    canvasWidth = canvasWidth || (window.canvasRenderer && window.canvasRenderer.canvas && window.canvasRenderer.canvas.width) || 800;
-    canvasHeight = canvasHeight || (window.canvasRenderer && window.canvasRenderer.canvas && window.canvasRenderer.canvas.height) || 520;
-    numberOfLanes = numberOfLanes || (window.canvasRenderer && window.canvasRenderer.props && window.canvasRenderer.props.numberOfLanes) || (window.gameState && window.gameState.settings && window.gameState.settings.trackProperties.numberOfLanes) || 1;
+    canvasWidth = canvasWidth || (window.renderManager && window.renderManager.canvas && window.renderManager.canvas.width) || 800;
+    canvasHeight = canvasHeight || (window.renderManager && window.renderManager.canvas && window.renderManager.canvas.height) || 520;
+    numberOfLanes = numberOfLanes || (window.renderManager && window.renderManager.renderProps && window.renderManager.renderProps.numberOfLanes) || (window.gameState && window.gameState.settings && window.gameState.settings.trackProperties.numberOfLanes) || 1;
 
     const pad = 10;
     const w = canvasWidth / dpr;
@@ -35,9 +35,9 @@ export class WorldTransform {
 
   screenToWorld(screenX, screenY, camera, canvasWidth, canvasHeight, numberOfLanes) {
     const dpr = (window.devicePixelRatio || 1);
-    canvasWidth = canvasWidth || (window.canvasRenderer && window.canvasRenderer.canvas && window.canvasRenderer.canvas.width) || 800;
-    canvasHeight = canvasHeight || (window.canvasRenderer && window.canvasRenderer.canvas && window.canvasRenderer.canvas.height) || 520;
-    numberOfLanes = numberOfLanes || (window.canvasRenderer && window.canvasRenderer.props && window.canvasRenderer.props.numberOfLanes) || (window.gameState && window.gameState.settings && window.gameState.settings.trackProperties.numberOfLanes) || 1;
+    canvasWidth = canvasWidth || (window.renderManager && window.renderManager.canvas && window.renderManager.canvas.width) || 800;
+    canvasHeight = canvasHeight || (window.renderManager && window.renderManager.canvas && window.renderManager.canvas.height) || 520;
+    numberOfLanes = numberOfLanes || (window.renderManager && window.renderManager.renderProps && window.renderManager.renderProps.numberOfLanes) || (window.gameState && window.gameState.settings && window.gameState.settings.trackProperties.numberOfLanes) || 1;
 
     const w = canvasWidth / dpr;
     const h = this.laneHeight;
