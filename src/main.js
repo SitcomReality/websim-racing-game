@@ -19,7 +19,7 @@ import { initGame } from '../init.js';
 // removed obsolete legacy module imports that cause 404s
 // import '../setupRace.js';
 // import '../setupTrack.js';
-import '../domUtils.js';
+// remove legacy domUtils import
 
 // Initialize the application
 class Application {
@@ -41,6 +41,7 @@ class Application {
     // Make eventBus and app available globally for compatibility/debugging
     window.eventBus = this.eventBus;
     window.app = this;
+    window.gameState = this.gameStateManager;
     
     // Setup event listeners
     this.setupEventListeners();
@@ -133,7 +134,7 @@ class Application {
       ];
 
       // Load prefixes
-      const prefixResponse = await fetch('../wordlist/racerNamePrefixes.xml');
+      const prefixResponse = await fetch('wordlist/racerNamePrefixes.xml');
       const prefixXmlText = await prefixResponse.text();
       const prefixParser = new DOMParser();
       const prefixXml = prefixParser.parseFromString(prefixXmlText, "text/xml");
@@ -149,7 +150,7 @@ class Application {
       window.racerNamePrefixes.push(...dynamicPrefixes);
 
       // Load suffixes
-      const suffixResponse = await fetch('../wordlist/racerNameSuffixes.xml');
+      const suffixResponse = await fetch('wordlist/racerNameSuffixes.xml');
       const suffixXmlText = await suffixResponse.text();
       const suffixParser = new DOMParser();
       const suffixXml = suffixParser.parseFromString(suffixXmlText, "text/xml");
@@ -203,7 +204,7 @@ class Application {
     this.uiManager.showScreen('intro', { gameState: this.gameState });
 
     // Initialize legacy UI components that might still be needed globally
-    if (window.Tabs) Tabs.initialize();
+    if (window.Tabs) window.Tabs.initialize();
   }
 }
 
