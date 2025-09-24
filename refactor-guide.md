@@ -101,6 +101,15 @@ With modular system in place, easily add:
 - `src/data/SaveGame.js` - Save/load functionality
 - `src/data/WordListManager.js` - Handle name generation data
 
+## Refactor Progress (Phases 1–3)
+- Modules established (main, GameState, EventBus, helpers), index.html loads single entry.
+- Racer componentized (Stats, Performance, History, Betting) + new features; render stack consolidated with central RenderManager.
+
+## Mid-Refactor Maintenance – Next Steps
+1) Split render/RenderManager.js into modules: RenderPipeline, SceneRenderer, OverlayRenderer, InteractionController, CanvasAdapter.
+2) Remove redundancies: delete Racer.js (legacy), ParticleSystem duplicates (root/effects), Camera/WorldTransform duplicates (root/render/core), HitTestIndex duplicate (root vs render/core).
+3) Update imports to new pieces; run verification (race flow, particles, nameplates, camera, leaderboard, countdown) and keep index.html, src/main.js unchanged.
+
 ## Implementation Guidelines
 
 ### Module Standards
@@ -119,4 +128,4 @@ class RacerComponent {
   serialize() { /* ... */ }
   static getRequiredComponents() { return []; }
 }
-``` 
+```
