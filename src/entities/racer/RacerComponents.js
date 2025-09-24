@@ -1,3 +1,12 @@
+import { RacerStats } from './RacerStats.js';
+import { RacerPerformance } from './RacerPerformance.js';
+import { RacerBetting } from './RacerBetting.js';
+import { RacerHistory } from './RacerHistory.js';
+import { RacerPersonality } from './RacerPersonality.js';
+import { RacerInjuries } from './RacerInjuries.js';
+import { RacerTraining } from './RacerTraining.js';
+import { RacerRelationships } from './RacerRelationships.js';
+
 /**
  * RacerComponents - Component registration and management system
  */
@@ -136,3 +145,7 @@ racerComponents.register('stats', RacerStats);
 racerComponents.register('performance', RacerPerformance, ['stats']);
 racerComponents.register('betting', RacerBetting, ['performance', 'history']);
 racerComponents.register('history', RacerHistory);
+racerComponents.register('personality', RacerPersonality);
+racerComponents.register('injuries', RacerInjuries);
+racerComponents.register('training', RacerTraining);
+racerComponents.register('relationships', RacerRelationships);
