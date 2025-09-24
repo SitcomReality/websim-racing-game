@@ -14,6 +14,7 @@ import '../ui/components/settingsPanel.js';
 import '../ui/components/tabs.js';
 import '../ui/eventHandlers.js';
 import { initGame } from '../init.js';
+import '../setupRace.js';
 
 // Initialize the application
 class Application {

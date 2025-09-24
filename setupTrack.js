@@ -100,3 +100,7 @@ function setupTrack(track) {
     window.renderManager.resizeToContainer();
     window.renderManager.start();
 }
+
+// expose for legacy usage and module usage
+window.setupTrack = setupTrack;
+export { setupTrack };
