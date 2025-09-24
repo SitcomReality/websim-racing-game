@@ -21,6 +21,8 @@ export class GameState {
           averageWins: 0.1,
         },
       },
+      raceWeek: null, // Add raceWeek property
+      currentRaceIndex: 0, // Add currentRaceIndex property
     };
   }
 
@@ -161,6 +163,8 @@ export class GameState {
   get currentRace() { return this.state.currentRace; }
   get raceHistory() { return this.state.raceHistory; }
   get racerPerformance() { return this.state.racerPerformance; }
+  get raceWeek() { return this.state.raceWeek; }
+  get currentRaceIndex() { return this.state.currentRaceIndex; }
 
   // Setters
   set running(value) { this.state.running = value; }
@@ -172,6 +176,8 @@ export class GameState {
   set currentRace(value) { this.state.currentRace = value; }
   set raceHistory(value) { this.state.raceHistory = value; }
   set racerPerformance(value) { this.state.racerPerformance = value; }
+  set raceWeek(value) { this.state.raceWeek = value; }
+  set currentRaceIndex(value) { this.state.currentRaceIndex = value; }
 
   // Utility methods
   getState(path) {
@@ -207,6 +213,24 @@ export class GameState {
           averageWins: 0.1,
         },
       },
+      raceWeek: null,
+      currentRaceIndex: 0,
     };
+  }
+
+  /**
+   * Serialize game state for save/load
+   */
+  serialize() {
+    return JSON.parse(JSON.stringify(this.state));
+  }
+
+  /**
+   * Deserialize game state from save data
+   */
+  deserialize(data) {
+    if (data && typeof data === 'object') {
+      this.state = { ...this.state, ...data };
+    }
   }
 }

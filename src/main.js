@@ -25,7 +25,7 @@ class Application {
   constructor() {
     this.moduleLoader = new ModuleLoader();
     this.gameStateManager = new GameState();
-    this.gameState = this.gameStateManager.state; // direct access for legacy code
+    this.gameState = this.gameStateManager; // Use the manager directly
     this.eventBus = new EventBus();
     
     // Initialize game logic managers
@@ -37,9 +37,8 @@ class Application {
     this.uiManager = new UIManager(this.eventBus);
     this.hud = new HUDComponent(document.getElementById('hud'));
     
-    // Make gameState available globally for compatibility
+    // Make eventBus available globally for compatibility
     window.eventBus = this.eventBus;
-    window.gameState = this.gameState;
     window.app = this;
     
     // Setup event listeners
@@ -101,7 +100,7 @@ class Application {
     });
     
     this.eventBus.on('game:initialize', () => {
-      initGame(this.gameState);
+      initGame(this.gameStateManager);
       this.hud.setStep(1, 'done');
       this.hud.setStep(2, 'active');
       this.hud.setStatus('Racers and tracks generated. Start Race Week.');
