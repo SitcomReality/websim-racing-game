@@ -1,14 +1,18 @@
 class FerretAnimationSystem {
   update(ferret, racer, time) {
-    const currentSpeed = racer.speedThisRace[racer.speedThisRace.length - 1] || 10;
-    const baseSpeed = gameState.settings.racerProperties.speedBase;
-    const speedRatio = currentSpeed / baseSpeed;
-    
-    // Update gait cycle based on movement speed
-    ferret.gait.cyclePhase += speedRatio * 0.15;
-    if (ferret.gait.cyclePhase > Math.PI * 2) {
-      ferret.gait.cyclePhase -= Math.PI * 2;
+    const liveX = (gameState.currentRace?.liveLocations?.[racer.id]) || 0;
+    const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
+    const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
+
+    if (velocity > 0.0005) {
+      const k = 0.22; // maps world velocity to gait speed
+      ferret.gait.cyclePhase += velocity * k;
+      ferret.gait.stride = Math.min(1.3, 0.6 + velocity * 0.12);
+    } else {
+      ferret.gait.stride = 0; // feet planted when not moving
     }
+    if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
+    ferret._lastX = liveX; ferret._lastTime = time;
 
     // Update stumble/crash animation
     if (ferret.isStumbling) {

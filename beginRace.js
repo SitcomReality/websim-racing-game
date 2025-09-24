@@ -70,7 +70,7 @@ function beginRace() {
                   const currentSpeed = thisRacer.calculateSpeed(thisRacer.formThisWeek, percentRaceComplete, segmentType, gameState.currentRace.weather);
                   const baseSpeed = gameState.settings.racerProperties.speedBase;
                   const speedRatio = currentSpeed / baseSpeed;
-                  thisRacer.ferret.gait.cyclePhase += speedRatio * 0.02;
+                  // remove manual cycle increment; AnimationSystem now uses live velocity
                   thisRacer.ferret.isStumbling = false; // Normal running
                 }
                 
