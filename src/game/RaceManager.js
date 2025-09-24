@@ -41,7 +41,7 @@ export class RaceManager {
     const raceData = this.gameState.raceWeek.races[raceIndex];
     this.prepareRace(raceData);
 
-    this.eventBus.emit('race:setup', {
+    this.eventBus.emit('race:setupComplete', {
       raceIndex: raceIndex,
       race: this.gameState.currentRace
     });

@@ -28,7 +28,7 @@ export class GameScreen {
 
     // Game State -> UI events
     this.eventBus.on('race:weekStarted', (data) => this.onRaceWeekStarted(data));
-    this.eventBus.on('race:setup', (data) => this.onRaceSetup(data));
+    this.eventBus.on('race:setupComplete', (data) => this.onRaceSetup(data));
     this.eventBus.on('race:start', (data) => this.onRaceStart(data));
     this.eventBus.on('race:finish', (raceData) => this.onRaceFinish(raceData));
     this.eventBus.on('bets:settled', () => this.updatePlayerBalance());
