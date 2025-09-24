@@ -11,6 +11,7 @@ import { GameScreen } from '../ui/screens/GameScreen.js';
 import { IntroScreen } from '../ui/screens/IntroScreen.js';
 import { UIManager } from '../ui/UIManager.js';
 import { SettingsPanel } from '../ui/components/settingsPanel.js';
+import { LoadingComponent } from '../ui/components/LoadingComponent.js';
 // Ensure legacy UI helpers are available
 import '../ui/components/tabs.js';
 // ui/eventHandlers.js is deprecated and will be removed.
@@ -29,14 +30,15 @@ class Application {
     this.gameState = this.gameStateManager; // Use the manager directly
     this.eventBus = new EventBus();
     
+    // UI Manager
+    this.uiManager = new UIManager(this.eventBus);
+    this.loadingManager = new LoadingComponent(document.getElementById('loading-screen'));
+    
     // Initialize game logic managers
     this.raceManager = new RaceManager(this.eventBus, this.gameStateManager);
     this.bettingManager = new BettingManager(this.eventBus, this.gameStateManager);
     this.progressionManager = new ProgressionManager(this.eventBus, this.gameStateManager);
     this.eventBus._progressionManager = this.progressionManager;
-    
-    // UI Manager
-    this.uiManager = new UIManager(this.eventBus);
     
     // Make eventBus and app available globally for compatibility/debugging
     window.eventBus = this.eventBus;
@@ -52,21 +54,30 @@ class Application {
 
   async initialize() {
     try {
+      this.loadingManager.show('Initializing Application...');
+
       // Load XML wordlists first
+      this.loadingManager.update('Loading wordlists...', 20);
       await this.loadXmlWordlists();
 
       // Initialize core systems
+      this.loadingManager.update('Initializing core systems...', 40);
       await this.initializeCoreSystems();
 
       // Load and initialize modules
+      this.loadingManager.update('Loading modules...', 60);
       await this.moduleLoader.loadModules();
 
       // Initialize UI
+      this.loadingManager.update('Initializing UI...', 80);
       this.initializeUI();
 
+      this.loadingManager.update('Ready!', 100);
       console.log('Application initialized successfully');
+      this.loadingManager.hide();
     } catch (error) {
       console.error('Failed to initialize application:', error);
+      this.loadingManager.update('Error during initialization. Check console.');
       throw error;
     }
   }
@@ -110,9 +121,18 @@ class Application {
       this.gameState.raceHistory.push(raceData);
     });
     
-    this.eventBus.on('game:initialize', () => {
-      initGame(this.gameStateManager);
+    this.eventBus.on('game:initialize', async () => {
+      this.loadingManager.show('Generating New Game...');
+      // Using setTimeout to allow the UI to update with the loading message
+      await new Promise(resolve => setTimeout(resolve, 50)); 
+      
+      initGame(this.gameStateManager, this.loadingManager);
+      
+      this.loadingManager.update('Finalizing...', 100);
+      await new Promise(resolve => setTimeout(resolve, 50)); 
+
       this.uiManager.showScreen('game');
+      this.loadingManager.hide();
     });
 
     this.eventBus.on('race:update', (raceData) => {
