@@ -1,4 +1,5 @@
 import { racerComponents } from './RacerComponents.js';
+import { FerretFactory } from '../../../FerretFactory.js';
 
 /**
  * Racer - Lightweight entity that composes components
@@ -19,7 +20,7 @@ export class Racer {
     this.didNotFinish = false;
 
     // Create ferret anatomy data for rendering
-    this.ferret = window.FerretFactory ? window.FerretFactory.create(this) : null;
+    this.ferret = FerretFactory.create(this);
 
     // Initialize components - FIX: ensure components is initialized first
     this.components = new Map();

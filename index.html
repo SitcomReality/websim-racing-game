@@ -39,8 +39,24 @@
 <body data-theme="dark">
     <div id="no-js" style="text-align:center;background-color:white;width:80%;margin:5% 10%;color:#391d1d;padding:2px 4px 12px 4px;border:3px dashed #ff6000;z-index:99999;position:fixed;"><h2 style="color:red;">No JavaScript?</h2><p style="font-weight:bold;">JavaScript is required for this page to work.</p><p>If you're seeing this message, it's because JavaScript is disabled.</p><p>Check your browser/NoScript settings and make sure JavaScript is allowed for this domain.</p></div>
     <div id="app"></div>
-    <script src="wordlist/const_colors.js"></script>
-    <script src="setPaletteCSS.js"></script>
+    <script>
+      (function setPaletteCSS() {
+        const racerColors = [
+        	"#FFF275", "#FF8C42", "#FF3C38", "#A23E48", "#6C8EAD",
+        	"#171219", "#225560", "#7AC74F", "#F1DABF", "#08BDBD",
+        	"#2A0C4E", "#EEABC4", "#006BA6", "#161032", "#E06D06",
+        	"#475841", "#266DD3", "#B7ADCF", "#4F646F", "#083D77",
+        	"#EE964B", "#1D3557", "#F7A072", "#435058", "#084C61",
+        	"#606C38", "#283618", "#FFB2E6", "#D972FF", "#EA9E8D",
+        	"#1C2826"
+        ];
+        window.racerColors = racerColors;
+        const root = document.documentElement;
+        for (let i = 0; i < racerColors.length; i++) {
+          root.style.setProperty(`--racer-color-${i}`, racerColors[i]);
+        }
+      })();
+    </script>
     <script type="module" src="src/main.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>

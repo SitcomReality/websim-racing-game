@@ -16,6 +16,9 @@ import '../ui/components/tabs.js';
 // ui/eventHandlers.js is deprecated and will be removed.
 // import '../ui/eventHandlers.js'; 
 import { initGame } from '../init.js';
+import { FerretFactory } from '../FerretFactory.js';
+import { Racer } from '../src/entities/racer/Racer.js';
+import { Track } from '../src/models/Track.js';
 // remove legacy domUtils import
 
 // Initialize the application
@@ -39,6 +42,9 @@ class Application {
     window.eventBus = this.eventBus;
     window.app = this;
     window.gameState = this.gameStateManager;
+    window.FerretFactory = FerretFactory;
+    window.Racer = Racer;
+    window.Track = Track;
     
     // Setup event listeners
     this.setupEventListeners();

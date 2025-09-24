@@ -244,7 +244,7 @@ export class GameScreen {
     resultsContainer.className = 'd-grid grid-cols-2 gap-2';
 
     raceData.results.forEach((racerId, index) => {
-        const racer = window.app.gameState.racers.find(r => r.id === racerId);
+        const racer = this.gameState.racers.find(r => r.id === racerId);
         if (racer) {
             const racerCard = new RacerCardComponent(racer, { index: index, compact: true });
             resultsContainer.appendChild(racerCard.createElement());
