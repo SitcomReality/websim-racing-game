@@ -49,18 +49,21 @@ class FerretBodyRenderer {
     const earBaseX = headX - headSize * 0.4;
     const earBaseY = headY - headSize * 0.6;
     
-    // Smooth transition between up and down using sine wave
-    const directionFactor = Math.sin(ferret.gait.cyclePhase * 3) * (ferret.isStumbling ? 0.9 : 0.8);
+    // Create smooth ear flapping animation
+    // Use a sine wave that oscillates between -1 and 1
+    const basePhase = ferret.gait.cyclePhase * 3;
+    const directionFactor = Math.sin(basePhase);
     
-    // Apply easing to make the transition smoother
-    const easedDirection = Math.sin(directionFactor * Math.PI * 0.5);
+    // Add a smooth transition through the flat state
+    // When directionFactor is near 0, the ear should be flat
+    // When it's near ±1, it should be fully up or down
     
     const baseLen = Math.max(3, headSize * 0.5);
-    const len = baseLen * (1 + 0.15 * Math.abs(easedDirection));
-    const tipOffset = len * Math.sign(easedDirection);
+    const len = baseLen * (0.3 + Math.abs(directionFactor) * 0.7);
+    const tipOffset = len * directionFactor;
     const w = Math.max(2, headSize * 0.18);
     
-    // Draw single ear (back ear only)
+    // Draw single ear with smooth transition
     ctx.beginPath();
     ctx.moveTo(earBaseX - w, earBaseY);
     ctx.lineTo(earBaseX + w, earBaseY);
