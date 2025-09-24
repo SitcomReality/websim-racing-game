@@ -19,7 +19,15 @@ class EventHandlers {
                 this.disabled = true;
                 const setupRaceBtn = document.getElementById('setupRace');
                 if (setupRaceBtn) { setupRaceBtn.disabled = false; }
+                
+                // Call the new progression manager
                 window.app.progressionManager.startNewRaceWeek();
+                
+                // Also call the legacy UI update function to display the race week info
+                if (typeof createNewRaceWeek === 'function') {
+                    createNewRaceWeek();
+                }
+
                 window.app.hud.setStep(2, 'done'); 
                 window.app.hud.setStep(3, 'active');
                 window.app.hud.setStatus('Race Week created. Setup the next race.');

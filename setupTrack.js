@@ -1,3 +1,5 @@
+import { DOMUtils } from './domUtils.js';
+
 function setupTrack(track) {
     document.getElementById('setupRace').disabled = true;
     document.getElementById('startRace').disabled = false;

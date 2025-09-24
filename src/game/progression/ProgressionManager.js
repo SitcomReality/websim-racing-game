@@ -75,13 +75,9 @@ export class ProgressionManager {
       const raceRacers = this.selectRaceRacers(selectedRacers);
       const weather = this.selectWeather();
 
-      races.push({
-        id: `${this.gameState.raceWeekCounter}-${i + 1}`,
-        racers: raceRacers,
-        track: track,
-        weather: weather,
-        number: i + 1
-      });
+      const race = new Race(`${this.gameState.raceWeekCounter}-${i + 1}`, raceRacers, track);
+      race.weather = weather;
+      races.push(race);
     }
 
     return {
