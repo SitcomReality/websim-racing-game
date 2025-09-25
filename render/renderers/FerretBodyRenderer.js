@@ -3,7 +3,7 @@
  */
 export class FerretBodyRenderer {
   renderBody(ctx, ferret, colors) {
-    const bodyLength = ferret.body.length * 30;
+    const bodyLength = ferret.body.length * 45;
     let bodyHeight = ferret.body.height * 20;
     bodyHeight *= ferret.body.stockiness;
 
@@ -29,9 +29,12 @@ export class FerretBodyRenderer {
     const headX = ferret.body.length * 15 - 8;
     const headY = 0;
     const headSize = 12 * (ferret.head.headType === 'rounded' ? 1.1 : 0.9) * ferret.head.earSize;
+    const headRoundness = ferret.head.roundness || 0.7;
+    const headWidth = headSize * (1.2 + (1 - headRoundness) * 0.8);
+    const headHeight = headSize * headRoundness;
 
     ctx.beginPath();
-    ctx.arc(headX, headY, headSize, 0, Math.PI * 2);
+    ctx.ellipse(headX, headY, headWidth/2, headHeight/2, 0, 0, Math.PI * 2);
     ctx.fillStyle = colors[0];
     ctx.fill();
     ctx.stroke();
