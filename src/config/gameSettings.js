@@ -40,7 +40,7 @@ export class GameSettings {
         numberOfColorsToChooseFrom: 31,
         numberOfColorsPerRacer: 3,
         speedBase: 10,
-        speedMultiplier: 0.2,
+        speedMultiplier: 0.02,
         enduranceInitialValueMultiplier: 1,
         enduranceDrainMultiplier: 1,
         enduranceBase: 2000,

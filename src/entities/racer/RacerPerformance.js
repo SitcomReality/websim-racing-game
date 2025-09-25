@@ -52,7 +52,7 @@ export class RacerPerformance {
       returnSpeed += stats.getStat('boostPower');
     }
     
-    returnSpeed = Math.trunc(returnSpeed * this.config.racerProperties.speedMultiplier, 4);
+    returnSpeed *= this.config.racerProperties.speedMultiplier;
     
     if (this.speedThisRace[this.speedThisRace.length - 1] !== returnSpeed) {
       this.speedThisRace.push(returnSpeed);
