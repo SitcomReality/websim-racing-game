@@ -21,6 +21,45 @@ export class FerretAnimationSystem {
     if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
     ferret._lastX = liveX; ferret._lastTime = time;
 
+    // Initialize ear state
+    ferret.ear = ferret.ear || { value: 0, anim: null };
+    const dtSecs = Math.max(0.0001, dt);
+
+    // Trigger flap once per half-cycle (phase 0 and π)
+    const phase = ferret.gait.cyclePhase;
+    const prev = ferret._prevPhase ?? phase;
+    const wrapped = prev > phase; // crossed 2π -> 0
+    const crossedPi = prev < Math.PI && phase >= Math.PI;
+
+    if (wrapped || crossedPi) {
+      // start an ear flap (lift then fall)
+      ferret.ear.anim = { phase: 'up', t: 0, upDur: 0.15, downDur: 0.30 };
+    }
+
+    // Progress ear animation
+    if (ferret.ear.anim) {
+      const easeOutCubic = (u) => 1 - Math.pow(1 - u, 3);
+      const easeInCubic = (u) => Math.pow(u, 3);
+      const anim = ferret.ear.anim;
+
+      if (anim.phase === 'up') {
+        anim.t += dtSecs;
+        const u = Math.min(1, anim.t / anim.upDur);
+        ferret.ear.value = easeOutCubic(u);
+        if (u >= 1) { anim.phase = 'down'; anim.t = 0; }
+      } else { // down
+        anim.t += dtSecs;
+        const u = Math.min(1, anim.t / anim.downDur);
+        ferret.ear.value = 1 - easeInCubic(u);
+        if (u >= 1) { ferret.ear.value = 0; ferret.ear.anim = null; }
+      }
+    } else {
+      // default gently towards down if no animation
+      ferret.ear.value += (0 - ferret.ear.value) * Math.min(1, dtSecs * 4);
+    }
+
+    ferret._prevPhase = phase;
+
     // Update stumble/crash animation
     if (ferret.isStumbling) {
       ferret.crashPhase += 0.2;
