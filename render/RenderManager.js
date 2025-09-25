@@ -62,6 +62,28 @@ export class RenderManager {
     // Provide gameState to renderers
     this.trackRenderer.gameState = this.gameState;
     this.racerRenderer.renderManager = this;
+    
+    // Set up race director event listeners for future features
+    const raceDirector = this.camera.getRaceDirector();
+    raceDirector.on('shotChange', (event) => {
+      // Future: trigger UI updates based on shot changes
+      console.log(`Camera shot changed from ${event.data.from} to ${event.data.to}`);
+    });
+    
+    raceDirector.on('stumble', (event) => {
+      // Future: show racer name banner and notify commentary system
+      console.log(`Racer ${event.data.racerId} stumbled at position ${event.data.position.toFixed(1)}%`);
+    });
+    
+    raceDirector.on('leadChange', (event) => {
+      // Future: dramatic camera work and UI notifications
+      console.log(`Lead change! Racer ${event.data.newLeader} overtook ${event.data.oldLeader}`);
+    });
+    
+    raceDirector.on('closeRacing', (event) => {
+      // Future: highlight close racing with UI elements
+      console.log(`Close racing detected between racers ${event.data.racers.join(' and ')}`);
+    });
   }
 
   /**
@@ -304,16 +326,13 @@ export class RenderManager {
   updateCameraTarget() {
     if (!this.currentRace || !this.currentRace.racers || this.currentRace.racers.length === 0) return;
     
-    const { desiredX, desiredZoom } = this.camera.calculateDesiredState(this.currentRace, this.gameState);
     const dims = this.canvasAdapter.getDimensions();
-    const lanes = this.renderProps?.numberOfLanes || this.gameState.settings.trackProperties.numberOfLanes || 10;
-    const totalHeight = this.worldTransform.laneHeight * lanes;
-    const verticalFitZoom = Math.max(0.1, (dims.height / totalHeight)); // fit all lanes
-    const zMin = this.gameState.settings?.render?.camera?.zoomMin || 0.5;
-    const zMax = this.gameState.settings?.render?.camera?.zoomMax || 3.0;
+    const { desiredX, desiredZoom } = this.camera.calculateDesiredState(this.currentRace, this.gameState, dims);
     
-    // For leader tracking, we want to be more zoomed in to focus on the action
-    const targetZoom = Math.max(zMin, Math.min(zMax, Math.max(verticalFitZoom * 0.7, desiredZoom)));
+    const zMin = this.gameState.settings?.render?.camera?.zoomMin || 0.3;
+    const zMax = this.gameState.settings?.render?.camera?.zoomMax || 2.0;
+    
+    const targetZoom = Math.max(zMin, Math.min(zMax, desiredZoom));
     const targetX = Math.max(0, Math.min(100, desiredX));
     
     this.camera.target.x += (targetX - this.camera.target.x) * this.camera.damping;
