@@ -34,6 +34,8 @@ export class RaceDirector {
    * Get the current shot configuration
    */
   getShot(race, gameState, canvasDimensions) {
+    if (this.debug) console.log('[RaceDirector:getShot] Starting analysis');
+    
     this.eventManager.analyzeRaceEvents(race, gameState, this.raceAnalysis);
     
     // ShotSelector will call back to director's setShot method
@@ -43,7 +45,14 @@ export class RaceDirector {
     // The racers to frame are determined by the shot definition
     const racersToFrame = shotDef.updateRacers(race, gameState, this.raceAnalysis);
     
-    if (this.debug) console.debug('[Director:getShot]', this.currentShot, { racersToFrame });
+    if (this.debug) {
+      console.log('[RaceDirector:getShot] Results:', {
+        shotName: this.currentShot,
+        racersToFrame: racersToFrame,
+        target: this.cameraCalculator.calculateOptimalTarget(racersToFrame, race, shotDef),
+        zoom: this.cameraCalculator.calculateOptimalZoom(racersToFrame, race, canvasDimensions, shotDef)
+      });
+    }
     
     return {
       name: this.currentShot,
@@ -62,7 +71,13 @@ export class RaceDirector {
       this.currentShot = shotName;
       this.lastShotChangeTime = time;
       
-      if (this.debug) console.log('[Director:shotChange]', { from: previousShot, to: shotName, time });
+      if (this.debug) {
+        console.log('[RaceDirector:setShot] Shot changed:', { 
+          from: previousShot, 
+          to: shotName, 
+          time: time 
+        });
+      }
       
       this.eventManager.emitEvent('shotChange', {
         from: previousShot,
