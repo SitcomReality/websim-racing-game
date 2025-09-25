@@ -4,6 +4,7 @@ export class SettingsPanel extends BaseComponent {
     constructor(element, options = {}) {
         super(element, options);
         this.gameState = options.gameState;
+        this.lastActiveTab = null; // remember which tab was active between refreshes
     }
 
     static generateSettingsHTML(gameState) {
@@ -53,6 +54,11 @@ export class SettingsPanel extends BaseComponent {
         }
         const settingsContainer = this.element;
         if (settingsContainer) {
+            // preserve currently active tab id (if any)
+            const currentActive = settingsContainer.querySelector('.tab-button.active');
+            if (currentActive) {
+                this.lastActiveTab = currentActive.dataset.tab;
+            }
             settingsContainer.innerHTML = SettingsPanel.generateSettingsHTML(gameState);
             this.buildLocalTabs(); // add tabs for top-level sections
         }
@@ -77,9 +83,17 @@ export class SettingsPanel extends BaseComponent {
         });
 
         root.innerHTML = ''; tabs.appendChild(btns); tabs.appendChild(content); root.appendChild(tabs);
-        // activate first tab
-        const firstBtn = btns.querySelector('.tab-button'); const firstPanel = content.querySelector('.tab-panel');
-        if (firstBtn && firstPanel) { firstBtn.classList.add('active'); firstPanel.classList.add('active'); }
+
+        // determine which tab to activate: previously stored or default to first
+        const targetTab = this.lastActiveTab || (btns.querySelector('.tab-button')?.dataset.tab);
+        if (targetTab) {
+            btns.querySelectorAll('.tab-button').forEach(x => x.classList.toggle('active', x.dataset.tab === targetTab));
+            content.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tabPanel === targetTab));
+        } else {
+            // fallback: activate first
+            const firstBtn = btns.querySelector('.tab-button'); const firstPanel = content.querySelector('.tab-panel');
+            if (firstBtn && firstPanel) { firstBtn.classList.add('active'); firstPanel.classList.add('active'); }
+        }
 
         // simple tab handler (local only)
         btns.addEventListener('click', (e) => {
@@ -89,6 +103,8 @@ export class SettingsPanel extends BaseComponent {
             b.classList.add('active');
             const panel = content.querySelector(`.tab-panel[data-tab-panel="${b.dataset.tab}"]`);
             if (panel) panel.classList.add('active');
+            // remember selection so future refreshes keep this tab
+            this.lastActiveTab = b.dataset.tab;
         });
     }
 }
