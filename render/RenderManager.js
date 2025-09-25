@@ -1,3 +1,5 @@
+
+```javascript
 import { Camera } from './core/Camera.js';
 import { WorldTransform } from './core/WorldTransform.js';
 import { HitTestIndex } from './core/HitTestIndex.js';
@@ -23,30 +25,30 @@ export class RenderManager {
     this.ctx = this.canvasAdapter.getContext();
     this.dpr = this.canvasAdapter.dpr;
     this.gameState = gameState;
-    
+
     // Core rendering systems
     this.camera = new Camera();
     this.worldTransform = new WorldTransform();
     this.particleSystem = new ParticleSystem();
     this.nameplate = new Nameplate();
     this.hitIndex = new HitTestIndex();
-    
+
     // Renderer instances
     this.trackRenderer = new TrackRenderer();
     this.racerRenderer = new RacerRenderer();
-    
+
     // Additional systems
     this.interactionController = new InteractionController(this);
     this.overlayRenderer = new OverlayRenderer(this);
     this.renderPipeline = new RenderPipeline(this);
-    
+
     // Render state
     this.isRendering = false;
     this.lastTime = performance.now();
     this.currentRace = null;
     this.renderProps = null;
     this.raceEndCountdown = null;
-    
+
     // Initialize camera
     this.camera.damping = (this.gameState?.settings?.render?.camera?.smoothing) || 0.15;
     this.camera.setMode('fitAll');
@@ -73,7 +75,7 @@ export class RenderManager {
     this.banners?.clear();
     this.currentHoveredLane = null;
     this.previousHoveredLane = null;
-    
+
     // Update camera target
     if (race && race.racers && race.racers.length > 0) {
       this.updateCameraTarget();
@@ -84,10 +86,17 @@ export class RenderManager {
    * Main render loop managed by AnimationLoop
    */
   tick(time) {
-    if (!this.isRendering) return;
-    
+    // if (!this.isRendering) return; // We want to tick even if paused to update UI, but not game logic
+
     const deltaTime = (time - this.lastTime) / 1000;
     this.lastTime = time;
+
+    // Emit a global tick event for other modules to use
+    if (window.app?.eventBus) {
+      window.app.eventBus.emit('app:tick', deltaTime);
+    }
+
+    if (!this.isRendering) return;
 
     this.renderPipeline.execute(time, deltaTime);
   }
@@ -98,7 +107,7 @@ export class RenderManager {
   clear() {
     this.canvasAdapter.clear();
   }
-  
+
   /**
    * Update systems
    */
@@ -112,15 +121,15 @@ export class RenderManager {
    */
   renderScene(time) {
     if (!this.currentRace || !this.renderProps) return;
-    
+
     this.ctx.save();
     this.applyCameraTransform();
-    
+
     this.trackRenderer.render(this.ctx, this.currentRace, this.renderProps, this.camera);
     this.racerRenderer.render(this.ctx, this.currentRace, this.worldTransform, time / 1000);
-    
+
     this.ctx.restore();
-    
+
     this.ctx.save();
     this.applyCameraTransform();
     this.particleSystem.render(this.ctx);
@@ -160,16 +169,16 @@ export class RenderManager {
     this.ctx.fillText(`Particles: ${this.particleSystem.particles.length}`, 20, 75);
     this.ctx.fillText(`Hovered Lane: ${this.interactionController.hoveredLane}`, 20, 90);
   }
-  
+
   /**
    * Apply camera transformation to context
    */
   applyCameraTransform() {
     const dims = this.canvasAdapter.getDimensions();
-    
+
     this.ctx.translate(dims.width / 2, dims.height / 2);
     this.ctx.scale(this.camera.zoom, this.camera.zoom);
-    
+
     const worldPixelWidth = dims.width * 4;
     const cameraPixelX = this.camera.target.x / 100 * worldPixelWidth;
     const laneHeight = this.worldTransform.laneHeight;
@@ -178,20 +187,20 @@ export class RenderManager {
 
     this.ctx.translate(-cameraPixelX, -trackCenterY);
   }
-  
+
   /**
    * Render weather effects
    */
   renderWeatherEffects() {
     const weather = this.currentRace?.weather;
     if (!weather) return;
-    
+
     const dims = this.canvasAdapter.getDimensions();
     const wLower = weather.toLowerCase();
-    
+
     this.ctx.save();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    
+
     if (wLower === 'rainy' || wLower === 'stormy') {
       this.renderRainEffect(dims);
     } else if (wLower === 'snowy') {
@@ -201,7 +210,7 @@ export class RenderManager {
     } else if (wLower === 'dusty') {
       this.renderDustEffect(dims);
     }
-    
+
     this.ctx.restore();
   }
 
@@ -255,7 +264,7 @@ export class RenderManager {
     this.lastTime = performance.now();
     this.animationLoop.start((time) => this.tick(time));
   }
-  
+
   /**
    * Stop rendering
    */

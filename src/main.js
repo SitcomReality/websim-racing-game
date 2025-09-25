@@ -177,6 +177,12 @@ class Application {
             this.uiManager.activeScreen.renderManager.setRace(raceData.race, { numberOfLanes: raceData.race.racers.length});
         }
     });
+
+    this.eventBus.on('app:tick', (deltaTime) => {
+      if (this.gameState.running) {
+        this.raceManager.updateRace(deltaTime);
+      }
+    });
   }
 
   /**

@@ -393,6 +393,11 @@ export class GameScreen {
     this.hudComponent.setStatus('Game initialized. Start the first Race Week.');
     this.updatePlayerBalance();
     
+    // Resize canvas after it's added to the DOM
+    if (this.renderManager) {
+        this.renderManager.resizeToContainer();
+    }
+
     if (window.Tabs?.initialize) window.Tabs.initialize();
   }
 

@@ -1,3 +1,5 @@
+
+```javascript
 /** 
  * GameSettings - Centralized game configuration with validation
  */
@@ -40,7 +42,7 @@ export class GameSettings {
         numberOfColorsToChooseFrom: 31,
         numberOfColorsPerRacer: 3,
         speedBase: 10,
-        speedMultiplier: 0.02,
+        speedMultiplier: 0.2,
         enduranceInitialValueMultiplier: 1,
         enduranceDrainMultiplier: 1,
         enduranceBase: 2000,
@@ -89,7 +91,8 @@ export class GameSettings {
         camera: {
           smoothing: 0.15,
           zoomMin: 0.5,
-          zoomMax: 3.0
+          zoomMax: 3.0,
+          fitAllMargin: 15,
         }
       },
 

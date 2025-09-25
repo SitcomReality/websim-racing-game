@@ -57,7 +57,8 @@ export class RaceManager {
     if (!this.currentRace) return; // setupRace might have determined week is over
 
     this.gameState.running = true;
-    this.startRaceTimer();
+    // The main loop in application will now call updateRace with deltaTime.
+    // this.startRaceTimer();
 
     // Emit distinct event to avoid recursively triggering startRace listeners
     this.eventBus.emit('race:started', {
@@ -126,19 +127,17 @@ export class RaceManager {
    * Start race timer
    */
   startRaceTimer() {
+    // DEPRECATED: updateRace is now called from main loop with deltaTime
     this.raceTimer = setInterval(() => {
-      this.updateRace();
+      this.updateRace(0.016); // Simulate 16ms delta
     }, 16); // ~60fps
   }
 
   /**
    * Update race state
    */
-  updateRace() {
+  updateRace(deltaTime) {
     if (!this.gameState.running || !this.currentRace) return;
-
-    const currentTime = Date.now();
-    const raceDuration = currentTime - this.currentRace.startTime;
 
     // Check for race end conditions
     if (this.shouldEndRace()) {
@@ -147,7 +146,7 @@ export class RaceManager {
     }
 
     // Update racer positions
-    this.updateRacerPositions();
+    this.updateRacerPositions(deltaTime);
 
     // Check for finishers
     this.checkForFinishers();
@@ -155,14 +154,13 @@ export class RaceManager {
     // Emit race update
     this.eventBus.emit('race:update', {
       race: this.currentRace,
-      duration: raceDuration
     });
   }
 
   /**
    * Update all racer positions
    */
-  updateRacerPositions() {
+  updateRacerPositions(deltaTime) {
     this.currentRace.racers.forEach(racerId => {
       const racer = this.gameState.racers.find(r => r.id === racerId);
       if (!racer || racer.visual.finished) return;
@@ -184,8 +182,8 @@ export class RaceManager {
         this.currentRace.weather
       );
 
-      // Update position
-      const distanceToTravel = (speed * 16) / (1000 * 5); // 16ms interval, 5 seconds approx race time
+      // Update position based on deltaTime for smooth movement
+      const distanceToTravel = speed * deltaTime;
       this.currentRace.liveLocations[racerId] = Math.min(100, currentPosition + distanceToTravel);
     });
   }
