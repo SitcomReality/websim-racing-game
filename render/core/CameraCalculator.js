@@ -41,8 +41,8 @@ export class CameraCalculator {
     const framedMinPos = Math.min(...framedPositions);
     const framedMaxPos = Math.max(...framedPositions);
     
-    const span = Math.max(shotDef.minSpan || 20, framedMaxPos - framedMinPos);
-    const targetSpan = span + (shotDef.margin || 15);
+    const span = Math.max(shotDef.minSpan || 5, framedMaxPos - framedMinPos);
+    const targetSpan = span + (shotDef.margin || 10);
     
     // Calculate zoom needed for horizontal fit
     const worldPixelWidth = width * 4; // From rendering system
@@ -53,11 +53,11 @@ export class CameraCalculator {
 
     // Apply shot-specific zoom modifiers for more dynamic camera work
     if (shotDef.priority === 'tight') {
-      optimalZoom *= 1.2; // Push in a bit for tight shots
+      optimalZoom *= 1.1; // Push in a bit for tight shots
     }
 
     // Reasonable bounds - baseline zoom sets an effective upper limit for most shots.
-    return Math.max(0.3, Math.min(baselineZoom * 1.5, optimalZoom));
+    return Math.max(0.3, Math.min(baselineZoom * 1.2, optimalZoom));
   }
 
   /**
@@ -110,16 +110,16 @@ export class CameraCalculator {
     
     if (sortedPositions.length === 1) {
       // Single racer focus - center on them with minimal lookahead
-      const lead = Math.min(shotDef.lookahead || 0, 0.5);
-      targetX = sortedPositions[0] + lead * 0.08; // Much more reduced lookahead
+      const lead = Math.min(shotDef.lookahead || 0, 0.2);
+      targetX = sortedPositions[0] + lead * 0.05; // Significantly reduced lookahead
     } else {
       // Multiple racers - more balanced weighting
-      const weights = sortedPositions.map((_, i) => Math.pow(0.85, i)); // Less aggressive front-weighting
+      const weights = sortedPositions.map((_, i) => Math.pow(0.9, i)); // Less aggressive front-weighting
       const weightedSum = sortedPositions.reduce((sum, pos, i) => sum + pos * weights[i], 0);
       const totalWeight = weights.reduce((sum, w) => sum + w, 0);
       
-      const lead = Math.min(shotDef.lookahead || 0, 0.5);
-      targetX = weightedSum / totalWeight + lead * 0.08; // Much more reduced lookahead
+      const lead = Math.min(shotDef.lookahead || 0, 0.2);
+      targetX = weightedSum / totalWeight + lead * 0.05; // Significantly reduced lookahead
     }
 
     // Special handling for finish line shots - much less aggressive

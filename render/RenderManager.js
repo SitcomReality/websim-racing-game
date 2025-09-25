@@ -48,7 +48,7 @@ export class RenderManager {
     this.raceEndCountdown = null;
 
     // Initialize camera
-    this.camera.damping = (this.gameState?.settings?.render?.camera?.smoothing) || 0.04;
+    this.camera.damping = (this.gameState?.settings?.render?.camera?.smoothing) || 0.015;
     this.camera.setMode('directed');
   }
 
@@ -327,11 +327,12 @@ export class RenderManager {
       const leader = activeRacers.sort((a,b)=> (this.currentRace.liveLocations[b]||0)-(this.currentRace.liveLocations[a]||0))[0];
       const worldPixelWidth = dims.width * 4;
       const leaderX = (this.currentRace.liveLocations[leader] || 0) / 100 * worldPixelWidth;
-      const uiLeaderX = (leaderX - this.camera.target.x / 100 * worldPixelWidth) * this.camera.zoom + dims.width / 2;
-      const margin = dims.width * 0.08;
+      const cameraPixelX = this.camera.target.x / 100 * worldPixelWidth;
+      const uiLeaderX = (leaderX - cameraPixelX) * this.camera.zoom + dims.width / 2;
+      const margin = dims.width * 0.15;
       if (uiLeaderX < margin || uiLeaderX > (dims.width - margin)) {
-        // Override to quicker pan to keep leader in frame, but still slower than before
-        const fastPan = Math.max(panD, 0.15);
+        // Override to quicker pan to keep leader in frame, but still slow
+        const fastPan = Math.max(panD, 0.06);
         this.camera.target.x += (targetX - this.camera.target.x) * fastPan;
       } else {
         this.camera.target.x += (targetX - this.camera.target.x) * panD;

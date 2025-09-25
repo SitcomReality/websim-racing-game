@@ -1,3 +1,5 @@
+
+```javascript
 import { RaceEventManager } from './RaceEventManager.js';
 import { ShotSelector } from './ShotSelector.js';
 import { CameraCalculator } from './CameraCalculator.js';
@@ -68,7 +70,7 @@ export class RaceDirector {
       const urgency = urgentShots.has(shotName) ? 'urgent' : 'smooth';
       this.currentTransition = {
         urgency,
-        suggestedDamping: urgency === 'urgent' ? { pan: 0.12, zoom: 0.12 } : { pan: 0.04, zoom: 0.04 }
+        suggestedDamping: urgency === 'urgent' ? { pan: 0.05, zoom: 0.05 } : { pan: 0.015, zoom: 0.015 }
       };
 
       this.eventManager.emitEvent('shotChange', {
