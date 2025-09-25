@@ -1,5 +1,3 @@
-
-```
 /**
  * RaceDirector - Comprehensive race direction system that manages camera, events, and spectacle
  */
@@ -228,7 +226,7 @@ export class RaceDirector {
     // Calculate how much vertical space we need for all lanes
     const totalTrackHeight = numberOfLanes * laneHeight;
     
-    // We want to ensure all lanes are visible vertically
+    // Ensure all lanes are visible vertically
     const maxZoomForVerticalFit = height / (totalTrackHeight + 40); // +40 for padding
     
     // Calculate horizontal requirements
@@ -354,7 +352,7 @@ export class RaceDirector {
    */
   shots = {
     starting_lineup: {
-      updateRacers: (race) => race.racers.filter(rid => !(race.results || []).includes(rid)),
+      updateRacers: (race, gameState) => race.racers.filter(rid => !(race.results || []).includes(rid)),
       margin: 15, // Reduced from 25
       minSpan: 40, // Reduced from 120
       lookahead: 0,
@@ -362,7 +360,7 @@ export class RaceDirector {
     },
     
     leader_focus: {
-      updateRacers: (race) => {
+      updateRacers: (race, gameState) => {
         const sorted = race.racers
           .filter(rid => !(race.results || []).includes(rid))
           .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
@@ -375,7 +373,7 @@ export class RaceDirector {
     },
     
     pack_focus: {
-      updateRacers: (race) => {
+      updateRacers: (race, gameState) => {
         const sorted = race.racers
           .filter(rid => !(race.results || []).includes(rid))
           .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
@@ -388,7 +386,7 @@ export class RaceDirector {
     },
     
     close_finish: {
-      updateRacers: (race) => {
+      updateRacers: (race, gameState) => {
         const sorted = race.racers
           .filter(rid => !(race.results || []).includes(rid))
           .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
@@ -450,7 +448,7 @@ export class RaceDirector {
     },
     
     finish_approach: {
-      updateRacers: (race) => {
+      updateRacers: (race, gameState) => {
         const sorted = race.racers
           .filter(rid => !(race.results || []).includes(rid))
           .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
@@ -463,7 +461,7 @@ export class RaceDirector {
     },
     
     finish_focus: {
-      updateRacers: (race) => {
+      updateRacers: (race, gameState) => {
         // Focus on recently finished racers or the last active ones
         if (race.results && race.results.length > 0) {
           return race.results.slice(-2); // Last two finishers
