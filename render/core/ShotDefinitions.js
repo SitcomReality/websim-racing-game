@@ -20,7 +20,7 @@ export const shotDefinitions = {
     },
     margin: 20,
     minSpan: 25,
-    lookahead: 3,
+    lookahead: 5,
     priority: 'medium',
     description: 'Focus on the race leader'
   },
@@ -30,11 +30,11 @@ export const shotDefinitions = {
       const sorted = race.racers
         .filter(rid => !(race.results || []).includes(rid))
         .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-      return sorted.slice(0, Math.min(6, sorted.length));
+      return sorted.slice(0, Math.min(5, sorted.length));
     },
     margin: 15,
     minSpan: 35,
-    lookahead: 2,
+    lookahead: 4,
     priority: 'wide',
     description: 'Focus on the racing pack'
   },
@@ -48,7 +48,7 @@ export const shotDefinitions = {
     },
     margin: 8,
     minSpan: 15,
-    lookahead: 1,
+    lookahead: 2,
     priority: 'tight',
     description: 'Tight focus on close finish'
   },
@@ -70,7 +70,7 @@ export const shotDefinitions = {
     },
     margin: 12,
     minSpan: 20,
-    lookahead: 2,
+    lookahead: 3,
     priority: 'medium',
     description: 'Focus on racing battles'
   },
@@ -107,17 +107,21 @@ export const shotDefinitions = {
     },
     margin: 10,
     minSpan: 20,
-    lookahead: 5,
+    lookahead: 2,
     priority: 'medium',
     description: 'Focus on finish approach'
   },
   
   finish_focus: {
     updateRacers: (race, gameState) => {
+      // Show the finishers, prioritizing the most recent one.
       if (race.results && race.results.length > 0) {
-        return race.results.slice(-2);
+        return race.results.slice(-3);
       }
-      return race.racers.filter(rid => !(race.results || []).includes(rid));
+      // If no one has finished yet, show the lead pack.
+      const sorted = race.racers.filter(rid => !(race.results || []).includes(rid))
+          .sort((a,b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+      return sorted.slice(0,1);
     },
     margin: 15,
     minSpan: 25,
