@@ -55,7 +55,7 @@ export class GameState {
         numberOfColorsToChooseFrom: 31,
         numberOfColorsPerRacer: 3,
         speedBase: 10,
-        speedMultiplier: 0.02,
+        speedMultiplier: 0.005,
         enduranceInitialValueMultiplier: 1,
         enduranceDrainMultiplier: 1,
         enduranceBase: 2000,
