@@ -1,5 +1,3 @@
-
-```
 import { SettingsPanel } from '../components/settingsPanel.js';
 
 /** 
