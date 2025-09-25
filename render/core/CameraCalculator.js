@@ -49,21 +49,15 @@ export class CameraCalculator {
     if (racers.length === 0) {
       return { x: 50, y: 0 };
     }
-
     const positions = racers.map(rid => race.liveLocations[rid] || 0);
     const minPos = Math.min(...positions);
     const maxPos = Math.max(...positions);
-    
-    let targetX = (minPos + maxPos) / 2;
-    
-    // Apply lookahead for dynamic shots
+    const leaderPos = maxPos;
+    const bias = shotDef.priority === 'wide' ? 0.7 : 0.85;
+    let targetX = minPos + (leaderPos - minPos) * bias;
     if (shotDef.lookahead && shotDef.lookahead > 0) {
-      targetX = Math.max(...positions) + shotDef.lookahead;
+      targetX = leaderPos + shotDef.lookahead;
     }
-    
-    return {
-      x: Math.max(0, Math.min(100, targetX)),
-      y: 0
-    };
+    return { x: Math.max(0, Math.min(100, targetX)), y: 0 };
   }
 }

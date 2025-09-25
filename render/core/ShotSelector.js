@@ -26,6 +26,10 @@ export class ShotSelector {
     );
     const leaderPos = race.liveLocations[sortedRacers[0]] || 0;
 
+    // Absolute priority: show winner crossing/finish
+    if (race.results && race.results.length > 0) { this.setShot('finish_focus', now); return; }
+    if (leaderPos >= 97) { this.setShot('finish_approach', now); return; }
+
     // Check for recent dramatic events that should influence shot selection
 
     // 1. Close finish (highest priority)
@@ -62,7 +66,7 @@ export class ShotSelector {
       const positions = sortedRacers.map(rid => race.liveLocations[rid] || 0);
       const spread = Math.max(...positions) - Math.min(...positions);
 
-      if (spread > 20) {
+      if (spread > 8) {
         this.setShot('leader_focus', now);
       } else {
         this.setShot('pack_focus', now);
