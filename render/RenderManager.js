@@ -306,12 +306,17 @@ export class RenderManager {
    */
   updateCameraTarget() {
     if (!this.currentRace || !this.currentRace.racers || this.currentRace.racers.length === 0) return;
-
     const { desiredX, desiredZoom } = this.camera.calculateDesiredState(this.currentRace, this.gameState);
-
-    // Apply damping for smooth camera movement
-    this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
-    this.camera.zoom += (desiredZoom - this.camera.zoom) * this.camera.damping;
+    const dims = this.canvasAdapter.getDimensions();
+    const lanes = this.renderProps?.numberOfLanes || this.gameState.settings.trackProperties.numberOfLanes || 10;
+    const totalHeight = this.worldTransform.laneHeight * lanes;
+    const verticalFitZoom = Math.max(0.1, (dims.height / totalHeight)); // fit all lanes
+    const zMin = this.gameState.settings?.render?.camera?.zoomMin || 0.5;
+    const zMax = this.gameState.settings?.render?.camera?.zoomMax || 3.0;
+    const targetZoom = Math.max(zMin, Math.min(Math.min(verticalFitZoom * 0.98, zMax), desiredZoom));
+    const targetX = Math.max(0, Math.min(100, desiredX));
+    this.camera.target.x += (targetX - this.camera.target.x) * this.camera.damping;
+    this.camera.zoom += (targetZoom - this.camera.zoom) * this.camera.damping;
   }
 
   /**
