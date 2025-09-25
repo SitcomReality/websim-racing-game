@@ -22,7 +22,7 @@ export class FerretAnimationSystem {
     ferret._lastX = liveX; ferret._lastTime = time;
 
     // Initialize ear state
-    ferret.ear = ferret.ear || { value: 0, anim: null };
+    ferret.ear = ferret.ear || { value: 0, anim: null, reverse: false };
     const dtSecs = Math.max(0.0001, dt);
 
     // Trigger flap once per half-cycle (phase 0 and π)
@@ -46,12 +46,14 @@ export class FerretAnimationSystem {
         anim.t += dtSecs;
         const u = Math.min(1, anim.t / anim.upDur);
         ferret.ear.value = easeOutCubic(u);
+        ferret.ear.reverse = true;
         if (u >= 1) { anim.phase = 'down'; anim.t = 0; }
       } else { // down
         anim.t += dtSecs;
         const u = Math.min(1, anim.t / anim.downDur);
         ferret.ear.value = 1 - easeInCubic(u);
-        if (u >= 1) { ferret.ear.value = 0; ferret.ear.anim = null; }
+        ferret.ear.reverse = false;
+        if (u >= 1) { ferret.ear.value = 0; ferret.ear.anim = null; ferret.ear.reverse = false; }
       }
     } else {
       // default gently towards down if no animation

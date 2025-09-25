@@ -57,12 +57,13 @@ export class FerretBodyRenderer {
     // Map to angle (radians): down ~ 70deg, up ~ -10deg
     const downAngle = 70 * Math.PI / 180;
     const upAngle = -10 * Math.PI / 180;
-    const earAngle = downAngle + (upAngle - downAngle) * v;
+    let earAngle = downAngle + (upAngle - downAngle) * v;
+    if (ferret.ear?.reverse) earAngle = -earAngle;
 
     const baseLen = Math.max(3, headSize * 0.5);
     const len = baseLen;
     const w = Math.max(2, headSize * 0.18);
- 
+
     // Draw single ear with rotation based on earAngle
     ctx.save();
     ctx.translate(earBaseX, earBaseY);
@@ -70,7 +71,6 @@ export class FerretBodyRenderer {
     ctx.beginPath();
     ctx.moveTo(-w, 0);
     ctx.lineTo(w, 0);
-    // Remove the flipped triangle tip - keep original direction
     ctx.lineTo(0, -len);
     ctx.closePath();
     ctx.fill();
