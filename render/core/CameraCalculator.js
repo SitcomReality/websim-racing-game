@@ -85,3 +85,5 @@ export class CameraCalculator {
     return { x: Math.max(0, Math.min(100, targetX)), y: 0 };
   }
 }
+
+import { shotDefinitions } from './ShotDefinitions.js';
