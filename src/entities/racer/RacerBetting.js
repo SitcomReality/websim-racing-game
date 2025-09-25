@@ -9,16 +9,15 @@ export class RacerBetting {
   }
 
   generateBaseBettingOdds() {
-    const { history, getAverageFinishingPosition } = this.racer;
+    // Use bound methods to preserve 'this' context
+    const history = this.racer.history;
     const { numberOfLanes } = this.config.trackProperties;
 
-    // If the racer has no race history, set base odds to 1/numberOfLanes (equal odds)
     if (history.length === 0) {
       return 1 / numberOfLanes;
     }
 
-    // Calculate the average finishing position over the last 5 races
-    const averageFinishingPosition = getAverageFinishingPosition(Math.min(5, history.length));
+    const averageFinishingPosition = this.racer.getAverageFinishingPosition(Math.min(5, history.length));
 
     // Calculate the base odds based on the average finishing position
     let baseOdds = averageFinishingPosition / numberOfLanes;
