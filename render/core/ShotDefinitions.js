@@ -23,7 +23,7 @@ export const shotDefinitions = {
     },
     margin: 8,
     minSpan: 12,
-    lookahead: 1.5,
+    lookahead: 0.5,
     priority: 'tight',
     description: 'Focus on the race leader'
   },
@@ -37,7 +37,7 @@ export const shotDefinitions = {
     },
     margin: 12,
     minSpan: 20,
-    lookahead: 1,
+    lookahead: 0.3,
     priority: 'medium',
     description: 'Focus on the racing pack'
   },
@@ -50,7 +50,7 @@ export const shotDefinitions = {
     },
     margin: 6,
     minSpan: 12,
-    lookahead: 1,
+    lookahead: 0.2,
     priority: 'tight',
     description: 'Tight focus on close finish'
   },
@@ -73,7 +73,7 @@ export const shotDefinitions = {
     },
     margin: 10,
     minSpan: 16,
-    lookahead: 1,
+    lookahead: 0.3,
     priority: 'medium',
     description: 'Focus on racing battles'
   },
@@ -111,7 +111,7 @@ export const shotDefinitions = {
     },
     margin: 8,
     minSpan: 15,
-    lookahead: 1,
+    lookahead: 0.2,
     priority: 'medium',
     description: 'Focus on finish approach'
   },

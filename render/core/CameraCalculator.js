@@ -22,7 +22,7 @@ export class CameraCalculator {
 
     const { width, height } = canvasDimensions;
     
-    // Get the baseline zoom that fits the entire track height
+    // Get the baseline zoom that fits the track height
     
     // Calculate horizontal requirements based on racers to frame
     const positions = racers.map(rid => race.liveLocations[rid] || 0);
@@ -100,7 +100,7 @@ export class CameraCalculator {
     
     if (sortedPositions.length === 1) {
       // Single racer focus - center on them with modest lookahead
-      const lead = Math.min(shotDef.lookahead || 0, 0.8);
+      const lead = Math.min(shotDef.lookahead || 0, 0.35);
       targetX = sortedPositions[0] + lead * 0.35;
     } else {
       // Multiple racers - more balanced weighting
@@ -108,8 +108,8 @@ export class CameraCalculator {
       const weightedSum = sortedPositions.reduce((sum, pos, i) => sum + pos * weights[i], 0);
       const totalWeight = weights.reduce((sum, w) => sum + w, 0);
       
-      const lead = Math.min(shotDef.lookahead || 0, 0.8);
-      targetX = weightedSum / totalWeight + lead * 0.3;
+      const lead = Math.min(shotDef.lookahead || 0, 0.35);
+      targetX = weightedSum / totalWeight + lead * 0.2;
     }
 
     // Special handling for finish line shots
