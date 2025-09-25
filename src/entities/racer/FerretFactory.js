@@ -14,7 +14,7 @@ export class FerretFactory {
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
     const body = {
-      length: pick(0.8, 1.2),
+      length: pick(1.6, 1.8), // doubled min, +50% max
       height: pick(0.9, 1.1),
       stockiness: pick(0.8, 1.2)
     };
@@ -29,7 +29,9 @@ export class FerretFactory {
     const head = {
       noseLength: pick(0.7, 1.3),
       underbiteDepth: pick(0.0, 0.3),
-      earSize: pick(0.8, 1.2)
+      earSize: pick(0.8, 1.2),
+      size: pick(0.85, 1.25),
+      roundness: pick(0.0, 0.8)
     };
     head.headType = rnd() < 0.5 ? 'pointed' : 'rounded';
     head.earShape = rnd() < 0.5 ? 'pointy' : 'round';

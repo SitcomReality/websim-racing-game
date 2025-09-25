@@ -7,8 +7,13 @@ export class FerretEyeRenderer {
   }
 
   render(ctx, ferret, colors) {
-    const headX = ferret.body.length * 15 - 2;
-    const headY = -4;
+    const bodyLength = ferret.body.length * 30;
+    const attachX = -5 + bodyLength / 2;
+    const base = 12 * (ferret.head.size || 1);
+    const round = ferret.head.roundness ?? 0.3;
+    const rx = base * (1 + round * 0.8), ry = base * (1 - round * 0.4);
+    const headX = attachX + rx - 2; // near front
+    const headY = -ry * 0.1;
     
     this.renderEye(ctx, headX, headY, ferret, colors);
   }

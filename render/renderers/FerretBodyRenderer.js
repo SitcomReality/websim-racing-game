@@ -3,7 +3,7 @@
  */
 export class FerretBodyRenderer {
   renderBody(ctx, ferret, colors) {
-    const bodyLength = ferret.body.length * 45;
+    const bodyLength = ferret.body.length * 30;
     let bodyHeight = ferret.body.height * 20;
     bodyHeight *= ferret.body.stockiness;
 
@@ -26,32 +26,31 @@ export class FerretBodyRenderer {
   }
 
   renderHead(ctx, ferret, colors, time, racer) {
-    const headX = ferret.body.length * 15 - 8;
-    const headY = 0;
-    const headSize = 12 * (ferret.head.headType === 'rounded' ? 1.1 : 0.9) * ferret.head.earSize;
-    const headRoundness = ferret.head.roundness || 0.7;
-    const headWidth = headSize * (1.2 + (1 - headRoundness) * 0.8);
-    const headHeight = headSize * headRoundness;
+    const bodyLength = ferret.body.length * 30;
+    const attachX = -5 + bodyLength / 2;
+    const base = 12 * (ferret.head.size || 1);
+    const round = ferret.head.roundness ?? 0.3;
+    const rx = base * (1 + round * 0.8), ry = base * (1 - round * 0.4);
+    const headX = attachX + rx, headY = 0; // anchor at left edge of head
 
-    ctx.beginPath();
-    ctx.ellipse(headX, headY, headWidth/2, headHeight/2, 0, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.ellipse(headX, headY, rx, ry, 0, 0, Math.PI * 2);
     ctx.fillStyle = colors[0];
     ctx.fill();
     ctx.stroke();
 
-    // Ears
-    this.renderEars(ctx, ferret, colors, headX, headY, headSize);
+    // Ears (biased left)
+    this.renderEars(ctx, ferret, colors, headX, headY, rx);
 
-    // Nose
-    this.renderNose(ctx, ferret, colors, headX, headY, time, racer);
+    // Nose (at right-most point)
+    this.renderNose(ctx, ferret, colors, headX + rx, headY, time, racer);
 
-    // Underbite
-    this.renderUnderbite(ctx, ferret, headX, headY, headSize);
+    // Underbite aligned with ellipse
+    this.renderUnderbite(ctx, ferret, headX, headY, rx);
   }
 
   renderEars(ctx, ferret, colors, headX, headY, headSize) {
     ctx.fillStyle = colors[2];
-    const earBaseX = headX - headSize * 0.4;
+    const earBaseX = headX - headSize * 0.8; // bias further left
     const earBaseY = headY - headSize * 0.6;
 
     // Ear flap value: 0 = down, 1 = up
@@ -82,11 +81,11 @@ export class FerretBodyRenderer {
   }
 
   renderNose(ctx, ferret, colors, headX, headY, time, racer) {
-    const noseLength = ferret.head.noseLength * 8;
+    const noseLength = ferret.head.noseLength * 6;
     const noseTwitch = ferret.isStumbling ? 0 : Math.sin(time * 10 + (racer?.id || 0)) * 0.8;
 
     ctx.beginPath();
-    ctx.ellipse(headX + noseLength + noseTwitch, headY, noseLength/2, 4, 0, 0, Math.PI * 2);
+    ctx.ellipse(headX + noseTwitch, headY, Math.max(2, noseLength / 2), 3, 0, 0, Math.PI * 2);
     ctx.fillStyle = colors[1];
     ctx.fill();
     ctx.stroke();
@@ -96,9 +95,9 @@ export class FerretBodyRenderer {
     if (ferret.head.underbiteDepth > 0.02) {
       const d = ferret.head.underbiteDepth * 6;
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.beginPath(); ctx.moveTo(headX + headSize*0.6, headY + headSize*0.3);
-      ctx.lineTo(headX + headSize*0.3 + d, headY + headSize*0.45 + d*0.4);
-      ctx.lineTo(headX + headSize*0.1, headY + headSize*0.3); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(headX + headSize*0.4, headY + headSize*0.25);
+      ctx.lineTo(headX + headSize*0.2 + d, headY + headSize*0.38 + d*0.4);
+      ctx.lineTo(headX, headY + headSize*0.25); ctx.closePath(); ctx.fill();
     }
   }
 
