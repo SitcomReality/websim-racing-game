@@ -1,3 +1,5 @@
+
+```javascript
 import { RaceEventManager } from './RaceEventManager.js';
 import { ShotSelector } from './ShotSelector.js';
 import { CameraCalculator } from './CameraCalculator.js';
@@ -11,14 +13,14 @@ export class RaceDirector {
   constructor() {
     this.currentShot = 'starting_lineup';
     this.lastShotChangeTime = 0;
-    this.minShotDuration = 3000; // 3 seconds minimum between shot changes
-    
+    this.minShotDuration = 2500; // Slightly more responsive shot changes
+
     // Initialize subsystems
     this.eventManager = new RaceEventManager();
     this.shotSelector = new ShotSelector(this);
     this.cameraCalculator = new CameraCalculator();
     this.shots = shotDefinitions;
-    
+
     // Track race state
     this.raceAnalysis = {
       leadChanges: [],
@@ -34,14 +36,14 @@ export class RaceDirector {
    */
   getShot(race, gameState, canvasDimensions) {
     this.eventManager.analyzeRaceEvents(race, gameState, this.raceAnalysis);
-    
+
     // ShotSelector will call back to director's setShot method
     this.shotSelector.updateShot(race, gameState, this.raceAnalysis);
-    
+
     const shotDef = this.shots[this.currentShot];
     // The racers to frame are determined by the shot definition
     const racersToFrame = shotDef.updateRacers(race, gameState, this.raceAnalysis);
-    
+
     return {
       name: this.currentShot,
       racers: racersToFrame,
@@ -58,7 +60,7 @@ export class RaceDirector {
       const previousShot = this.currentShot;
       this.currentShot = shotName;
       this.lastShotChangeTime = time;
-      
+
       this.eventManager.emitEvent('shotChange', {
         from: previousShot,
         to: shotName,
