@@ -66,23 +66,7 @@ export class RenderManager {
     // Set up race director event listeners for future features
     const raceDirector = this.camera.getRaceDirector();
     raceDirector.on('shotChange', (event) => {
-      // Future: trigger UI updates based on shot changes
-      console.log(`Camera shot changed from ${event.data.from} to ${event.data.to}`);
-    });
-    
-    raceDirector.on('stumble', (event) => {
-      // Future: show racer name banner and notify commentary system
-      console.log(`Racer ${event.data.racerId} stumbled at position ${event.data.position.toFixed(1)}%`);
-    });
-    
-    raceDirector.on('leadChange', (event) => {
-      // Future: dramatic camera work and UI notifications
-      console.log(`Lead change! Racer ${event.data.newLeader} overtook ${event.data.oldLeader}`);
-    });
-    
-    raceDirector.on('closeRacing', (event) => {
-      // Future: highlight close racing with UI elements
-      console.log(`Close racing detected between racers ${event.data.racers.join(' and ')}`);
+      console.log(`Camera shot changed: ${event.data.from} -> ${event.data.to}`);
     });
   }
 
