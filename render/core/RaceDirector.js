@@ -11,8 +11,9 @@ export class RaceDirector {
   constructor() {
     this.currentShot = 'starting_lineup';
     this.lastShotChangeTime = 0;
-    this.minShotDuration = 3500; // Increased for less frequent changes
-    this.lastShotChangeSection = -1; // For section-based pacing
+    this.minShotDuration = 3000;
+    this.lastShotChangeSection = -1;
+    this.currentTransition = { urgency: 'smooth', suggestedDamping: { pan: 0.10, zoom: 0.10 } };
 
     // Initialize subsystems
     this.eventManager = new RaceEventManager();
@@ -47,7 +48,8 @@ export class RaceDirector {
       name: this.currentShot,
       racers: racersToFrame,
       zoom: this.cameraCalculator.calculateOptimalZoom(racersToFrame, race, canvasDimensions, shotDef),
-      target: this.cameraCalculator.calculateOptimalTarget(racersToFrame, race, shotDef)
+      target: this.cameraCalculator.calculateOptimalTarget(racersToFrame, race, shotDef),
+      meta: this.currentTransition
     };
   }
 
@@ -60,6 +62,14 @@ export class RaceDirector {
       this.currentShot = shotName;
       this.lastShotChangeTime = time;
       this.lastShotChangeSection = section;
+
+      // Transition metadata: urgent shots move faster, otherwise ease
+      const urgentShots = new Set(['incident_focus','finish_approach','finish_focus','close_finish']);
+      const urgency = urgentShots.has(shotName) ? 'urgent' : 'smooth';
+      this.currentTransition = {
+        urgency,
+        suggestedDamping: urgency === 'urgent' ? { pan: 0.22, zoom: 0.22 } : { pan: 0.08, zoom: 0.08 }
+      };
 
       this.eventManager.emitEvent('shotChange', {
         from: previousShot,

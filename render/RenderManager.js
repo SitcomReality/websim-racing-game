@@ -125,7 +125,7 @@ export class RenderManager {
    * Update systems
    */
   update(time, deltaTime) {
-    this.updateCameraTarget();
+    this.updateCameraTarget(deltaTime);
     this.particleSystem.update(deltaTime);
   }
 
@@ -307,20 +307,39 @@ export class RenderManager {
   /**
    * Update camera target to follow the leader
    */
-  updateCameraTarget() {
+  updateCameraTarget(deltaTime = 0.016) {
     if (!this.currentRace || !this.currentRace.racers || this.currentRace.racers.length === 0) return;
-    
     const dims = this.canvasAdapter.getDimensions();
-    const { desiredX, desiredZoom } = this.camera.calculateDesiredState(this.currentRace, this.gameState, dims);
-    
+    const { desiredX, desiredZoom, suggestedDamping, urgency } = this.camera.calculateDesiredState(this.currentRace, this.gameState, dims);
+
     const zMin = this.gameState.settings?.render?.camera?.zoomMin || 0.3;
     const zMax = this.gameState.settings?.render?.camera?.zoomMax || 2.0;
-    
     const targetZoom = Math.max(zMin, Math.min(zMax, desiredZoom));
     const targetX = Math.max(0, Math.min(100, desiredX));
-    
-    this.camera.target.x += (targetX - this.camera.target.x) * this.camera.damping;
-    this.camera.zoom += (targetZoom - this.camera.zoom) * this.camera.damping;
+
+    // Dynamic damping: slower for smooth transitions
+    const panD = suggestedDamping?.pan ?? this.camera.damping;
+    const zoomD = suggestedDamping?.zoom ?? this.camera.damping;
+
+    // Leader-on-screen guard: if leader drifts near edges, temporarily speed up pan
+    const activeRacers = this.currentRace.racers.filter(rid => !(this.currentRace.results || []).includes(rid));
+    if (activeRacers.length) {
+      const leader = activeRacers.sort((a,b)=> (this.currentRace.liveLocations[b]||0)-(this.currentRace.liveLocations[a]||0))[0];
+      const worldPixelWidth = dims.width * 4;
+      const leaderX = (this.currentRace.liveLocations[leader] || 0) / 100 * worldPixelWidth;
+      const uiLeaderX = (leaderX - this.camera.target.x / 100 * worldPixelWidth) * this.camera.zoom + dims.width / 2;
+      const margin = dims.width * 0.08;
+      if (uiLeaderX < margin || uiLeaderX > (dims.width - margin)) {
+        // Override to quicker pan to keep leader in frame
+        const fastPan = Math.max(panD, 0.25);
+        this.camera.target.x += (targetX - this.camera.target.x) * fastPan;
+      } else {
+        this.camera.target.x += (targetX - this.camera.target.x) * panD;
+      }
+    } else {
+      this.camera.target.x += (targetX - this.camera.target.x) * panD;
+    }
+    this.camera.zoom += (targetZoom - this.camera.zoom) * zoomD;
   }
 
   /**

@@ -24,7 +24,9 @@ class Camera {
       const shot = this.director.getShot(race, gameState, canvasDimensions);
       return {
         desiredX: shot.target.x,
-        desiredZoom: shot.zoom
+        desiredZoom: shot.zoom,
+        suggestedDamping: shot.meta?.suggestedDamping,
+        urgency: shot.meta?.urgency
       };
     }
 

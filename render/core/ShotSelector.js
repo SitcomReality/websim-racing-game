@@ -11,12 +11,11 @@ export class ShotSelector {
    * High priority events can override the section lock.
    */
   trySetShot(shotName, now, currentSection, isSameSection, highPriorityEvent) {
-    // Allow shot change if it's a new section or a high-priority event happened.
-    // Also allow changes near the start/end of the race for better framing.
+    // Loosen section rule: allow transitions within the same section unless pace lock applies
     const isNearStart = currentSection === 0;
     const isNearFinish = (this.director.raceAnalysis?.leaderPos || 0) > 90;
 
-    if (!isSameSection || highPriorityEvent || isNearStart || isNearFinish) {
+    if (highPriorityEvent || isNearStart || isNearFinish || !isSameSection) {
       this.director.setShot(shotName, now, currentSection);
     }
   }
