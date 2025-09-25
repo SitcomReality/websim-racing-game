@@ -84,6 +84,8 @@ export class RaceManager {
       livePositions: [],
       startTime: race.startTime
     };
+    // Reset any prior race countdown
+    this.raceEndCountdown = null;
 
     // Initialize racer positions
     this.currentRace.racers.forEach(racerId => {

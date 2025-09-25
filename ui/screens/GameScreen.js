@@ -190,11 +190,14 @@ export class GameScreen {
     this.hudComponent.setStep(4, 'active');
     this.hudComponent.setStatus('Race is set up. Place your bets and start the race!');
     this.updateRaceNumbers();
-    
     const { race } = data;
-    this.renderManager.setRace(race, {
-      numberOfLanes: race.racers.length
-    });
+    this.renderManager.setRace(race, { numberOfLanes: race.racers.length });
+    // Reset countdown and camera for fresh race setup
+    this.renderManager.raceEndCountdown = null;
+    const dims = this.renderManager.canvasAdapter.getDimensions();
+    const baselineZoom = this.renderManager.camera.director.cameraCalculator.getTrackBasedZoom(dims, race);
+    this.renderManager.camera.target.x = 0;
+    this.renderManager.camera.zoom = baselineZoom;
     const weatherDisplay = this.element.querySelector("#overlayWeather");
     if(weatherDisplay) {
         weatherDisplay.textContent = `Weather: ${race.weather}`;

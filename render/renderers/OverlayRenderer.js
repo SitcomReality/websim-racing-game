@@ -175,10 +175,9 @@ export class OverlayRenderer {
 
   renderCountdown(ctx) {
     if (!this.renderManager.raceEndCountdown || !this.renderManager.raceEndCountdown.active) return;
-
     const w = ctx.canvas.width / this.renderManager.dpr;
     const h = ctx.canvas.height / this.renderManager.dpr;
-    const timeLeft = Math.max(0, Math.ceil((this.renderManager.raceEndCountdown.endTime - performance.now()) / 1000));
+    const timeLeft = Math.max(0, Math.ceil((this.renderManager.raceEndCountdown.endTime - Date.now()) / 1000));
 
     ctx.save();
 
@@ -196,7 +195,7 @@ export class OverlayRenderer {
     ctx.fillText(`Race ends in: ${timeLeft}s`, w/2, 40);
 
     const totalTime = 30000;
-    const elapsed = performance.now() - this.renderManager.raceEndCountdown.startTime;
+    const elapsed = Date.now() - this.renderManager.raceEndCountdown.startTime;
     const progress = Math.max(0, 1 - (elapsed / totalTime));
     const barWidth = 200;
     const barHeight = 4;
