@@ -29,7 +29,11 @@ export class FerretFactory {
     const head = {
       noseLength: pick(0.7, 1.3),
       underbiteDepth: pick(0.0, 0.3),
-      earSize: pick(0.8, 1.2)
+      earSize: pick(0.8, 1.2),
+      earFlapPhase: 0,
+      isEarFlapping: false,
+      earFlapTimer: 0,
+      earFlapDuration: 0.4
     };
     head.headType = rnd() < 0.5 ? 'pointed' : 'rounded';
     head.earShape = rnd() < 0.5 ? 'pointy' : 'round';
