@@ -1,5 +1,3 @@
-
-```
 /** 
  * BannerSystem - Manages race event banners with different visual styles
  */ 
