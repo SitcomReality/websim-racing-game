@@ -27,16 +27,16 @@ export class RacerRenderer {
       // Convert world position to pixels (0-100% becomes 0 to worldPixelWidth)
       const pixelX = (worldX / 100) * worldPixelWidth;
       
-      // Calculate lane Y position
-      const laneY = idx * laneHeight + laneHeight / 2 - totalHeight / 2;
+      // Calculate lane Y position - fix the positioning
+      const laneY = idx * laneHeight + laneHeight / 2;
       
       // These coordinates are in the world space, and the context is already camera-transformed
       const screenX = pixelX;
       const screenY = laneY;
       
       // Store screen positions for hit testing (convert back to screen space for UI)
-      const uiScreenX = screenX * this.renderManager.camera.zoom + dims.width / 2;
-      const uiScreenY = screenY * this.renderManager.camera.zoom + dims.height / 2;
+      const uiScreenX = (screenX - this.renderManager.camera.target.x / 100 * worldPixelWidth) * this.renderManager.camera.zoom + dims.width / 2;
+      const uiScreenY = (screenY - totalHeight / 2) * this.renderManager.camera.zoom + dims.height / 2;
       this.screenPositions.push({ rid, x: uiScreenX, y: uiScreenY, r: 25 * this.renderManager.camera.zoom });
 
       // Render ferret using the dedicated renderer

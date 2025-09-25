@@ -25,6 +25,7 @@ class WorldTransform {
     const totalHeight = h * numberOfLanes;
     const trackCenterY = pad + totalHeight / 2;
 
+    // Fix the lane positioning calculation
     const yPos = pad + laneIndex * h + h / 2;
 
     const worldPixelWidth = w * 4;
