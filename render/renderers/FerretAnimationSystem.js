@@ -11,7 +11,6 @@ export class FerretAnimationSystem {
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
     const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
 
-    const wasOver = ferret.gait.cyclePhase > Math.PI * 2;
     if (velocity > 0.0005) {
       const k = 0.22; // maps world velocity to gait speed
       ferret.gait.cyclePhase += velocity * k;
@@ -19,18 +18,47 @@ export class FerretAnimationSystem {
     } else {
       ferret.gait.stride = 0; // feet planted when not moving
     }
-    
-    if (ferret.gait.cyclePhase > Math.PI * 2) {
-        if (!wasOver) { // Trigger on first frame it crosses the threshold
-            if (!ferret.head.isEarFlapping) {
-                ferret.head.isEarFlapping = true;
-                ferret.head.earFlapTimer = 0;
-            }
-        }
-        ferret.gait.cyclePhase -= Math.PI * 2;
-    }
-    
+    if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
     ferret._lastX = liveX; ferret._lastTime = time;
+
+    // Initialize ear state
+    ferret.ear = ferret.ear || { value: 0, anim: null };
+    const dtSecs = Math.max(0.0001, dt);
+
+    // Trigger flap once per half-cycle (phase 0 and π)
+    const phase = ferret.gait.cyclePhase;
+    const prev = ferret._prevPhase ?? phase;
+    const wrapped = prev > phase; // crossed 2π -> 0
+    const crossedPi = prev < Math.PI && phase >= Math.PI;
+
+    if (wrapped || crossedPi) {
+      // start an ear flap (lift then fall)
+      ferret.ear.anim = { phase: 'up', t: 0, upDur: 0.15, downDur: 0.30 };
+    }
+
+    // Progress ear animation
+    if (ferret.ear.anim) {
+      const easeOutCubic = (u) => 1 - Math.pow(1 - u, 3);
+      const easeInCubic = (u) => Math.pow(u, 3);
+      const anim = ferret.ear.anim;
+
+      if (anim.phase === 'up') {
+        anim.t += dtSecs;
+        const u = Math.min(1, anim.t / anim.upDur);
+        ferret.ear.value = easeOutCubic(u);
+        if (u >= 1) { anim.phase = 'down'; anim.t = 0; }
+      } else { // down
+        anim.t += dtSecs;
+        const u = Math.min(1, anim.t / anim.downDur);
+        ferret.ear.value = 1 - easeInCubic(u);
+        if (u >= 1) { ferret.ear.value = 0; ferret.ear.anim = null; }
+      }
+    } else {
+      // default gently towards down if no animation
+      ferret.ear.value += (0 - ferret.ear.value) * Math.min(1, dtSecs * 4);
+    }
+
+    ferret._prevPhase = phase;
 
     // Update stumble/crash animation
     if (ferret.isStumbling) {
@@ -43,29 +71,8 @@ export class FerretAnimationSystem {
       }
     }
 
-    // Update ear flap animation
-    this.updateEarAnimation(ferret, dt);
-
     // Update eye tracking
     this.updateEyeTracking(ferret, racer, time, raceState);
-  }
-
-  updateEarAnimation(ferret, dt) {
-    if (ferret.head.isEarFlapping) {
-        ferret.head.earFlapTimer += dt;
-        let progress = ferret.head.earFlapTimer / ferret.head.earFlapDuration;
-
-        if (progress >= 1) {
-            ferret.head.earFlapPhase = 0;
-            ferret.head.isEarFlapping = false;
-        } else {
-            // Symmetrical flap up and down
-            const upDownProgress = Math.sin(progress * Math.PI);
-            ferret.head.earFlapPhase = upDownProgress;
-        }
-    } else {
-        ferret.head.earFlapPhase = 0;
-    }
   }
 
   updateEyeTracking(ferret, racer, time, currentRace) {

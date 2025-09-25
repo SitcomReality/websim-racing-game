@@ -48,49 +48,35 @@ export class FerretBodyRenderer {
 
   renderEars(ctx, ferret, colors, headX, headY, headSize) {
     ctx.fillStyle = colors[2];
-    // Only draw the back ear (left side from our perspective)
     const earBaseX = headX - headSize * 0.4;
     const earBaseY = headY - headSize * 0.6;
-    
-    // Easing functions
-    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
-    const easeInCubic = t => t * t * t;
 
-    let flapProgress = ferret.head.earFlapPhase;
-    let upProgress, downProgress;
+    // Ear flap value: 0 = down, 1 = up
+    const v = Math.max(0, Math.min(1, ferret.ear?.value ?? 0));
 
-    // Split the flap into up and down phases
-    if (flapProgress <= 0.5) { // Going up
-        upProgress = easeOutCubic(flapProgress * 2);
-        downProgress = 0;
-    } else { // Going down
-        upProgress = 1;
-        downProgress = easeInCubic((flapProgress - 0.5) * 2);
-    }
-
-    // Direction factor: -1 (down) to 1 (up)
-    // The animation is a brief flick upwards from the default down state.
-    // So it goes from down -> up -> down.
-    // `ferret.head.earFlapPhase` is a symmetrical 0 -> 1 -> 0 wave.
-    // We want the default to be down.
-    const directionFactor = (ferret.head.earFlapPhase * 2) - 1; // map 0->1 to -1->1
-    const tipDirection = -1 + (ferret.head.earFlapPhase * 2);
+    // Map to angle (radians): down ~ 70deg, up ~ -10deg
+    const downAngle = 70 * Math.PI / 180;
+    const upAngle = -10 * Math.PI / 180;
+    const earAngle = downAngle + (upAngle - downAngle) * v;
 
     const baseLen = Math.max(3, headSize * 0.5);
-    const len = baseLen * (0.3 + Math.abs(directionFactor) * 0.7);
-    
-    // Default down (-1), flaps up towards (+1) and back
-    const tipOffset = baseLen * tipDirection;
+    const len = baseLen;
     const w = Math.max(2, headSize * 0.18);
-    
-    // Draw single ear
+ 
+    // Draw single ear with rotation based on earAngle
+    ctx.save();
+    ctx.translate(earBaseX, earBaseY);
+    // rotate in opposite direction so the triangular tip points backwards during the flap
+    ctx.rotate(-earAngle);
     ctx.beginPath();
-    ctx.moveTo(earBaseX - w, earBaseY);
-    ctx.lineTo(earBaseX + w, earBaseY);
-    ctx.lineTo(earBaseX, earBaseY - tipOffset); // -tipOffset because negative Y is up
+    ctx.moveTo(-w, 0);
+    ctx.lineTo(w, 0);
+    // flip the triangle tip to point the other way (backwards)
+    ctx.lineTo(0, len);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
+    ctx.restore();
   }
 
   renderNose(ctx, ferret, colors, headX, headY, time, racer) {
