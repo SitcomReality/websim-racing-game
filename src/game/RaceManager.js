@@ -251,6 +251,11 @@ export class RaceManager {
       startTime: Date.now(),
       endTime: Date.now() + 30000 // 30 seconds
     };
+    
+    // Emit event to notify UI components
+    this.eventBus.emit('race:countdownStarted', {
+      countdown: this.raceEndCountdown
+    });
   }
 
   /**

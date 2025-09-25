@@ -31,6 +31,7 @@ export class GameScreen {
     this.eventBus.on('race:setupComplete', (data) => this.onRaceSetup(data));
     this.eventBus.on('race:start', (data) => this.onRaceStart(data));
     this.eventBus.on('race:finish', (raceData) => this.onRaceFinish(raceData));
+    this.eventBus.on('race:countdownStarted', (data) => this.onCountdownStarted(data));
     this.eventBus.on('bets:settled', () => this.updatePlayerBalance());
     this.eventBus.on('race:update', (data) => this.onRaceUpdate(data));
     this.eventBus.on('progression:weekStarted', (data) => this.displayRaceWeekInfo(this.gameState.raceWeek));
@@ -208,6 +209,10 @@ export class GameScreen {
     this.hudComponent.setStep(4, 'done');
     this.hudComponent.setStatus('The race is on!');
     this.renderManager.start();
+  }
+  
+  onCountdownStarted(data) {
+    this.renderManager.raceEndCountdown = data.countdown;
   }
   
   onRaceUpdate(data) {
