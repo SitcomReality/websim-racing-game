@@ -55,9 +55,11 @@ export class RacerRenderer {
   renderBoostEffects(ctx, racer, screen, laneIndex, worldTransform) {
     if (racer?.isBoosting && Math.random() < 0.3) {
       if (this.renderManager && this.renderManager.particleSystem) {
+        // Emit from feet position - feet are below the center
+        const feetY = screen.y + 15 * screen.scale; // Move down from center to feet
         this.renderManager.particleSystem.emit(
           screen.x, 
-          screen.y, 
+          feetY, 
           Math.PI, 
           80 * screen.scale, 
           2, 
@@ -71,9 +73,11 @@ export class RacerRenderer {
   renderTrailEffects(screen) {
     if (!this.renderManager?.particleSystem) return;
     if (Math.random() < 0.12) {
+      // Emit from feet position - feet are below the center
+      const feetY = screen.y + 15 * screen.scale;
       this.renderManager.particleSystem.emit(
         screen.x - 8 * screen.scale,
-        screen.y + 3 * screen.scale,
+        feetY,
         Math.PI,
         30 * screen.scale,
         1,
