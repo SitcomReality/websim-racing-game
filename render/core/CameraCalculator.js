@@ -30,7 +30,7 @@ export class CameraCalculator {
     // Prevent zooming on empty space if racers are too spread out.
     // If the gap is huge, we might frame a smaller group.
     let racersToFrame = [...racers];
-    const maxSpreadThreshold = 50; // Don't try to frame racers more than 50% of track apart in pack shots
+    const maxSpreadThreshold = 35; // tightened to avoid excessive zooming for very spread-out packs
     if ((maxPos - minPos) > maxSpreadThreshold && shotDef.priority !== 'wide') {
         const leaderPos = Math.max(...positions);
         // Filter out racers that are too far behind the leader for this shot
@@ -40,9 +40,16 @@ export class CameraCalculator {
     const framedPositions = racersToFrame.map(rid => race.liveLocations[rid] || 0);
     const framedMinPos = Math.min(...framedPositions);
     const framedMaxPos = Math.max(...framedPositions);
-    
-    const span = Math.max(shotDef.minSpan || 5, framedMaxPos - framedMinPos);
-    const targetSpan = span + (shotDef.margin || 10);
+    const horizontalSpread = framedMaxPos - framedMinPos;
+
+    // If spread is very small, keep vertical-fit zoom (avoid unnecessary zoom-out)
+    const tightenThreshold = shotDef.tightSpanThreshold ?? 8;
+    if (horizontalSpread <= tightenThreshold) {
+      return baselineZoom;
+    }
+
+    const span = Math.max(shotDef.minSpan || 5, horizontalSpread);
+    const targetSpan = span + (shotDef.margin || 6);
     
     // Calculate zoom needed for horizontal fit
     const worldPixelWidth = width * 4; // From rendering system
@@ -57,7 +64,7 @@ export class CameraCalculator {
     }
 
     // Reasonable bounds - baseline zoom sets an effective upper limit for most shots.
-    return Math.max(0.3, Math.min(baselineZoom * 1.2, optimalZoom));
+    return Math.max(0.6, Math.min(baselineZoom * 1.1, optimalZoom));
   }
 
   /**
@@ -83,7 +90,7 @@ export class CameraCalculator {
     // Calculate zoom that fits the track height exactly
     const trackFitZoom = height / totalHeight;
     
-    return Math.max(0.5, Math.min(2.0, trackFitZoom));
+    return Math.max(0.85, Math.min(1.6, trackFitZoom));
   }
 
   /**

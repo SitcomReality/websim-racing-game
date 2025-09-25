@@ -21,10 +21,11 @@ export const shotDefinitions = {
       const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.length > 0 ? [sorted[0]] : [];
     },
-    margin: 8,
-    minSpan: 12,
+    margin: 6,
+    minSpan: 6,
     lookahead: 0.1,
     priority: 'tight',
+    tightSpanThreshold: 6,
     description: 'Focus on the race leader'
   },
   
@@ -35,10 +36,11 @@ export const shotDefinitions = {
       // Focus on top 4 racers for better framing
       return sorted.slice(0, Math.min(4, sorted.length));
     },
-    margin: 12,
-    minSpan: 20,
+    margin: 8,
+    minSpan: 12,
     lookahead: 0.08,
     priority: 'medium',
+    tightSpanThreshold: 10,
     description: 'Focus on the racing pack'
   },
   
@@ -49,9 +51,10 @@ export const shotDefinitions = {
       return sorted.slice(0, Math.min(3, sorted.length));
     },
     margin: 6,
-    minSpan: 12,
+    minSpan: 10,
     lookahead: 0.05,
     priority: 'tight',
+    tightSpanThreshold: 8,
     description: 'Tight focus on close finish'
   },
   
@@ -71,10 +74,11 @@ export const shotDefinitions = {
       const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.slice(0, Math.min(3, sorted.length));
     },
-    margin: 10,
-    minSpan: 16,
+    margin: 8,
+    minSpan: 12,
     lookahead: 0.08,
     priority: 'medium',
+    tightSpanThreshold: 10,
     description: 'Focus on racing battles'
   },
   
@@ -110,9 +114,10 @@ export const shotDefinitions = {
       return sorted.slice(0, Math.min(3, sorted.length));
     },
     margin: 6,
-    minSpan: 10,
+    minSpan: 8,
     lookahead: 0,
     priority: 'tight',
+    tightSpanThreshold: 8,
     description: 'Focus on finish approach'
   },
   
@@ -127,10 +132,11 @@ export const shotDefinitions = {
       const sorted = [...activeRacers].sort((a,b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.slice(0, 1);
     },
-    margin: 8,
-    minSpan: 10,
+    margin: 6,
+    minSpan: 8,
     lookahead: 0,
     priority: 'tight',
+    tightSpanThreshold: 8,
     description: 'Focus on finishers'
   }
 };
