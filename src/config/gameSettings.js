@@ -1,5 +1,3 @@
-
-```javascript
 /** 
  * GameSettings - Centralized game configuration with validation
  */
