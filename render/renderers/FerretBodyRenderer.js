@@ -172,23 +172,27 @@ export class FerretBodyRenderer {
       const finalLegLength = legLength - pos.lift;
 
       const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
-      // Skip any leg that doesn't have horizontal stride (removes duplicate "up–down only" legs)
-      // if (Math.abs(pos.x - startX) < 1) return;
+      const hipX = startX + (farSideOnly ? -sideOffset : sideOffset);
+      const hipY = bodyHeight/4;
+      const footX = pos.x + (farSideOnly ? -sideOffset : sideOffset);
+      const footY = hipY + finalLegLength;
+      const bendDir = (footX - hipX) >= 0 ? 1 : -1;
+      const kneeX = (hipX + footX) * 0.5 + bendDir * Math.min(6, Math.abs(footX - hipX) * 0.3);
+      const kneeY = hipY + finalLegLength * 0.5 - 4;
 
       ctx.beginPath();
-      ctx.moveTo(startX + (farSideOnly ? -sideOffset : sideOffset), bodyHeight/4);
-      ctx.lineTo(pos.x + (farSideOnly ? -sideOffset : sideOffset), pos.y + finalLegLength);
+      ctx.moveTo(hipX, hipY);
+      ctx.lineTo(kneeX, kneeY);
+      ctx.lineTo(footX, footY);
       ctx.lineWidth = 3 * legThickness;
-      // far-side legs should be slightly dimmer to sell depth
       ctx.strokeStyle = farSideOnly ? this.shadeColor(colors[1] || '#000000', -25) : (colors[1] || '#000');
       ctx.lineCap = 'round';
       ctx.stroke();
 
-      // Draw paw
       const pawSize = ferret.isStumbling ? 2 : 3;
       ctx.fillStyle = farSideOnly ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.4)';
       ctx.beginPath();
-      ctx.arc(pos.x + (farSideOnly ? -sideOffset : sideOffset), pos.y + finalLegLength, pawSize, 0, Math.PI * 2);
+      ctx.arc(footX, footY, pawSize, 0, Math.PI * 2);
       ctx.fill();
     });
   }
