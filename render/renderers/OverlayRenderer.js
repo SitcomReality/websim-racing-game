@@ -6,6 +6,15 @@ export class OverlayRenderer {
     this.renderManager = renderManager;
   }
 
+  renderLaneBanners(ctx) {
+    const w = ctx.canvas.width / this.renderManager.dpr;
+    const h = ctx.canvas.height / this.renderManager.dpr;
+    const laneH = this.renderManager.worldTransform.laneHeight;
+    this.updateHoverBanners(w, h, laneH);
+    this.renderBanners(ctx, w, h, laneH);
+    this.renderManager.interactionController.previousHoveredLane = this.renderManager.interactionController.currentHoveredLane;
+  }
+
   renderLaneBanners() {
     // Lane banners now rendered by BannerSystem behind racers; no overlay drawing here.
   }
