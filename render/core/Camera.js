@@ -1,5 +1,3 @@
-
-```javascript
 import { RaceDirector } from './RaceDirector.js';
 
 class Camera {
@@ -50,3 +48,4 @@ class Camera {
 }
 
 export { Camera };
+

@@ -1,5 +1,3 @@
-
-```javascript
 import { RaceEventManager } from './RaceEventManager.js';
 import { ShotSelector } from './ShotSelector.js';
 import { CameraCalculator } from './CameraCalculator.js';
