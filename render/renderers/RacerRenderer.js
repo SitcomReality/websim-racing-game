@@ -40,7 +40,7 @@ export class RacerRenderer {
       this.screenPositions.push({ rid, x: uiScreenX, y: uiScreenY, r: 25 * this.renderManager.camera.zoom });
 
       // Render ferret using the dedicated renderer
-      this.ferretRenderer.render(ctx, screenX, screenY, racer, time, this.renderManager.camera.zoom);
+      this.ferretRenderer.render(ctx, screenX, screenY, racer, time, this.renderManager.camera.zoom, this.renderManager.currentRace);
 
       // Handle boost particles
       this.renderBoostEffects(ctx, racer, { x: screenX, y: screenY, scale: this.renderManager.camera.zoom }, idx, worldTransform);

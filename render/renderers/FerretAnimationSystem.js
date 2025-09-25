@@ -85,6 +85,25 @@ export class FerretAnimationSystem {
     ferret.eye.pupil.x += (ferret.eye.targetPupilX - ferret.eye.pupil.x) * deltaTime * moveSpeed;
     ferret.eye.pupil.y += (ferret.eye.targetPupilY - ferret.eye.pupil.y) * deltaTime * moveSpeed;
 
+    // Blink logic
+    const dt = (ferret._blinkLastTime != null) ? (time - ferret._blinkLastTime) : 0;
+    ferret._blinkLastTime = time;
+    ferret.eye.blinkTimer -= dt;
+    if (!ferret.eye.isBlinking && ferret.eye.blinkTimer <= 0) {
+      ferret.eye.isBlinking = true;
+      ferret.eye.blinkPhase = 0;
+    }
+    if (ferret.eye.isBlinking) {
+      ferret.eye.blinkPhase += (dt || 0.016) * 18; // quick blink
+      if (ferret.eye.blinkPhase >= Math.PI) {
+        ferret.eye.isBlinking = false;
+        // next blink between 2-6s
+        const nextBlink = 2 + (ferret.seed % 4000) / 1000; // deterministic-ish per ferret
+        ferret.eye.blinkTimer = nextBlink;
+        ferret.eye.blinkPhase = 0;
+      }
+    }
+
     // Update eyelid expressions
     const moodTimer = time * 0.5 + racer.id;
     ferret.eye.upperLid = 0.1 + Math.sin(moodTimer) * 0.05;
