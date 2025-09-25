@@ -100,14 +100,16 @@ export class CameraCalculator {
     
     if (sortedPositions.length === 1) {
       // Single racer focus - center on them with modest lookahead
-      targetX = sortedPositions[0] + (shotDef.lookahead || 0) * 0.7; // Reduce lookahead by 30%
+      const lead = Math.min(shotDef.lookahead || 0, 0.8);
+      targetX = sortedPositions[0] + lead * 0.35;
     } else {
       // Multiple racers - more balanced weighting
       const weights = sortedPositions.map((_, i) => Math.pow(0.75, i)); // Less extreme decay
       const weightedSum = sortedPositions.reduce((sum, pos, i) => sum + pos * weights[i], 0);
       const totalWeight = weights.reduce((sum, w) => sum + w, 0);
       
-      targetX = weightedSum / totalWeight + (shotDef.lookahead || 0) * 0.6; // Reduced lookahead
+      const lead = Math.min(shotDef.lookahead || 0, 0.8);
+      targetX = weightedSum / totalWeight + lead * 0.3;
     }
 
     // Special handling for finish line shots
