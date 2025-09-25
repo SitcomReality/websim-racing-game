@@ -324,11 +324,26 @@ export class RenderManager {
   }
 
   /**
+   * Start race end countdown
+   */
+  startRaceEndCountdown() {
+    this.raceEndCountdown = {
+      active: true,
+      startTime: performance.now(),
+      endTime: performance.now() + 30000 // 30 seconds
+    };
+    console.log('Race end countdown started');
+  }
+
+  /**
    * End race early (moved from OverlayRenderer for better cohesion)
    */
   endRaceEarly() {
+    console.log('Ending race early');
     this.gameState.running = false;
-    this.raceEndCountdown.active = false;
+    if (this.raceEndCountdown) {
+      this.raceEndCountdown.active = false;
+    }
 
     const finishedRacers = new Set(this.gameState.currentRace.results);
     const allRacers = this.gameState.currentRace.racers;
