@@ -1,16 +1,19 @@
 /**
  * RaceDirector - Comprehensive race direction system that manages camera, events, and spectacle
+ * Refactored into smaller, focused modules
  */
 export class RaceDirector {
   constructor() {
     this.currentShot = 'starting_lineup';
     this.lastShotChangeTime = 0;
     this.minShotDuration = 3000; // 3 seconds minimum between shot changes
-    this.events = [];
-    this.activeNotifications = new Map();
-    this.eventListeners = new Map();
     
-    // Track race state for better decisions
+    // Initialize subsystems
+    this.eventManager = new RaceEventManager();
+    this.shotSelector = new ShotSelector(this.eventManager);
+    this.cameraCalculator = new CameraCalculator();
+    
+    // Track race state
     this.raceAnalysis = {
       leadChanges: [],
       closeFinishes: [],
@@ -21,11 +24,11 @@ export class RaceDirector {
   }
 
   /**
-   * Get the current shot configuration with improved zoom logic
+   * Get the current shot configuration
    */
   getShot(race, gameState, canvasDimensions) {
-    this.analyzeRaceEvents(race, gameState);
-    this.updateShot(race, gameState, canvasDimensions);
+    this.eventManager.analyzeRaceEvents(race, gameState, this.raceAnalysis);
+    this.shotSelector.updateShot(race, gameState, this.raceAnalysis, canvasDimensions);
     
     const shotDef = this.shots[this.currentShot];
     const racers = shotDef.updateRacers(race, gameState);
@@ -33,18 +36,183 @@ export class RaceDirector {
     return {
       ...shotDef,
       racers: racers,
-      zoom: this.calculateOptimalZoom(racers, race, canvasDimensions, shotDef),
-      target: this.calculateOptimalTarget(racers, race, shotDef)
+      zoom: this.cameraCalculator.calculateOptimalZoom(racers, race, canvasDimensions, shotDef),
+      target: this.cameraCalculator.calculateOptimalTarget(racers, race, shotDef)
     };
+  }
+
+  /**
+   * Set the current shot
+   */
+  setShot(shotName, time) {
+    if (this.currentShot !== shotName) {
+      const previousShot = this.currentShot;
+      this.currentShot = shotName;
+      this.lastShotChangeTime = time;
+      
+      this.eventManager.emitEvent('shotChange', {
+        from: previousShot,
+        to: shotName,
+        time: time
+      });
+    }
+  }
+
+  /**
+   * Subscribe to race director events
+   */
+  on(eventType, callback) {
+    this.eventManager.on(eventType, callback);
+  }
+
+  /**
+   * Get current race events for UI display
+   */
+  getRecentEvents(maxAge = 10000) {
+    return this.eventManager.getRecentEvents(maxAge);
+  }
+
+  /**
+   * Shot definitions
+   */
+  shots = {
+    starting_lineup: {
+      updateRacers: (race, gameState) => race.racers.filter(rid => !(race.results || []).includes(rid)),
+      margin: 15,
+      minSpan: 40,
+      lookahead: 0,
+      priority: 'wide'
+    },
+    
+    leader_focus: {
+      updateRacers: (race, gameState) => {
+        const sorted = race.racers
+          .filter(rid => !(race.results || []).includes(rid))
+          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+        return sorted.slice(0, 2);
+      },
+      margin: 20,
+      minSpan: 25,
+      lookahead: 3,
+      priority: 'medium'
+    },
+    
+    pack_focus: {
+      updateRacers: (race, gameState) => {
+        const sorted = race.racers
+          .filter(rid => !(race.results || []).includes(rid))
+          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+        return sorted.slice(0, Math.min(6, sorted.length));
+      },
+      margin: 15,
+      minSpan: 35,
+      lookahead: 2,
+      priority: 'wide'
+    },
+    
+    close_finish: {
+      updateRacers: (race, gameState) => {
+        const sorted = race.racers
+          .filter(rid => !(race.results || []).includes(rid))
+          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+        return sorted.slice(0, 3);
+      },
+      margin: 8,
+      minSpan: 15,
+      lookahead: 1,
+      priority: 'tight'
+    },
+    
+    battle_focus: {
+      updateRacers: (race, gameState) => {
+        const recentLeadChange = this.raceAnalysis.leadChanges
+          .filter(lc => performance.now() - lc.time < 5000)
+          .pop();
+        
+        if (recentLeadChange) {
+          return [recentLeadChange.oldLeader, recentLeadChange.newLeader];
+        }
+        
+        const sorted = race.racers
+          .filter(rid => !(race.results || []).includes(rid))
+          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+        return sorted.slice(0, 3);
+      },
+      margin: 12,
+      minSpan: 20,
+      lookahead: 2,
+      priority: 'medium'
+    },
+    
+    incident_focus: {
+      updateRacers: (race, gameState) => {
+        const recentStumble = this.raceAnalysis.stumbles
+          .filter(s => performance.now() - s.time < 3000)
+          .pop();
+        
+        if (recentStumble) {
+          const stumblerPos = race.liveLocations[recentStumble.racerId] || 0;
+          return race.racers.filter(rid => {
+            const pos = race.liveLocations[rid] || 0;
+            return Math.abs(pos - stumblerPos) < 15;
+          });
+        }
+        
+        return this.shots.pack_focus.updateRacers(race);
+      },
+      margin: 18,
+      minSpan: 30,
+      lookahead: 0,
+      priority: 'medium'
+    },
+    
+    finish_approach: {
+      updateRacers: (race, gameState) => {
+        const sorted = race.racers
+          .filter(rid => !(race.results || []).includes(rid))
+          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+        return sorted.slice(0, 4);
+      },
+      margin: 10,
+      minSpan: 20,
+      lookahead: 5,
+      priority: 'medium'
+    },
+    
+    finish_focus: {
+      updateRacers: (race, gameState) => {
+        if (race.results && race.results.length > 0) {
+          return race.results.slice(-2);
+        }
+        return race.racers.filter(rid => !(race.results || []).includes(rid));
+      },
+      margin: 15,
+      minSpan: 25,
+      lookahead: 0,
+      priority: 'medium'
+    }
+  };
+}
+
+/**
+ * RaceEventManager - Handles race event detection and management
+ */
+class RaceEventManager {
+  constructor() {
+    this.events = [];
+    this.eventListeners = new Map();
+    this.raceAnalysis = null;
   }
 
   /**
    * Analyze ongoing race events for dramatic moments
    */
-  analyzeRaceEvents(race, gameState) {
+  analyzeRaceEvents(race, gameState, raceAnalysis) {
+    this.raceAnalysis = raceAnalysis;
+    const now = performance.now();
+    
     if (!race || !race.racers) return;
     
-    const now = performance.now();
     const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
     
     // Detect lead changes
@@ -60,9 +228,6 @@ export class RaceDirector {
     this.cleanupOldEvents(now);
   }
 
-  /**
-   * Detect lead changes for dramatic camera work
-   */
   detectLeadChanges(race, now) {
     const sortedRacers = [...race.racers]
       .filter(rid => !(race.results || []).includes(rid))
@@ -91,9 +256,6 @@ export class RaceDirector {
     this.raceAnalysis.lastLeader = currentLeader;
   }
 
-  /**
-   * Detect close racing situations
-   */
   detectCloseRacing(race, activeRacers, now) {
     if (activeRacers.length < 2) return;
     
@@ -105,7 +267,7 @@ export class RaceDirector {
     // Check for tight racing (racers within 5% of each other)
     for (let i = 0; i < positions.length - 1; i++) {
       const gap = positions[i].pos - positions[i + 1].pos;
-      if (gap < 5 && positions[i].pos > 20) { // Close racing after start
+      if (gap < 5 && positions[i].pos > 20) {
         this.emitEvent('closeRacing', {
           racers: [positions[i].rid, positions[i + 1].rid],
           gap: gap,
@@ -115,9 +277,6 @@ export class RaceDirector {
     }
   }
 
-  /**
-   * Detect incidents like stumbles
-   */
   detectIncidents(race, gameState, now) {
     if (!gameState || !gameState.racers) return;
     
@@ -147,12 +306,57 @@ export class RaceDirector {
     });
   }
 
+  cleanupOldEvents(now) {
+    const maxAge = 30000; // 30 seconds
+    this.events = this.events.filter(event => now - event.time < maxAge);
+  }
+
+  emitEvent(type, data) {
+    const event = {
+      type,
+      data,
+      time: performance.now()
+    };
+    
+    this.events.push(event);
+    
+    const listeners = this.eventListeners.get(type) || [];
+    listeners.forEach(listener => {
+      try {
+        listener(event);
+      } catch (error) {
+        console.error(`Error in race director event listener for ${type}:`, error);
+      }
+    });
+  }
+
+  on(eventType, callback) {
+    if (!this.eventListeners.has(eventType)) {
+      this.eventListeners.set(eventType, []);
+    }
+    this.eventListeners.get(eventType).push(callback);
+  }
+
+  getRecentEvents(maxAge = 10000) {
+    const now = performance.now();
+    return this.events.filter(event => now - event.time < maxAge);
+  }
+}
+
+/**
+ * ShotSelector - Handles shot selection logic
+ */
+class ShotSelector {
+  constructor(eventManager) {
+    this.eventManager = eventManager;
+  }
+
   /**
    * Update the current shot based on race analysis
    */
-  updateShot(race, gameState, canvasDimensions) {
+  updateShot(race, gameState, raceAnalysis, canvasDimensions) {
     const now = performance.now();
-    if (now - this.lastShotChangeTime < this.minShotDuration) {
+    if (now - this.eventManager.lastShotChangeTime < this.eventManager.minShotDuration) {
       return; // Don't change shots too frequently
     }
 
@@ -179,7 +383,7 @@ export class RaceDirector {
     }
 
     // 2. Recent dramatic events
-    const recentEvents = this.events.filter(e => now - e.time < 5000);
+    const recentEvents = this.eventManager.events.filter(e => now - e.time < 5000);
     const hasRecentStumble = recentEvents.some(e => e.type === 'stumble');
     const hasRecentLeadChange = recentEvents.some(e => e.type === 'leadChange');
     
@@ -209,6 +413,15 @@ export class RaceDirector {
         this.setShot('pack_focus', now);
       }
     }
+  }
+}
+
+/**
+ * CameraCalculator - Handles camera calculations
+ */
+class CameraCalculator {
+  constructor() {
+    // Camera calculation state
   }
 
   /**
@@ -271,207 +484,4 @@ export class RaceDirector {
       y: 0
     };
   }
-
-  /**
-   * Set the current shot
-   */
-  setShot(shotName, time) {
-    if (this.currentShot !== shotName) {
-      const previousShot = this.currentShot;
-      this.currentShot = shotName;
-      this.lastShotChangeTime = time;
-      
-      this.emitEvent('shotChange', {
-        from: previousShot,
-        to: shotName,
-        time: time
-      });
-    }
-  }
-
-  /**
-   * Emit events to listeners
-   */
-  emitEvent(type, data) {
-    const event = {
-      type,
-      data,
-      time: performance.now()
-    };
-    
-    this.events.push(event);
-    
-    // Notify listeners
-    const listeners = this.eventListeners.get(type) || [];
-    listeners.forEach(listener => {
-      try {
-        listener(event);
-      } catch (error) {
-        console.error(`Error in race director event listener for ${type}:`, error);
-      }
-    });
-  }
-
-  /**
-   * Subscribe to race director events
-   */
-  on(eventType, callback) {
-    if (!this.eventListeners.has(eventType)) {
-      this.eventListeners.set(eventType, []);
-    }
-    this.eventListeners.get(eventType).push(callback);
-  }
-
-  /**
-   * Clean up old events
-   */
-  cleanupOldEvents(now) {
-    const maxAge = 30000; // 30 seconds
-    this.events = this.events.filter(event => now - event.time < maxAge);
-    
-    // Clean up analysis data
-    Object.keys(this.raceAnalysis).forEach(key => {
-      if (Array.isArray(this.raceAnalysis[key])) {
-        this.raceAnalysis[key] = this.raceAnalysis[key].filter(item => 
-          !item.time || now - item.time < maxAge
-        );
-      }
-    });
-  }
-
-  /**
-   * Get current race events for UI display
-   */
-  getRecentEvents(maxAge = 10000) {
-    const now = performance.now();
-    return this.events.filter(event => now - event.time < maxAge);
-  }
-
-  /**
-   * Shot definitions with improved parameters
-   */
-  shots = {
-    starting_lineup: {
-      updateRacers: (race, gameState) => race.racers.filter(rid => !(race.results || []).includes(rid)),
-      margin: 15, // Reduced from 25
-      minSpan: 40, // Reduced from 120
-      lookahead: 0,
-      priority: 'wide'
-    },
-    
-    leader_focus: {
-      updateRacers: (race, gameState) => {
-        const sorted = race.racers
-          .filter(rid => !(race.results || []).includes(rid))
-          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-        return sorted.slice(0, 2); // Leader + closest competitor
-      },
-      margin: 20, // Reduced from 35
-      minSpan: 25, // Reduced from 50
-      lookahead: 3,
-      priority: 'medium'
-    },
-    
-    pack_focus: {
-      updateRacers: (race, gameState) => {
-        const sorted = race.racers
-          .filter(rid => !(race.results || []).includes(rid))
-          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-        return sorted.slice(0, Math.min(6, sorted.length)); // Top 6 or all
-      },
-      margin: 15, // Reduced from 25
-      minSpan: 35, // Reduced from 70
-      lookahead: 2,
-      priority: 'wide'
-    },
-    
-    close_finish: {
-      updateRacers: (race, gameState) => {
-        const sorted = race.racers
-          .filter(rid => !(race.results || []).includes(rid))
-          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-        return sorted.slice(0, 3); // Top 3 in close finish
-      },
-      margin: 8, // Reduced from 15
-      minSpan: 15, // Reduced from 25
-      lookahead: 1,
-      priority: 'tight'
-    },
-    
-    battle_focus: {
-      updateRacers: (race, gameState) => {
-        // Focus on racers involved in recent lead changes
-        const recentLeadChange = this.raceAnalysis.leadChanges
-          .filter(lc => performance.now() - lc.time < 5000)
-          .pop();
-        
-        if (recentLeadChange) {
-          return [recentLeadChange.oldLeader, recentLeadChange.newLeader];
-        }
-        
-        // Fallback to top 3
-        const sorted = race.racers
-          .filter(rid => !(race.results || []).includes(rid))
-          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-        return sorted.slice(0, 3);
-      },
-      margin: 12,
-      minSpan: 20,
-      lookahead: 2,
-      priority: 'medium'
-    },
-    
-    incident_focus: {
-      updateRacers: (race, gameState) => {
-        // Focus on racers involved in recent incidents
-        const recentStumble = this.raceAnalysis.stumbles
-          .filter(s => performance.now() - s.time < 3000)
-          .pop();
-        
-        if (recentStumble) {
-          // Include the stumbling racer and nearby competitors
-          const stumblerPos = race.liveLocations[recentStumble.racerId] || 0;
-          const nearbyRacers = race.racers.filter(rid => {
-            const pos = race.liveLocations[rid] || 0;
-            return Math.abs(pos - stumblerPos) < 15;
-          });
-          return nearbyRacers;
-        }
-        
-        // Fallback to pack focus
-        return this.shots.pack_focus.updateRacers(race);
-      },
-      margin: 18,
-      minSpan: 30,
-      lookahead: 0,
-      priority: 'medium'
-    },
-    
-    finish_approach: {
-      updateRacers: (race, gameState) => {
-        const sorted = race.racers
-          .filter(rid => !(race.results || []).includes(rid))
-          .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-        return sorted.slice(0, 4); // Top 4 approaching finish
-      },
-      margin: 10,
-      minSpan: 20,
-      lookahead: 5,
-      priority: 'medium'
-    },
-    
-    finish_focus: {
-      updateRacers: (race, gameState) => {
-        // Focus on recently finished racers or the last active ones
-        if (race.results && race.results.length > 0) {
-          return race.results.slice(-2); // Last two finishers
-        }
-        return race.racers.filter(rid => !(race.results || []).includes(rid));
-      },
-      margin: 15,
-      minSpan: 25,
-      lookahead: 0,
-      priority: 'medium'
-    }
-  };
 }
