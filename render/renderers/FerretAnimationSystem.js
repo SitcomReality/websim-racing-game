@@ -11,6 +11,10 @@ export class FerretAnimationSystem {
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
     const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
 
+    // Calculate ground speed factor for leg synchronization
+    const baseSpeed = 0.005; // base movement speed
+    ferret.groundSpeed = 1.0 + (velocity - baseSpeed) * 0.5; // Adjust stride to match ground speed
+
     if (velocity > 0.0005) {
       const k = 0.22; // maps world velocity to gait speed
       ferret.gait.cyclePhase += velocity * k;

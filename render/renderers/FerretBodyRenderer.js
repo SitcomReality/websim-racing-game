@@ -180,20 +180,25 @@ export class FerretBodyRenderer {
       // Normal running stride
       const strideLength = ferret.gait.stride * 10;
       const stridePhase = ferret.gait.cyclePhase;
-      const strideOffset = Math.sin(stridePhase) * strideLength;
-      const strideOffset2 = Math.sin(stridePhase + Math.PI) * strideLength * (ferret.legs.length > 1 ? 1.05 : 0.95);
+      
+      // Calculate ground speed to synchronize foot movement
+      const groundSpeed = ferret.groundSpeed || 1.0;
+      const adjustedStrideLength = strideLength * groundSpeed;
+      
+      const strideOffset = Math.sin(stridePhase) * adjustedStrideLength;
+      const strideOffset2 = Math.sin(stridePhase + Math.PI) * adjustedStrideLength * (ferret.legs.length > 1 ? 1.05 : 0.95);
 
-      // Determine foot lift. Lift happens when foot is moving forward (positive velocity)
+      // Determine foot lift with better ground contact timing
       const liftHeight = 8;
       const cosPhase = Math.cos(stridePhase);
-      const liftAmount = cosPhase > 0 ? cosPhase * liftHeight : 0;
-      const liftAmount2 = -cosPhase > 0 ? -cosPhase * liftHeight : 0;
+      const liftAmount = cosPhase > 0 ? cosPhase * liftHeight * 0.7 : 0; // Reduced lift for better ground contact
+      const liftAmount2 = -cosPhase > 0 ? -cosPhase * liftHeight * 0.7 : 0;
 
       legPositions = [
-        { x: bodyLength/3 + strideOffset, y: bodyHeight/4, lift: liftAmount },
-        { x: bodyLength/3 - 5 + strideOffset2, y: bodyHeight/4, lift: liftAmount2 },
-        { x: -bodyLength/4 + strideOffset2, y: bodyHeight/4, lift: liftAmount2 },
-        { x: -bodyLength/4 - 5 + strideOffset, y: bodyHeight/4, lift: liftAmount }
+        { x: bodyLength/3 + strideOffset, y: bodyHeight/4, lift: liftAmount, groundContact: cosPhase <= 0 },
+        { x: bodyLength/3 - 5 + strideOffset2, y: bodyHeight/4, lift: liftAmount2, groundContact: cosPhase >= 0 },
+        { x: -bodyLength/4 + strideOffset2, y: bodyHeight/4, lift: liftAmount2, groundContact: cosPhase >= 0 },
+        { x: -bodyLength/4 - 5 + strideOffset, y: bodyHeight/4, lift: liftAmount, groundContact: cosPhase <= 0 }
       ];
     }
 
@@ -206,21 +211,25 @@ export class FerretBodyRenderer {
     indicesToDraw.forEach((i) => {
       const pos = legPositions[i];
       const sideOffset = farSideOnly ? 2 : 0; // subtle horizontal offset for depth
-      const finalLegLength = legLength - pos.lift;
-
-      const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
+      
+      // Calculate foot position with better ground tracking
+      const footY = bodyHeight/4 + (legLength - pos.lift);
+      const footX = pos.x + (farSideOnly ? -sideOffset : sideOffset);
+      
+      // Add slight ground contact adjustment
+      const groundContactAdjustment = pos.groundContact ? 2 : 0;
+      const finalFootY = footY + groundContactAdjustment;
+      
       const hipX = startX + (farSideOnly ? -sideOffset : sideOffset);
       const hipY = bodyHeight/4;
-      const footX = pos.x + (farSideOnly ? -sideOffset : sideOffset);
-      const footY = hipY + finalLegLength;
       const bendDir = (footX - hipX) >= 0 ? 1 : -1;
       const kneeX = (hipX + footX) * 0.5 + bendDir * Math.min(6, Math.abs(footX - hipX) * 0.3);
-      const kneeY = hipY + finalLegLength * 0.5 - 4;
+      const kneeY = hipY + (legLength - pos.lift) * 0.5 - 4;
 
       ctx.beginPath();
       ctx.moveTo(hipX, hipY);
       ctx.lineTo(kneeX, kneeY);
-      ctx.lineTo(footX, footY);
+      ctx.lineTo(footX, finalFootY);
       ctx.lineWidth = 3 * legThickness;
       ctx.strokeStyle = farSideOnly ? this.shadeColor(colors[1] || '#000000', -25) : (colors[1] || '#000');
       ctx.lineCap = 'round';
@@ -229,7 +238,7 @@ export class FerretBodyRenderer {
       const pawSize = ferret.isStumbling ? 2 : 3;
       ctx.fillStyle = farSideOnly ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.4)';
       ctx.beginPath();
-      ctx.arc(footX, footY, pawSize, 0, Math.PI * 2);
+      ctx.arc(footX, finalFootY, pawSize, 0, Math.PI * 2);
       ctx.fill();
     });
   }
