@@ -76,8 +76,8 @@ export class CameraDirector {
   shots = {
     starting_lineup: {
       updateRacers: (race) => race.racers.filter(rid => !(race.results || []).includes(rid)),
-      margin: 10,
-      minSpan: 80,
+      margin: 25, // Increased from 10
+      minSpan: 120, // Increased from 80
       lookahead: 0,
     },
     leader_focus: {
@@ -87,8 +87,8 @@ export class CameraDirector {
             .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
           return sorted.length > 0 ? [sorted[0]] : [];
       },
-      margin: 20,
-      minSpan: 25,
+      margin: 35, // Increased from 20
+      minSpan: 50, // Increased from 25
       lookahead: 5,
     },
     pack_focus: {
@@ -99,8 +99,8 @@ export class CameraDirector {
           // Frame the top 5 racers or all if fewer
           return sorted.slice(0, 5);
       },
-      margin: 15,
-      minSpan: 40,
+      margin: 25, // Increased from 15
+      minSpan: 70, // Increased from 40
       lookahead: 3,
     },
     close_finish: {
@@ -111,8 +111,8 @@ export class CameraDirector {
         // Tightly frame the top 2-3 racers
         return sorted.slice(0, 3);
       },
-      margin: 5,
-      minSpan: 10,
+      margin: 15, // Increased from 5
+      minSpan: 25, // Increased from 10
       lookahead: 2,
     },
   };
