@@ -245,6 +245,18 @@ export class RenderManager {
    */
   resizeToContainer() {
     this.canvasAdapter.resizeToContainer();
+    // Force a proper resize to fill container
+    const container = this.canvas.parentElement;
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      this.canvas.width = Math.floor(rect.width * dpr);
+      this.canvas.height = Math.floor(rect.height * dpr);
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.ctx.scale(dpr, dpr);
+      this.canvas.style.width = rect.width + 'px';
+      this.canvas.style.height = rect.height + 'px';
+    }
   }
 
   /**

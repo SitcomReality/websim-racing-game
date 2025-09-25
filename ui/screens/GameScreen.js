@@ -113,7 +113,7 @@ export class GameScreen {
 
         <div id="right-panel">
           <div class="track track-container" id="raceTrack">
-            <canvas id="raceCanvas"></canvas>
+            <canvas id="raceCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
             <div id="liveLeaderboard" class="overlay-leaderboard">
               <h5>Leaders</h5>
               <ol id="leaderList"></ol>
