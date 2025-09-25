@@ -4,11 +4,12 @@ export class Track {
     this.name = name;
     this.sections = [];
     const types = Array.isArray(groundTypes) && groundTypes.length ? groundTypes : ["asphalt","gravel","dirt","grass","mud","rock","marble"];
-    for (let i = 0; i < numberOfSections; i++) {
+    // Increase sections by 3x for longer tracks
+    const extendedSections = numberOfSections * 3;
+    for (let i = 0; i < extendedSections; i++) {
       const t = types[Math.floor(Math.random() * types.length)];
       this.sections.push(t);
     }
   }
 }
 window.Track = Track;
-
