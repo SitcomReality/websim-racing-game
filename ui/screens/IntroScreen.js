@@ -50,6 +50,8 @@ export class IntroScreen {
             value = parseFloat(value);
         }
         this.updateSetting(fullKey, value);
+        // Prevent tab switch by stopping propagation
+        e.stopPropagation();
       }
     });
 
