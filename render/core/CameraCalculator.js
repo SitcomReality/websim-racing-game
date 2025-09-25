@@ -54,9 +54,10 @@ export class CameraCalculator {
       }
       return { x: 50, y: 0 };
     }
-    const positions = racers.map(rid => race.liveLocations[rid] || 0);
-    const minPos = Math.min(...positions);
-    const maxPos = Math.max(...positions);
+    const positions = racers.map(rid => race.liveLocations[rid] || 0).sort((a,b) => b - a);
+    const leaderPos = positions[0] || 0;
+    const runnerUp = positions[1] ?? leaderPos;
+    const spread = Math.max(...positions) - Math.min(...positions);
     
     // Bias towards the front of the pack. 0.5 is center, 1.0 is leader.
     // A higher bias keeps the camera focused on the frontrunners.
