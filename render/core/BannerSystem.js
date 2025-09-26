@@ -10,6 +10,8 @@ export class BannerSystem {
       INCIDENT: 'incident',
       NAME: 'name'
     };
+    // screen-space animation defaults
+    this.slideInStartOffset = 100; // start off-screen to the right
   }
 
   createBanner(type, laneIndex, text, duration = null) {
@@ -28,45 +30,56 @@ export class BannerSystem {
         type: type,
         startTime: Date.now(),
         duration: duration,
+        x: null,            // will be initialized on first render
+        targetX: 20,        // fixed left-side position in screen space
+        opacity: 0,
+        active: true
       };
       this.activeBanners.set(laneIndex, banner);
     }
   }
 
   render(ctx, camera, worldTransform, race, renderProps) {
-    // Render all active banners in world-space (camera already applied via ctx)
+    // Render active banners in screen-space (fixed left position; vertical follows lane)
     const dpr = (window.devicePixelRatio || 1);
     const w = ctx.canvas.width / dpr;
+    const h = ctx.canvas.height / dpr;
     const laneHeight = worldTransform.laneHeight;
     const totalHeight = laneHeight * (renderProps?.numberOfLanes || 10);
-    const worldPixelWidth = w * 4;
 
     for (const [laneIndex, banner] of this.activeBanners.entries()) {
       const { type, text, startTime, duration } = banner;
-      const rid = race?.racers?.[laneIndex];
-      const locPct = race?.liveLocations?.[rid] ?? 0;
 
-      const bannerWidth = 200;
-      const bannerHeight = 30;
-      const bannerX = (locPct / 100) * worldPixelWidth - (bannerWidth * 0.5); // center-ish near racer
-      const laneTopY = laneIndex * laneHeight;
-      const bannerY = laneTopY + (laneHeight * 0.15); // stay within lane
+      if (banner.x === null) banner.x = w + this.slideInStartOffset;
+      banner.x += (banner.targetX - banner.x) * 0.18;
+      const targetOpacity = banner.active ? 1 : 0;
+      banner.opacity += (targetOpacity - banner.opacity) * 0.15;
+
+      const bannerWidth = 220;
+      const bannerHeight = Math.max(30, laneHeight * camera.zoom * 0.8);
+      const laneCenterY = (laneIndex * laneHeight + laneHeight / 2 - totalHeight / 2) * camera.zoom + h / 2;
+      const bannerY = laneCenterY - bannerHeight / 2;
+      const bannerX = banner.x;
 
       const bannerColor = this.getBannerColor(type);
       const textColor = this.getBannerTextColor(type);
-      const isFinished = typeof duration === 'number' && (Date.now() - startTime > duration * 1000);
+      const isDurationElapsed = typeof duration === 'number' && (Date.now() - startTime > duration * 1000);
+      if (isDurationElapsed) { banner.active = false; banner.targetX = -bannerWidth - 50; }
 
       ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, banner.opacity));
       ctx.fillStyle = bannerColor;
       ctx.fillRect(bannerX, bannerY, bannerWidth, bannerHeight);
       ctx.fillStyle = textColor;
-      ctx.font = '18px Orbitron';
+      ctx.font = 'bold 16px Orbitron';
       ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText(text, bannerX + 10, bannerY + 5);
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, bannerX + 10, laneCenterY);
       ctx.restore();
 
-      if (isFinished) {
+      const offLeft = banner.x < -bannerWidth - 60;
+      const fullyFaded = banner.opacity < 0.02;
+      if (!banner.active && offLeft && fullyFaded) {
         this.activeBanners.delete(laneIndex);
       }
     }
