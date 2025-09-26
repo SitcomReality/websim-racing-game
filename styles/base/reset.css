@@ -9,3 +9,24 @@ body {
     color: #E2E0E9;
     margin: 0;
 }
+
+/* No-JS message styling moved from index.html */
+#no-js {
+    text-align: center;
+    background-color: white;
+    width: 80%;
+    margin: 5% 10%;
+    color: #391d1d;
+    padding: 2px 4px 12px 4px;
+    border: 3px dashed #ff6000;
+    z-index: 99999;
+    position: fixed;
+}
+
+#no-js h2 {
+    color: red;
+}
+
+#no-js p {
+    font-weight: bold;
+}

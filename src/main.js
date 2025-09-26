@@ -21,6 +21,10 @@ import { Racer } from './entities/racer/Racer.js';
 import { Track } from './models/Track.js';
 // remove legacy domUtils import
 
+// Import polyfills
+import './utils/polyfills.js';
+import './utils/palette.js';
+
 // Initialize the application
 class Application {
   constructor() {
