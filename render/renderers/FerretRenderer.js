@@ -24,10 +24,17 @@ export class FerretRenderer {
     // Pass time in milliseconds (as provided by RenderManager.tick)
     this.animationSystem.update(ferret, racer, time, raceState);
 
-    // Resolve racer colors robustly with a local fallback palette
-    const fallback = ["#6C8EAD", "#A23E48", "#FF8C42", "#171219"];
-    const palette = (window && window.racerColors && Array.isArray(window.racerColors)) ? window.racerColors : fallback;
-    const colors = (racer.colors || fallback).map(c => (typeof c === 'string' ? c : (palette[c] ?? fallback[c % fallback.length])));
+    // Resolve racer colors from the racer's colors array using the global palette
+    const palette = window.racerColors || [
+      "#FFF275", "#FF8C42", "#FF3C38", "#A23E48", "#6C8EAD",
+      "#171219", "#225560", "#7AC74F", "#F1DABF", "#08BDBD"
+    ];
+    
+    // Map the racer's color indices to actual hex colors
+    const colors = (racer.colors || [0, 1, 2]).map(index => {
+      const colorIndex = typeof index === 'number' ? index : 0;
+      return palette[colorIndex] || palette[0];
+    });
 
     // Render ferret components
     // Use the bodyRenderer's main render method which coordinates all components
