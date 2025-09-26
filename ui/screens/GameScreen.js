@@ -326,11 +326,13 @@ export class GameScreen {
       const trackLength = Math.max(0, (race.segments?.length || 0) - 1);
       const groundTypes = [...new Set(race.track.sections)].join(', ');
 
-      let racersHTML = '<ul class="racers-list">';
+      // Create colorful racer cards instead of plain list
+      let racersHTML = '<div class="racers-list">';
       race.racers.forEach(racer => {
-        racersHTML += `<li>- ${this.getRacerNameString(racer)}</li>`;
+        const racerCard = new RacerCardComponent(racer, { compact: true });
+        racersHTML += racerCard.createElement().outerHTML;
       });
-      racersHTML += '</ul>';
+      racersHTML += '</div>';
 
       raceEl.innerHTML = `
         <div class="race-week-header">

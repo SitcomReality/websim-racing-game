@@ -1,34 +1,139 @@
-.racers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-  margin-top: 10px;
+.gui-container {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    background: url("../../assets/images/panel_background.png") repeat, linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+    border: 1px solid #444;
+    padding: 15px;
 }
 
-.race-week-container .racer-card {
-  margin: 0;
-  min-height: 60px;
+.race-week-container {
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
 }
 
-.race-week-container .racer-card .racer-number {
-  width: 32px;
-  height: 32px;
-  font-size: 14px;
+.race-week-container.current-race {
+    border-color: var(--accent-color);
+    background: linear-gradient(135deg, rgba(0,123,255,0.1) 0%, rgba(0,0,0,0.3) 100%);
+    box-shadow: 0 0 15px rgba(0,123,255,0.3);
 }
 
-.race-week-container .racer-card .racer-name {
-  font-size: 12px;
+.race-week-container.past-race {
+    opacity: 0.6;
+    border-color: #555;
 }
 
-.race-week-container .racer-card .racer-info {
-  padding-left: 8px;
+.race-week-container.past-race:hover {
+    opacity: 0.8;
 }
 
-.race-week-container h5 {
-  margin: 15px 0 8px 0;
-  color: var(--accent-color);
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.race-week-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
+.race-week-header h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: var(--accent-color);
+}
+
+.track-info {
+    display: flex;
+    gap: 15px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.track-length {
+    background: rgba(0,123,255,0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.ground-types {
+    font-style: italic;
+}
+
+.racers-list {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    padding: 0;
+}
+
+.racers-list .racer-card {
+    margin: 0;
+    padding: 8px 10px;
+    font-size: 12px;
+    grid-template-columns: 28px 1fr;
+    gap: 6px;
+}
+
+.racers-list .racer-number {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+}
+
+.racers-list .racer-name {
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.racers-list .placing-badge {
+    transform: translate(-4px, -4px);
+    font-size: 10px;
+    padding: 2px 4px;
+}
+
+.racers-list .swatch {
+    width: 10px;
+    height: 10px;
+}
+
+.stat {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    color: #4dff88;
+    background: rgba(0,0,0,0.3);
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #4dff88;
+}
+
+#hud .hud-steps {
+    display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+}
+#hud .step {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 10px; border: 1px solid #555; border-radius: 16px;
+    background: rgba(0,0,0,0.3); color: var(--text-primary);
+    opacity: 0.6; transition: opacity .2s ease, border-color .2s ease;
+}
+#hud .step .num {
+    display: inline-block; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent-color); color: #fff; font-size: 12px; text-align: center; line-height: 18px;
+}
+#hud .step.active { opacity: 1; border-color: var(--accent-color); }
+#hud .step.done { opacity: 0.9; border-color: #2aa34a; }
+#hud .hud-status {
+    padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px;
+    background: rgba(0,0,0,0.25);
+}
+
+.tabs { display: flex; flex-direction: column; gap: 10px; }
+.tab-buttons { display: flex; gap: 6px; }
+.tab-button {
+    padding: 6px 10px; border: 1px solid #555; background: rgba(0,0,0,0.2);
+    color: var(--text-primary); border-radius: 6px; cursor: pointer; font-size: 12px;
+}
+.tab-button.active { border-color: var(--accent-color); background: rgba(0,0,0,0.35); }
+.tab-content { position: relative; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
