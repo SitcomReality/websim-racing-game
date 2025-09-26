@@ -11,7 +11,6 @@ export class FerretAnimationSystem {
   update(ferret, racer, time, raceState) {
     const liveX = (raceState?.liveLocations?.[racer.id]) || 0;
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
-    const dtSecs = dt; // dt is in milliseconds, dtSecs should be in seconds if used outside this block
     const dtSeconds = Math.max(0.0001, dt / 1000);
     
     // Calculate velocity more reliably - use the racer's current speed
@@ -19,6 +18,11 @@ export class FerretAnimationSystem {
     
     // Check if the racer has finished or is not moving (stopped)
     const isRacing = raceState?.racers?.includes(racer.id) && !racer.visual.finished && !raceState.results.includes(racer.id);
+    
+    // Use actual forward progress to drive animation speed
+    const deltaX = liveX - (ferret._lastX ?? liveX);
+    const speedPctPerSec = Math.abs(deltaX) / dtSeconds;
+    const angularVel = isRacing ? (speedPctPerSec / Math.max(0.05, ferret.gait.stride || 0.6)) : 0;
     
     let velocity;
     if (isRacing) {
@@ -29,12 +33,10 @@ export class FerretAnimationSystem {
       velocity = 0;
     }
 
-    if (velocity > 0.00005) {
-      const k = 12.5; // Adjusted from 0.22: drives animation phase speed relative to racer velocity (12.5 chosen to normalize stride duration to ~0.5s at max speed 1)
-      ferret.gait.cyclePhase += velocity * k * dtSeconds;
-      ferret.gait.stride = Math.min(1.3, 0.6 + velocity * 0.12);
+    if (angularVel > 0) {
+      ferret.gait.cyclePhase += angularVel * dtSeconds;
+      ferret.gait.stride = Math.min(1.6, 0.6 + speedPctPerSec * 0.4);
     } else {
-      // Subtle animation when nearly stationary or finished/paused
       ferret.gait.cyclePhase += dtSeconds * 1.2;
       ferret.gait.stride = Math.max(0.15, ferret.gait.stride * 0.95);
     }
