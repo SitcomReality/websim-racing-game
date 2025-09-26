@@ -2,10 +2,6 @@
  * Main entry point for the ES6 module system
  */
 import { Application } from './core/Application.js';
-import { initGame } from './init.js';
-import { FerretFactory } from './entities/racer/FerretFactory.js';
-import { Racer } from './entities/racer/Racer.js';
-import { Track } from './models/Track.js';
 
 // Import polyfills
 import './utils/polyfills.js';
