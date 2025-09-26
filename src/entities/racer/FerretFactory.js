@@ -18,8 +18,9 @@ export class FerretFactory {
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
     const body = {
-      length: pick(1.6, 1.8), // doubled min, +50% max
-      height: pick(0.9, 1.1),
+      // Increase body dimensions: min +50%, max +100%
+      length: pick(1.6 * 1.5, 1.8 * 2.0),
+      height: pick(0.9 * 1.5, 1.1 * 2.0),
       stockiness: pick(0.8, 1.2)
     };
     const legs = {
@@ -35,7 +36,8 @@ export class FerretFactory {
       noseLength: pick(0.7, 1.3),
       underbiteDepth: pick(0.0, 0.3),
       earSize: pick(0.8, 1.2),
-      size: pick(0.85, 1.25),
+      // Make heads smaller: reduce max head size by ~1/3
+      size: pick(0.6, 0.85),
       roundness: pick(0.0, 0.8)
     };
     head.headType = rnd() < 0.5 ? 'pointed' : 'rounded';
