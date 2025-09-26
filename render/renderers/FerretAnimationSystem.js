@@ -13,12 +13,14 @@ export class FerretAnimationSystem {
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
     const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
 
-    if (velocity > 0.0005) {
+    if (velocity > 0.00005) {
       const k = 0.22; // maps world velocity to gait speed
       ferret.gait.cyclePhase += velocity * k;
       ferret.gait.stride = Math.min(1.3, 0.6 + velocity * 0.12);
     } else {
-      ferret.gait.stride = 0; // feet planted when not moving
+      // keep subtle leg animation even when nearly stationary
+      ferret.gait.cyclePhase += dtSecs * 1.2;
+      ferret.gait.stride = Math.max(0.15, ferret.gait.stride * 0.95);
     }
     if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
     ferret._lastX = liveX; ferret._lastTime = time;
