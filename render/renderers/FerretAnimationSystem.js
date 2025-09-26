@@ -30,7 +30,7 @@ export class FerretAnimationSystem {
     }
 
     if (velocity > 0.00005) {
-      const k = 0.22;
+      const k = 12.5; // Adjusted from 0.22: drives animation phase speed relative to racer velocity (12.5 chosen to normalize stride duration to ~0.5s at max speed 1)
       ferret.gait.cyclePhase += velocity * k * dtSeconds;
       ferret.gait.stride = Math.min(1.3, 0.6 + velocity * 0.12);
     } else {
