@@ -1,5 +1,3 @@
-import { VerletChain } from "../systems/VerletChain.js";
-
 /**
  * FerretAnimationSystem - Handles ferret animation and movement
  */
@@ -46,16 +44,6 @@ export class FerretAnimationSystem {
       ferret.gait.stride = 0;
     }
 
-    // Calculate velocity more reliably - use the racer's current speed
-    const currentSpeed = racer.getAverageSpeed();
-    
-    // Check if the racer has finished or is not moving (stopped)
-    const isRacing = raceState?.racers?.includes(racer.id) && !racer.visual.finished && !raceState.results.includes(racer.id);
-    
-    // Use actual forward progress to drive animation speed
-    const deltaX = liveX - (ferret._lastX ?? liveX);
-    const speedPctPerSec = Math.abs(deltaX) / dtSeconds;
-    
     // Calculate animation speed based on actual movement - much faster stepping
     const baseStepSpeed = 8.0; // Much faster base stepping speed
     const movementMultiplier = Math.max(0.1, speedPctPerSec * 2.0); // Amplify movement sensitivity
