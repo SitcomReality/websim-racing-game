@@ -56,6 +56,9 @@ export class BannerSystem {
     ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform to screen space
     ctx.scale(dpr, dpr);
 
+    // Check for expired stumbling banners
+    this.cleanupStumblingBanners(race);
+
     for (const [laneIndex, banner] of this.activeBanners.entries()) {
       if (!banner || (!banner.active && banner.opacity <= 0.02)) continue;
 
@@ -79,6 +82,29 @@ export class BannerSystem {
     }
     
     ctx.restore();
+  }
+
+  cleanupStumblingBanners(race) {
+    for (const [laneIndex, banner] of this.activeBanners.entries()) {
+      if (banner.type === this.bannerTypes.STUMBLE) {
+        const racerId = race.racers[laneIndex];
+        const racer = this.getRacerFromId(racerId);
+        
+        // Check if the ferret is still stumbling
+        if (racer && !racer.ferret?.isStumbling) {
+          this.hideBanner(laneIndex);
+        }
+      }
+    }
+  }
+
+  getRacerFromId(racerId) {
+    // Try multiple ways to get the racer object
+    const gs = (window.app && window.app.gameState) || window.gameState || (window.app && window.app.gameStateManager);
+    if (gs?.racers) {
+      return gs.racers.find(r => r.id === racerId);
+    }
+    return null;
   }
 
   renderSingleBanner(ctx, banner, w, h, laneHeight, laneIndex, camera, renderProps) {
