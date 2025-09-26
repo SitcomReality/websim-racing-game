@@ -157,7 +157,7 @@ export class RenderManager {
 
     this.trackRenderer.render(this.ctx, this.currentRace, this.renderProps, this.camera);
     // Render banners in world-space using race positions
-    this.bannerSystem.render(this.ctx, this.camera, this.worldTransform, this.currentRace, this.renderProps);
+    // this.bannerSystem.render(this.ctx, this.camera, this.worldTransform, this.currentRace, this.renderProps);
     this.racerRenderer.render(this.ctx, this.currentRace, this.worldTransform, time);
 
     this.ctx.restore();
@@ -179,6 +179,8 @@ export class RenderManager {
    */
   renderOverlays() {
     this.overlayRenderer.renderLaneBanners(this.ctx);
+    // Render banners in screen-space
+    this.bannerSystem.render(this.ctx, this.camera, this.worldTransform, this.currentRace, this.renderProps);
     if (this.raceEndCountdown && this.raceEndCountdown.active) {
       this.overlayRenderer.renderCountdown(this.ctx);
     }

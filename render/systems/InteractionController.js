@@ -7,7 +7,7 @@ export class InteractionController {
     this.hoveredLane = null;
     this.currentHoveredLane = null;
     this.previousHoveredLane = null;
-    this.banners = new Map();
+    // this.banners = new Map(); // State moved to BannerSystem
 
     this.setupEventListeners();
   }
@@ -33,33 +33,30 @@ export class InteractionController {
     const laneH = this.renderManager.worldTransform.laneHeight;
 
     const currentLane = this.currentHoveredLane;
+    const previousLane = this.previousHoveredLane;
 
-    if (currentLane !== null) {
-        for (const [laneIndex, banner] of this.banners.entries()) {
-            if (laneIndex !== currentLane) { banner.active = false; }
-        }
+    if (currentLane !== previousLane) {
+      // Hide banner for previously hovered lane
+      if (previousLane !== null) {
+        this.renderManager.bannerSystem.hideBanner(previousLane);
+      }
+      
+      // Show banner for newly hovered lane
+      if (currentLane !== null && this.renderManager.currentRace) {
         const rid = this.renderManager.currentRace.racers[currentLane];
         const racer = this.renderManager.gameState?.racers.find(r => r.id === rid);
-        if (racer) { this.createHoverBanner(racer, currentLane, w); }
-    } else {
-        for (const banner of this.banners.values()) {
-            banner.active = false;
+        if (racer) {
+          const racerName = this.getRacerNameString(racer);
+          this.renderManager.bannerSystem.showBanner('name', currentLane, racerName, racer);
         }
+      }
     }
+    
+    this.previousHoveredLane = this.currentHoveredLane;
   }
 
   createHoverBanner(racer, laneIndex, w) {
-    if (!this.banners.has(laneIndex)) {
-      this.banners.set(laneIndex, {
-        lane: laneIndex,
-        text: this.getRacerNameString(racer),
-        active: true
-      });
-    } else {
-      const banner = this.banners.get(laneIndex);
-      banner.active = true;
-      banner.text = this.getRacerNameString(racer);
-    }
+    // Deprecated: Logic moved to update() and BannerSystem
   }
 
   getRacerNameString(racer) {
