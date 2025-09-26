@@ -131,13 +131,13 @@ export class FerretLegRenderer {
     const strokeStyle = farSideOnly ? this.shadeColor(colors[1] || '#000000', -25) : (colors[1] || '#000');
 
     // Draw front leg
-    this.drawSingleLeg(ctx, frontHip, { x: frontFootX, y: frontFootY }, legLength, legThickness, strokeStyle);
+    this.drawSingleLeg(ctx, frontHip, { x: frontFootX, y: frontFootY }, legLength, legThickness, strokeStyle, ferret);
 
     // Draw back leg
-    this.drawSingleLeg(ctx, backHip, { x: backFootX, y: backFootY }, legLength, legThickness, strokeStyle);
+    this.drawSingleLeg(ctx, backHip, { x: backFootX, y: backFootY }, legLength, legThickness, strokeStyle, ferret);
   }
 
-  drawSingleLeg(ctx, hip, foot, legLength, legThickness, strokeStyle) {
+  drawSingleLeg(ctx, hip, foot, legLength, legThickness, strokeStyle, ferret) {
     const dx = foot.x - hip.x;
     const dy = foot.y - hip.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -173,7 +173,7 @@ export class FerretLegRenderer {
     ctx.lineJoin = 'round';
     ctx.stroke();
 
-    const pawSize = ferret.isStumbling ? 2 : 3;
+    const pawSize = (ferret && ferret.isStumbling) ? 2 : 3;
     ctx.fillStyle = 'rgba(0,0,0,0.4)';
     ctx.beginPath();
     ctx.arc(foot.x, foot.y, pawSize, 0, Math.PI * 2);
