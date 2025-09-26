@@ -1,6 +1,6 @@
-/** 
+/**
  * FerretLegRenderer - Renders ferret legs with different gait styles
- */ 
+ */
 export class FerretLegRenderer {
   constructor() {
     // Leg rendering state managed per ferret instance
@@ -22,6 +22,11 @@ export class FerretLegRenderer {
     const legLength = ferret.legs.length * 15;
     const legThickness = ferret.legs.thickness;
 
+    // Initialize smooth leg length tracking
+    if (!ferret._legLengths) {
+      ferret._legLengths = [legLength, legLength, legLength, legLength];
+    }
+
     let legPositions;
     if (ferret.isStumbling) {
       // Scrambling/crashing leg positions
@@ -33,19 +38,17 @@ export class FerretLegRenderer {
         { x: -bodyLength/4 - 5 + Math.sin(scramblePhase + 3) * 5, y: bodyLength/4 + Math.cos(scramblePhase * 1.2) * 4, lift: 0 }
       ];
     } else {
-      // Normal running stride - much smoother transitions
-      const strideLength = ferret.gait.stride * 6; // Reduced from 10 for more controlled movement
+      // Normal running stride
+      const strideLength = ferret.gait.stride * 8; 
       const stridePhase = ferret.gait.cyclePhase;
       const strideOffset = Math.sin(stridePhase) * strideLength;
       const strideOffset2 = Math.sin(stridePhase + Math.PI) * strideLength * (ferret.legs.length > 1 ? 1.05 : 0.95);
 
-      // Determine foot lift with smooth transitions - much more gradual
-      const liftHeight = 4; // Reduced from 8 for more subtle movement
+      // Determine foot lift. Lift happens when foot is moving forward (positive velocity)
+      const liftHeight = 6; 
       const cosPhase = Math.cos(stridePhase);
-      // Smooth interpolation for leg length changes
-      const liftProgress = Math.max(0, Math.min(1, (cosPhase + 1) / 2));
-      const liftAmount = this.smoothStep(liftProgress) * liftHeight;
-      const liftAmount2 = this.smoothStep(Math.max(0, Math.min(1, ((-cosPhase + 1) / 2)))) * liftHeight;
+      const liftAmount = cosPhase > 0 ? cosPhase * liftHeight : 0;
+      const liftAmount2 = -cosPhase > 0 ? -cosPhase * liftHeight : 0;
 
       legPositions = [
         { x: bodyLength/3 + strideOffset, y: bodyHeight/4, lift: liftAmount },
@@ -63,8 +66,13 @@ export class FerretLegRenderer {
 
     indicesToDraw.forEach((i) => {
       const pos = legPositions[i];
-      const sideOffset = farSideOnly ? 2 : 0; // subtle horizontal offset for depth
-      const finalLegLength = legLength - pos.lift;
+      const sideOffset = farSideOnly ? 2 : 0; 
+
+      // Smooth leg length transitions to eliminate snapping
+      const targetLegLength = legLength - pos.lift;
+      const lerpSpeed = 0.15; 
+      ferret._legLengths[i] += (targetLegLength - ferret._legLengths[i]) * lerpSpeed;
+      const finalLegLength = ferret._legLengths[i];
 
       const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
       const hipX = startX + (farSideOnly ? -sideOffset : sideOffset);
@@ -99,7 +107,15 @@ export class FerretLegRenderer {
     const legLength = (ferret.legs?.length || 1) * 15;
     const legThickness = (ferret.legs?.thickness || 1);
     const sideOffset = farSideOnly ? 2 : 0;
-    const groundY = 15; // Ground level relative to body centerline
+    const groundY = 15; 
+
+    // Initialize smooth foot position tracking
+    if (!ferret._smoothFootPositions) {
+      ferret._smoothFootPositions = {
+        frontX: 0, frontY: groundY,
+        backX: 0, backY: groundY
+      };
+    }
 
     // Front legs are attached near the head anchor
     const frontHipNode = chain.nodes[1];
@@ -110,50 +126,49 @@ export class FerretLegRenderer {
     const backHip = { x: backHipNode.x + (farSideOnly ? -sideOffset : sideOffset), y: backHipNode.y };
 
     const stridePhase = ferret.gait.cyclePhase;
-    const strideLength = (ferret.gait.stride || 1) * 6; // Reduced from 8 for more controlled movement
+    const strideLength = (ferret.gait.stride || 1) * 6; 
 
-    // Stance/Swing logic with smooth transitions
-    const contactDuty = ferret.gait.contact.dutyCycle || 0.6;
-    const isFrontContact = Math.sin(stridePhase) < (contactDuty * 2 - 1);
-    ferret.gait.contact.frontInContact = isFrontContact;
-    ferret.gait.contact.backInContact = !isFrontContact;
+    // Target foot positions
+    const targetFrontFootX = frontHip.x + Math.cos(stridePhase) * strideLength;
+    const targetBackFootX = backHip.x + Math.cos(stridePhase + Math.PI) * strideLength;
 
-    // Smooth foot placement - much more gradual movement
-    const frontFootProgress = Math.max(0, Math.min(1, (Math.sin(stridePhase) + 1) / 2));
-    const backFootProgress = Math.max(0, Math.min(1, (Math.sin(stridePhase + Math.PI) + 1) / 2));
-    
-    const frontFootX = frontHip.x + this.smoothStep(frontFootProgress) * strideLength;
-    const backFootX = backHip.x + this.smoothStep(backFootProgress) * strideLength;
+    const targetFrontFootY = groundY + (ferret.gait.contact.frontInContact ? 0 : 4); 
+    const targetBackFootY = groundY + (ferret.gait.contact.backInContact ? 0 : 4);
 
-    const frontFootY = groundY + (ferret.gait.contact.frontInContact ? 0 : 3); // Reduced lift
-    const backFootY = groundY + (ferret.gait.contact.backInContact ? 0 : 3); // Reduced lift
+    // Smooth foot position interpolation for realistic ground contact
+    const footLerpSpeed = 0.2; 
+    ferret._smoothFootPositions.frontX += (targetFrontFootX - ferret._smoothFootPositions.frontX) * footLerpSpeed;
+    ferret._smoothFootPositions.frontY += (targetFrontFootY - ferret._smoothFootPositions.frontY) * footLerpSpeed;
+    ferret._smoothFootPositions.backX += (targetBackFootX - ferret._smoothFootPositions.backX) * footLerpSpeed;
+    ferret._smoothFootPositions.backY += (targetBackFootY - ferret._smoothFootPositions.backY) * footLerpSpeed;
 
     const strokeStyle = farSideOnly ? this.shadeColor(colors[1] || '#000000', -25) : (colors[1] || '#000');
 
-    // Draw front leg
-    this.drawSingleLeg(ctx, frontHip, { x: frontFootX, y: frontFootY }, legLength, legThickness, strokeStyle, ferret);
+    // Draw legs with smoothed positions
+    this.drawSingleLeg(ctx, frontHip, 
+      { x: ferret._smoothFootPositions.frontX, y: ferret._smoothFootPositions.frontY }, 
+      legLength, legThickness, strokeStyle);
 
-    // Draw back leg
-    this.drawSingleLeg(ctx, backHip, { x: backFootX, y: backFootY }, legLength, legThickness, strokeStyle, ferret);
+    this.drawSingleLeg(ctx, backHip, 
+      { x: ferret._smoothFootPositions.backX, y: ferret._smoothFootPositions.backY }, 
+      legLength, legThickness, strokeStyle);
   }
 
-  drawSingleLeg(ctx, hip, foot, legLength, legThickness, strokeStyle, ferret) {
+  drawSingleLeg(ctx, hip, foot, legLength, legThickness, strokeStyle) {
     const dx = foot.x - hip.x;
     const dy = foot.y - hip.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    // Simple IK for knee position with smooth transitions
+    // Simple IK for knee position
     let kneeX, kneeY;
     if (dist >= legLength) {
-      // Straight leg - but with smooth transition
-      const straightProgress = Math.min(1, (dist - legLength) / (legLength * 0.3));
+      // Straight leg
       kneeX = (hip.x + foot.x) / 2;
       kneeY = (hip.y + foot.y) / 2;
     } else {
-      // Bent leg - smooth bend calculation
       const h = legLength / 2;
       const d = dist / 2;
-      const a = Math.sqrt(Math.max(0, h*h - d*d));
+      const a = Math.sqrt(h*h - d*d);
       const angle = Math.atan2(dy, dx);
 
       const midX = (hip.x + foot.x) / 2;
@@ -173,16 +188,11 @@ export class FerretLegRenderer {
     ctx.lineJoin = 'round';
     ctx.stroke();
 
-    const pawSize = (ferret && ferret.isStumbling) ? 2 : 3;
+    const pawSize = 3;
     ctx.fillStyle = 'rgba(0,0,0,0.4)';
     ctx.beginPath();
     ctx.arc(foot.x, foot.y, pawSize, 0, Math.PI * 2);
     ctx.fill();
-  }
-
-  // Smooth step function for gradual transitions
-  smoothStep(t) {
-    return t * t * (3 - 2 * t);
   }
 
   shadeColor(color, percent) {

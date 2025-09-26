@@ -12,36 +12,61 @@ export class FerretAnimationSystem {
     const liveX = (raceState?.liveLocations?.[racer.id]) || 0;
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
     const dtSeconds = Math.max(0.0001, dt / 1000);
-    
+
     // Calculate velocity more reliably - use the racer's current speed
     const currentSpeed = racer.getAverageSpeed();
-    
+
     // Check if the racer has finished or is not moving (stopped)
     const isRacing = raceState?.racers?.includes(racer.id) && !racer.visual.finished && !raceState.results.includes(racer.id);
-    
-    // Use actual forward progress to drive animation speed - much slower, more grounded movement
+
+    // Use actual forward progress to drive animation speed
     const deltaX = liveX - (ferret._lastX ?? liveX);
     const speedPctPerSec = Math.abs(deltaX) / dtSeconds;
-    
-    // Much slower, more realistic animation speed that matches ground movement
-    let animationSpeed;
-    if (isRacing && speedPctPerSec > 0.001) {
-      // Scale animation speed to match ground movement - much slower
-      animationSpeed = 1.5 * speedPctPerSec; // Reduced from 8.0
-    } else if (isRacing) {
-      // Minimal movement - very slow stride
-      animationSpeed = 0.8; // Reduced from 2.0
+    const angularVel = isRacing ? (speedPctPerSec / Math.max(0.05, ferret.gait.stride || 0.6)) : 0;
+
+    let velocity;
+    if (isRacing) {
+      // Use the actual calculated speed to drive animation
+      velocity = currentSpeed > 0 ? currentSpeed : 0.001; // Ensure a tiny speed for stationary animation if race is active
     } else {
-      // Finished - no animation
+      // Racer is finished or race is paused, animation should stop.
+      velocity = 0;
+    }
+
+    if (angularVel > 0) {
+      ferret.gait.cyclePhase += angularVel * dtSeconds;
+      ferret.gait.stride = Math.min(1.6, 0.6 + speedPctPerSec * 0.4);
+    } else {
+      ferret.gait.cyclePhase += dtSeconds * 1.2;
+      ferret.gait.stride = Math.max(0.15, ferret.gait.stride * 0.95);
+    }
+
+    // If finished, force stride to zero to stop movement visualization
+    if (racer.visual.finished) {
+      ferret.gait.stride = 0;
+    }
+
+    // Calculate animation speed based on actual movement - reduced stepping speed
+    const baseStepSpeed = 3.5; // Reduced from 8.0 to better match ground speed
+    const movementMultiplier = Math.max(0.1, speedPctPerSec * 1.2); // Reduced sensitivity
+
+    let animationSpeed;
+    if (isRacing) {
+      // Use the actual calculated speed to drive animation - more realistic pace
+      animationSpeed = baseStepSpeed * movementMultiplier;
+      // Ensure minimum animation speed even when barely moving
+      animationSpeed = Math.max(1.5, animationSpeed); // Reduced minimum speed
+    } else {
+      // Racer is finished or race is paused, animation should stop.
       animationSpeed = 0;
     }
 
     // Update gait cycle with the calculated animation speed
     ferret.gait.cyclePhase += animationSpeed * dtSeconds;
-    
-    // Much more subtle stride adjustment
+
+    // Adjust stride based on movement speed - more realistic range
     if (isRacing && speedPctPerSec > 0.01) {
-      ferret.gait.stride = Math.min(1.2, 0.4 + speedPctPerSec * 1.5); // Reduced from 2.0
+      ferret.gait.stride = Math.min(1.5, 0.6 + speedPctPerSec * 2.0); // Reduced max stride
     } else if (isRacing) {
       // Minimal movement - small stride
       ferret.gait.stride = Math.max(0.2, ferret.gait.stride * 0.98);
@@ -49,12 +74,12 @@ export class FerretAnimationSystem {
       // Finished - no stride
       ferret.gait.stride = 0;
     }
-    
+
     // Keep cycle phase in bounds
     if (ferret.gait.cyclePhase > Math.PI * 2) {
       ferret.gait.cyclePhase -= Math.PI * 2;
     }
-    
+
     // If finished, ensure no movement
     if (racer.visual.finished) {
       ferret.gait.stride = 0;
@@ -107,7 +132,7 @@ export class FerretAnimationSystem {
     // Update stumble/crash animation
     if (ferret.isStumbling) {
       ferret.crashPhase += 0.2;
-      
+
       // Reset crash when stumble ends
       if (racer.remainingStumble <= 1) {
         ferret.isStumbling = false;
@@ -117,7 +142,7 @@ export class FerretAnimationSystem {
 
     // New: Update particle chain physics
     if (ferret.bodyChain?.enabled) {
-      this.updateBodyChain(ferret, racer, dtSeconds, currentSpeed);
+      this.updateBodyChain(ferret, racer, dtSeconds, velocity);
     }
 
     // Update eye tracking
@@ -141,11 +166,11 @@ export class FerretAnimationSystem {
     const bodyPixelLength = (chain.nodes.length - 1) * (chain.restLengths[0] || 8);
     chain.anchors.head.x = bodyPixelLength / 2;
     chain.anchors.hip.x = -bodyPixelLength / 2;
-    
+
     // Update Y positions with offset
     chain.anchors.head.y = chain.anchors.head.offsetY;
     chain.anchors.hip.y = chain.anchors.hip.offsetY;
-    
+
     // Stumbling makes the body go limp
     if (ferret.isStumbling) {
       chain.anchors.head.weight = 0.1;
@@ -182,16 +207,16 @@ export class FerretAnimationSystem {
         const targetRacerId = currentRace.racers[targetLane];
         const targetX = currentRace.liveLocations[targetRacerId] || 0;
         const myX = currentRace.liveLocations[racer.id] || 0;
-        
+
         // Only track if target is within reasonable distance
         if (Math.abs(targetX - myX) < 20) {
           ferret.eye.targetRid = targetRacerId;
-          
+
           // Calculate look direction based on relative position
           const deltaX = targetX - myX;
           const distance = Math.abs(deltaX);
           const maxPupilOffset = 1.5;
-          
+
           if (distance > 1) {
             ferret.eye.targetPupilX = Math.sign(deltaX) * Math.min(maxPupilOffset, distance / 10);
             ferret.eye.targetPupilY = (offset * 0.5);
