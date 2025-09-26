@@ -74,55 +74,84 @@ export class FerretTailRenderer {
     const chain = ferret.bodyChain;
     if (!chain || chain.nodes.length < 2) return;
 
-    // Tail follows the last few nodes of the body chain
-    // Use last nodes but render from body->tip (ensure base is at body and tip points outward)
-    const tailNodes = chain.nodes.slice(-3).map(n => ({ x: n.x, y: n.y })); // keep order so index 0 = base, last = tip
+    // The attachment point is the last node (N_end = hip)
+    const N = chain.nodes.length;
+    const baseNode = chain.nodes[N - 1]; 
+    const prevNode = chain.nodes[N - 2]; 
 
-    // Simple polyline sampling for tail
-    const pts = [];
-    for (let i = 0; i < tailNodes.length; i++) {
-      pts.push(tailNodes[i]);
+    // 1. Calculate the direction vector of the last segment (N_{end-1} -> N_end)
+    const dirX = baseNode.x - prevNode.x;
+    const dirY = baseNode.y - prevNode.y;
+    const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
+    
+    let normDirX = dirX;
+    let normDirY = dirY;
+    if (dirLength > 0.01) {
+      normDirX /= dirLength;
+      normDirY /= dirLength;
+    } else {
+        // Fallback direction: straight back (left in local space)
+        normDirX = -1;
+        normDirY = 0;
     }
     
-    // Calculate tail width based on fluffiness and current state
-    const baseWidth = 4 * ferret.tail.fluffiness;
-    const tipWidth = 2 * ferret.tail.fluffiness;
+    // 2. Calculate sway and tip position
+    
+    // Approximate ground level in local coordinates (used in FerretLegRenderer as well)
+    const targetGroundY = 15; 
+    
+    const tailLength = ferret.tail.length * 25; 
+    const tailSwayFactor = Math.sin(ferret.gait.cyclePhase * 0.8 + ferret.seed % 1000 * 0.1) * 0.5;
+    
+    // P0: Tail base, anchored at the last body node
+    const P0 = { x: baseNode.x, y: baseNode.y }; 
+    
+    // Calculate P1 (Tip) target: extend backward (in direction of normDir)
+    const tipX = P0.x + normDirX * tailLength * 0.8; 
+    // Calculate P1 (Tip) target Y: blend towards ground level (targetGroundY)
+    const tipY = P0.y * 0.2 + targetGroundY * 0.8;
+    
+    // Control Point PC: Halfway, influenced by direction, slightly bent downwards, and sway
+    const swayX = tailSwayFactor * 1.5;
+    const PC = { 
+        x: P0.x + normDirX * tailLength * 0.3 + swayX, 
+        y: P0.y + normDirY * tailLength * 0.2 + (tipY - P0.y) * 0.3 
+    };
 
-    // Render as a thick spline
-    if (pts.length >= 2) {
-      // Simple quadratic curve for tail
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x, pts[0].y);
-      
-      if (pts.length === 2) {
-        ctx.lineTo(pts[1].x, pts[1].y);
-      } else {
-        // Use quadratic curve for smoother tail (base -> control -> tip)
-        ctx.quadraticCurveTo(pts[1].x, pts[1].y, pts[pts.length - 1].x, pts[pts.length - 1].y);
-      }
-      
-      ctx.lineWidth = baseWidth;
-      ctx.strokeStyle = colors[2];
-      ctx.lineCap = 'round';
-      ctx.stroke();
-    }
+    const P1 = { x: tipX, y: tipY }; 
+
+    // Calculate tail width based on fluffiness
+    const baseWidth = 6 * ferret.tail.fluffiness; 
+    const currentWidth = baseWidth; 
+
+    // Render tail curve
+    ctx.lineWidth = currentWidth;
+    ctx.strokeStyle = colors[2];
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(P0.x, P0.y);
+    // Use quadratic curve from base (P0) through control (PC) to tip (P1)
+    ctx.quadraticCurveTo(PC.x, PC.y, P1.x, P1.y);
+    ctx.stroke();
 
     // Add subtle ground contact shadow
     if (!ferret.isStumbling) {
       ctx.globalAlpha = 0.3;
-      const shadowPts = pts.map(p => ({ x: p.x + 1, y: p.y + 2 }));
-      if (shadowPts.length >= 2) {
-        ctx.beginPath();
-        ctx.moveTo(shadowPts[0].x, shadowPts[0].y);
-        if (shadowPts.length === 2) {
-          ctx.lineTo(shadowPts[1].x, shadowPts[1].y);
-        } else {
-          ctx.quadraticCurveTo(shadowPts[1].x, shadowPts[1].y, shadowPts[shadowPts.length - 1].x, shadowPts[shadowPts.length - 1].y);
-        }
-        ctx.lineWidth = baseWidth * 0.8;
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-        ctx.stroke();
-      }
+      ctx.beginPath();
+      // Offset points for shadow
+      const shadowOffset = 2; 
+      const shadowP0 = { x: P0.x + 1, y: P0.y + shadowOffset };
+      const shadowPC = { x: PC.x + 1, y: PC.y + shadowOffset };
+      const shadowP1 = { x: P1.x + 1, y: P1.y + shadowOffset };
+
+      ctx.moveTo(shadowP0.x, shadowP0.y);
+      ctx.quadraticCurveTo(shadowPC.x, shadowPC.y, shadowP1.x, shadowP1.y);
+
+      ctx.lineWidth = currentWidth * 0.8;
+      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+      ctx.stroke();
       ctx.globalAlpha = 1;
     }
   }

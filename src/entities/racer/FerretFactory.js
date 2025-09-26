@@ -93,10 +93,10 @@ export class FerretFactory {
     const nodeCount = 4; // Fixed count (was pick(3, 5))
     
     // Increase spacing between body nodes to reflect longer bodies
-    const restDistance = pick(12, 20); // Increased from pick(9, 18)
-    const stiffness = pick(0.6, 0.9);
-    const iterations = Math.round(pick(2, 4));
-    const damping = pick(0.95, 0.995);
+    const restDistance = pick(18, 28); // Increased from pick(12, 20)
+    const stiffness = pick(0.2, 0.4); // Reduced from pick(0.6, 0.9) for more wobble
+    const iterations = Math.round(pick(1, 2)); // Reduced from Math.round(pick(2, 3))
+    const damping = pick(0.85, 0.92); // Reduced from pick(0.95, 0.995) for more jiggle
     
     // Thicker chain rendering for beefier bodies
     const thicknessStart = pick(14, 26); // Increased from pick(12, 24)
@@ -123,8 +123,8 @@ export class FerretFactory {
             thicknessEnd
         },
         anchors: {
-            head: { x: 0, y: 0, offsetY: 0, weight: 0.8 },
-            hip: { x: 0, y: 0, offsetY: 0, weight: 0.6 }
+            head: { x: 0, y: 0, offsetY: 0, weight: 0.6 }, // Reduced from 0.8 for more jiggle
+            hip: { x: 0, y: 0, offsetY: 0, weight: 0.4 } // Reduced from 0.6 for more jiggle
         }
     };
   }

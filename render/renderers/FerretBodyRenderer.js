@@ -52,14 +52,14 @@ export class FerretBodyRenderer {
     // Draw far-side legs first (behind body)
     this.legRenderer.render(ctx, ferret, colors, true);
     
-    // Draw tail early so it sits visually behind the body/head (trails out the back)
-    this.tailRenderer.render(ctx, ferret, colors);
-    
     // Draw body
     this.renderBody(ctx, ferret, colors);
     
     // Draw head
     this.headRenderer.render(ctx, ferret, colors, time, racer);
+    
+    // Draw tail
+    this.tailRenderer.render(ctx, ferret, colors);
     
     // Draw near-side legs (on top)
     this.legRenderer.render(ctx, ferret, colors, false);
