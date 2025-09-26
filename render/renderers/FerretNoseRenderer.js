@@ -1,1 +1,35 @@
-```\n/**\n * FerretNoseRenderer - Renders ferret nose and mouth\n */\nexport class FerretNoseRenderer {\n  constructor() {\n    // Nose rendering state managed per ferret instance\n  }\n\n  render(ctx, ferret, colors, headX, headY, time, racer) {\n    const noseSize = 2;\n    const noseX = headX;\n    const noseY = headY;\n    \n    // Draw nose\n    ctx.beginPath();\n    ctx.arc(noseX, noseY, noseSize, 0, Math.PI * 2);\n    ctx.fillStyle = 'rgba(0,0,0,0.8)';\n    ctx.fill();\n    \n    // Draw nostrils\n    ctx.beginPath();\n    ctx.arc(noseX - 0.5, noseY - 0.5, 0.5, 0, Math.PI * 2);\n    ctx.arc(noseX + 0.5, noseY - 0.5, 0.5, 0, Math.PI * 2);\n    ctx.fillStyle = 'rgba(255,255,255,0.3)';\n    ctx.fill();\n    \n    // Draw mouth line\n    ctx.beginPath();\n    ctx.moveTo(noseX, noseY + noseSize);\n    ctx.lineTo(noseX, noseY + noseSize + 2);\n    ctx.strokeStyle = 'rgba(0,0,0,0.6)';\n    ctx.lineWidth = 1;\n    ctx.stroke();\n  }\n}\n```
+/**
+ * FerretNoseRenderer - Renders ferret nose and mouth
+ */
+export class FerretNoseRenderer {
+  constructor() {
+    // Nose rendering state managed per ferret instance
+  }
+
+  render(ctx, ferret, colors, headX, headY, time, racer) {
+    const noseSize = 2;
+    const noseX = headX;
+    const noseY = headY;
+    
+    // Draw nose
+    ctx.beginPath();
+    ctx.arc(noseX, noseY, noseSize, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+    ctx.fill();
+    
+    // Draw nostrils
+    ctx.beginPath();
+    ctx.arc(noseX - 0.5, noseY - 0.5, 0.5, 0, Math.PI * 2);
+    ctx.arc(noseX + 0.5, noseY - 0.5, 0.5, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fill();
+    
+    // Draw mouth line
+    ctx.beginPath();
+    ctx.moveTo(noseX, noseY + noseSize);
+    ctx.lineTo(noseX, noseY + noseSize + 2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+}
