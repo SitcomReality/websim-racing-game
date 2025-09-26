@@ -75,8 +75,9 @@ export class FerretTailRenderer {
     if (!chain || chain.nodes.length < 2) return;
 
     // Tail follows the last few nodes of the body chain
-    const tailNodes = chain.nodes.slice(-3); // Use last 3 nodes for tail
-    
+    // Use last nodes but render from body->tip (ensure base is at body and tip points outward)
+    const tailNodes = chain.nodes.slice(-3).map(n => ({ x: n.x, y: n.y })).reverse();
+
     // Simple polyline sampling for tail
     const pts = [];
     for (let i = 0; i < tailNodes.length; i++) {
@@ -96,7 +97,7 @@ export class FerretTailRenderer {
       if (pts.length === 2) {
         ctx.lineTo(pts[1].x, pts[1].y);
       } else {
-        // Use quadratic curve for smoother tail
+        // Use quadratic curve for smoother tail (base -> control -> tip)
         ctx.quadraticCurveTo(pts[1].x, pts[1].y, pts[pts.length - 1].x, pts[pts.length - 1].y);
       }
       
