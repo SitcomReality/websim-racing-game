@@ -18,7 +18,7 @@ export class XmlWordlistLoader {
 
       const dynamicSuffixes = [
         () => `V${Math.floor(Math.random()*10)}.${Math.floor(Math.random()*10)}`,
-        () => `'${Math.floor(10 + Math.random()*89)}``,
+        () => `'${Math.floor(10 + Math.random()*89)}`,
         () => `${Math.floor(1 + Math.random()*9)}000`,
       ];
 

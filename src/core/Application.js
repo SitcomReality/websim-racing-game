@@ -4,7 +4,7 @@ import { EventBus } from './EventBus.js';
 import { RaceManager } from '../game/RaceManager.js';
 import { BettingManager } from '../game/betting/BettingManager.js';
 import { ProgressionManager } from '../game/progression/ProgressionManager.js';
-import { UIManager } from '../ui/UIManager.js';
+import { UIManager } from '../../ui/UIManager.js';
 import { LoadingManager } from './LoadingManager.js';
 import { XmlWordlistLoader } from '../data/XmlWordlistLoader.js';
 import { EventListeners } from './EventListeners.js';
@@ -132,7 +132,7 @@ export class Application {
     if (noJsDiv) noJsDiv.style.display = 'none';
 
     // Setup event listeners
-    this.eventListeners.setup();
+    // this.eventListeners.setup(); // removed: constructor already sets listeners
 
     this.updateLoadingProgress(90, 'Interface ready');
   }
