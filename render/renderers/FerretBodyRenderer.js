@@ -1,3 +1,5 @@
+import { SplineUtils } from "spline-utils";
+
 /**
  * FerretBodyRenderer - Renders ferret body parts
  */
@@ -35,6 +37,37 @@ export class FerretBodyRenderer {
   }
 
   renderHead(ctx, ferret, colors, time, racer) {
+    // New: Position head based on the front of the particle chain
+    if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length > 0) {
+      const headNode = ferret.bodyChain.nodes[0];
+      const nextNode = ferret.bodyChain.nodes[1];
+      const tangentX = headNode.x - nextNode.x;
+      const tangentY = headNode.y - nextNode.y;
+      const angle = Math.atan2(tangentY, tangentX);
+      
+      ctx.save();
+      ctx.translate(headNode.x, headNode.y);
+      ctx.rotate(angle);
+      
+      const base = 12 * (ferret.head.size || 1);
+      const round = ferret.head.roundness ?? 0.3;
+      const rx = base * (1 + round * 0.8), ry = base * (1 - round * 0.4);
+      const headX = 0, headY = 0;
+
+      ctx.beginPath(); ctx.ellipse(headX, headY, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fillStyle = colors[0];
+      ctx.fill();
+      ctx.stroke();
+
+      // Render features relative to the new transformed head position
+      this.renderEars(ctx, ferret, colors, headX, headY, rx);
+      this.renderNose(ctx, ferret, colors, headX + rx, headY, time, racer);
+      this.renderUnderbite(ctx, ferret, headX, headY, rx);
+      
+      ctx.restore();
+      return;
+    }
+
     const bodyLength = ferret.body.length * 30;
     const attachX = -5 + bodyLength / 2;
     const base = 12 * (ferret.head.size || 1);
@@ -170,6 +203,12 @@ export class FerretBodyRenderer {
   // draw farSideOnly = true to draw legs that should appear behind the body,
   // false to draw the ones on the visible (near) side
   renderLegs(ctx, ferret, colors, farSideOnly = false) {
+    // New: Bounding gait driven by anchors
+    if (ferret.bodyChain?.enabled) {
+      this.renderBoundingLegs(ctx, ferret, colors, farSideOnly);
+      return;
+    }
+
     const bodyLength = ferret.body.length * 30;
     const bodyHeight = ferret.body.height * 20 * ferret.body.stockiness;
     const legLength = ferret.legs.length * 15;
@@ -241,6 +280,83 @@ export class FerretBodyRenderer {
       ctx.arc(footX, footY, pawSize, 0, Math.PI * 2);
       ctx.fill();
     });
+  }
+
+  renderBoundingLegs(ctx, ferret, colors, farSideOnly) {
+    const chain = ferret.bodyChain;
+    if (!chain || chain.nodes.length < 3) return;
+
+    const legLength = (ferret.legs?.length || 1) * 15;
+    const legThickness = (ferret.legs?.thickness || 1);
+    const sideOffset = farSideOnly ? 2 : 0;
+    const groundY = 15; // Ground level relative to body centerline
+
+    // Front legs are attached near the head anchor
+    const frontHipNode = chain.nodes[1];
+    const frontHip = { x: frontHipNode.x + (farSideOnly ? -sideOffset : sideOffset), y: frontHipNode.y };
+    
+    // Back legs are attached near the hip anchor
+    const backHipNode = chain.nodes[chain.nodes.length - 2];
+    const backHip = { x: backHipNode.x + (farSideOnly ? -sideOffset : sideOffset), y: backHipNode.y };
+
+    const stridePhase = ferret.gait.cyclePhase;
+    const strideLength = (ferret.gait.stride || 1) * 8;
+
+    // Stance/Swing logic
+    const frontFootX = frontHip.x + Math.cos(stridePhase) * strideLength;
+    const backFootX = backHip.x + Math.cos(stridePhase + Math.PI) * strideLength;
+
+    const frontFootY = groundY + (ferret.gait.contact.frontInContact ? 0 : 5);
+    const backFootY = groundY + (ferret.gait.contact.backInContact ? 0 : 5);
+    
+    const strokeStyle = farSideOnly ? this.shadeColor(colors[1] || '#000000', -25) : (colors[1] || '#000');
+    
+    // Draw front leg
+    this.drawSingleLeg(ctx, frontHip, { x: frontFootX, y: frontFootY }, legLength, legThickness, strokeStyle);
+    
+    // Draw back leg
+    this.drawSingleLeg(ctx, backHip, { x: backFootX, y: backFootY }, legLength, legThickness, strokeStyle);
+  }
+
+  drawSingleLeg(ctx, hip, foot, legLength, legThickness, strokeStyle) {
+    const dx = foot.x - hip.x;
+    const dy = foot.y - hip.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
+    // Simple IK for knee position
+    let kneeX, kneeY;
+    if (dist >= legLength) {
+      // Straight leg
+      kneeX = (hip.x + foot.x) / 2;
+      kneeY = (hip.y + foot.y) / 2;
+    } else {
+      const h = legLength / 2;
+      const d = dist / 2;
+      const a = Math.sqrt(h*h - d*d);
+      const angle = Math.atan2(dy, dx);
+      
+      const midX = (hip.x + foot.x) / 2;
+      const midY = (hip.y + foot.y) / 2;
+      
+      kneeX = midX - a * Math.sin(angle);
+      kneeY = midY + a * Math.cos(angle);
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(hip.x, hip.y);
+    ctx.lineTo(kneeX, kneeY);
+    ctx.lineTo(foot.x, foot.y);
+    ctx.lineWidth = 3 * legThickness;
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    const pawSize = 3;
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath();
+    ctx.arc(foot.x, foot.y, pawSize, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   shadeColor(color, percent) {

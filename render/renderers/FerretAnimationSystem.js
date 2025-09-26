@@ -1,3 +1,5 @@
+import { VerletChain } from "verlet-chain";
+
 /**
  * FerretAnimationSystem - Handles ferret animation and movement
  */
@@ -73,8 +75,58 @@ export class FerretAnimationSystem {
       }
     }
 
+    // New: Update particle chain physics
+    if (ferret.bodyChain?.enabled) {
+      this.updateBodyChain(ferret, racer, dtSecs, velocity);
+    }
+
     // Update eye tracking
     this.updateEyeTracking(ferret, racer, time, raceState);
+  }
+
+  updateBodyChain(ferret, racer, dt, velocity) {
+    const chain = ferret.bodyChain;
+    if (!chain || !chain.nodes) return;
+
+    // --- 1. Update Gait and Anchors ---
+    const bounceHeight = ferret.gait.bounceHeight || 3;
+    const strideAmp = ferret.gait.strideAmplitude || 1;
+    const gaitPhase = ferret.gait.cyclePhase;
+
+    // Bounding gait: front and back anchors move vertically in opposition
+    chain.anchors.head.offsetY = -Math.sin(gaitPhase) * bounceHeight * strideAmp;
+    chain.anchors.hip.offsetY = Math.sin(gaitPhase) * bounceHeight * strideAmp;
+
+    // Set anchor X positions based on body length
+    const bodyPixelLength = (chain.nodes.length - 1) * (chain.restLengths[0] || 8);
+    chain.anchors.head.x = bodyPixelLength / 2;
+    chain.anchors.hip.x = -bodyPixelLength / 2;
+    
+    // Update Y positions with offset
+    chain.anchors.head.y = chain.anchors.head.offsetY;
+    chain.anchors.hip.y = chain.anchors.hip.offsetY;
+    
+    // Stumbling makes the body go limp
+    if (ferret.isStumbling) {
+      chain.anchors.head.weight = 0.1;
+      chain.anchors.hip.weight = 0.1;
+    } else {
+      chain.anchors.head.weight = 0.8;
+      chain.anchors.hip.weight = 0.6;
+    }
+
+    // --- 2. Update Leg Animation State ---
+    const contactDuty = ferret.gait.contact.dutyCycle || 0.6;
+    const isFrontContact = Math.sin(gaitPhase) < (contactDuty * 2 - 1);
+    ferret.gait.contact.frontInContact = isFrontContact;
+    ferret.gait.contact.backInContact = !isFrontContact;
+
+    // --- 3. Solve Verlet Chain ---
+    const { nodes, prevNodes, restLengths, params, anchors } = chain;
+    VerletChain.integrate(nodes, prevNodes, dt, params.damping);
+    VerletChain.updateAnchors(nodes, anchors.head, anchors.hip);
+    VerletChain.satisfyConstraints(nodes, restLengths, params.iterations, params.stiffness);
+    VerletChain.smoothCurvature(nodes, 0.1);
   }
 
   updateEyeTracking(ferret, racer, time, currentRace) {
