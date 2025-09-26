@@ -46,8 +46,56 @@ export class FerretAnimationSystem {
       ferret.gait.stride = 0;
     }
 
+    // Calculate velocity more reliably - use the racer's current speed
+    const currentSpeed = racer.getAverageSpeed();
     
-    if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
+    // Check if the racer has finished or is not moving (stopped)
+    const isRacing = raceState?.racers?.includes(racer.id) && !racer.visual.finished && !raceState.results.includes(racer.id);
+    
+    // Use actual forward progress to drive animation speed
+    const deltaX = liveX - (ferret._lastX ?? liveX);
+    const speedPctPerSec = Math.abs(deltaX) / dtSeconds;
+    
+    // Calculate animation speed based on actual movement - much faster stepping
+    const baseStepSpeed = 8.0; // Much faster base stepping speed
+    const movementMultiplier = Math.max(0.1, speedPctPerSec * 2.0); // Amplify movement sensitivity
+    
+    let animationSpeed;
+    if (isRacing) {
+      // Use the actual calculated speed to drive animation - much more responsive
+      animationSpeed = baseStepSpeed * movementMultiplier;
+      // Ensure minimum animation speed even when barely moving
+      animationSpeed = Math.max(2.0, animationSpeed);
+    } else {
+      // Racer is finished or race is paused, animation should stop.
+      animationSpeed = 0;
+    }
+
+    // Update gait cycle with the calculated animation speed
+    ferret.gait.cyclePhase += animationSpeed * dtSeconds;
+    
+    // Adjust stride based on movement speed - more dynamic range
+    if (isRacing && speedPctPerSec > 0.01) {
+      ferret.gait.stride = Math.min(2.0, 0.8 + speedPctPerSec * 3.0);
+    } else if (isRacing) {
+      // Minimal movement - small stride
+      ferret.gait.stride = Math.max(0.3, ferret.gait.stride * 0.98);
+    } else {
+      // Finished - no stride
+      ferret.gait.stride = 0;
+    }
+    
+    // Keep cycle phase in bounds
+    if (ferret.gait.cyclePhase > Math.PI * 2) {
+      ferret.gait.cyclePhase -= Math.PI * 2;
+    }
+    
+    // If finished, ensure no movement
+    if (racer.visual.finished) {
+      ferret.gait.stride = 0;
+      ferret.gait.cyclePhase = 0;
+    }
+
     ferret._lastX = liveX;
     ferret._lastTime = time;
 
