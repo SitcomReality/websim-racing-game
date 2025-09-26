@@ -199,8 +199,7 @@ export class RenderManager {
    * Render overlays and UI elements
    */
   renderOverlays() {
-    this.overlayRenderer.renderLaneBanners(this.ctx);
-    // Render banners in screen-space
+    // Render banners in screen-space - moved here so they render behind ferrets
     this.bannerSystem.render(this.ctx, this.camera, this.worldTransform, this.currentRace, this.renderProps);
     if (this.raceEndCountdown && this.raceEndCountdown.active) {
       this.overlayRenderer.renderCountdown(this.ctx);
