@@ -8,6 +8,7 @@ export class IntroScreen {
     this.element = null;
     this.eventBus = null;
     this.settingsPanel = null;
+    this.loadingIndicator = null;
   }
 
   initialize(eventBus) {
@@ -28,6 +29,10 @@ export class IntroScreen {
         <div id="initButtonContainer" class="ui-section">
           <div class="ui-item">
             <button id="initGame" class="btn btn-primary">New Game</button>
+            <div id="newGameLoading" class="loading-indicator" style="display: none;">
+              <div class="loading-spinner-small"></div>
+              <span>Initializing...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -38,6 +43,7 @@ export class IntroScreen {
     const initButton = this.element.querySelector('#initGame');
     if (initButton) {
       initButton.addEventListener('click', () => {
+        this.showLoadingIndicator();
         this.eventBus.emit('game:initialize');
       });
     }
@@ -64,6 +70,28 @@ export class IntroScreen {
             });
         }
     });
+  }
+
+  showLoadingIndicator() {
+    const initButton = this.element.querySelector('#initGame');
+    const loadingIndicator = this.element.querySelector('#newGameLoading');
+    
+    if (initButton && loadingIndicator) {
+      initButton.disabled = true;
+      initButton.style.display = 'none';
+      loadingIndicator.style.display = 'flex';
+    }
+  }
+
+  hideLoadingIndicator() {
+    const initButton = this.element.querySelector('#initGame');
+    const loadingIndicator = this.element.querySelector('#newGameLoading');
+    
+    if (initButton && loadingIndicator) {
+      loadingIndicator.style.display = 'none';
+      initButton.style.display = 'block';
+      initButton.disabled = false;
+    }
   }
 
   show(data = {}) {

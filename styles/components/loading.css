@@ -37,3 +37,32 @@
   transition: width 0.3s ease;
 }
 
+/* New Game Loading Indicator */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 15px;
+  background: rgba(0, 123, 255, 0.1);
+  border: 1px solid var(--accent-color);
+  border-radius: 6px;
+  color: var(--accent-color);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 123, 255, 0.3);
+  border-radius: 50%;
+  border-top: 2px solid var(--accent-color);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
