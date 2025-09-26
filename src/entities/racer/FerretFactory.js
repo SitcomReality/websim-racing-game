@@ -18,10 +18,10 @@ export class FerretFactory {
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
     const body = {
-      // Increase body dimensions: min +50%, max +100%
-      length: pick(1.6 * 1.5, 1.8 * 2.0),
-      height: pick(0.9 * 1.5, 1.1 * 2.0),
-      stockiness: pick(0.8, 1.2)
+      // Increase body dimensions: ~50% to 100% longer/taller and a bit thicker
+      length: pick(1.0 * 1.5, 1.0 * 2.0), // base length increased (50% - 100%)
+      height: pick(0.9 * 1.5, 1.2 * 2.0), // taller overall
+      stockiness: pick(1.0, 1.6) // thicker bodies
     };
     const legs = {
       length: pick(0.8, 1.2),
@@ -91,12 +91,14 @@ export class FerretFactory {
   static createBodyChain(racer, rnd, pick) {
     // Get chain parameters with some randomization
     const nodeCount = Math.round(pick(3, 5));
-    const restDistance = pick(6, 12);
+    // Increase spacing between body nodes to reflect longer bodies
+    const restDistance = pick(9, 18);
     const stiffness = pick(0.6, 0.9);
     const iterations = Math.round(pick(2, 4));
     const damping = pick(0.95, 0.995);
-    const thicknessStart = pick(8, 16);
-    const thicknessEnd = pick(4, 8);
+    // Thicker chain rendering for beefier bodies
+    const thicknessStart = pick(12, 24);
+    const thicknessEnd = pick(6, 12);
 
     // Initial chain setup (will be positioned properly during animation)
     const chain = VerletChain.createChain({
