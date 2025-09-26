@@ -41,6 +41,30 @@ export class RacerProperties {
       two: { base: 5, variance: 0.3, min: 4.5, max: 5.5 },
       three: { base: 6, variance: 0.6, min: 5, max: 7 }
     };
+
+    // New: Particle body chain configuration defaults
+    this.bodyChain = {
+      nodeCount: { base: 4, variance: 1, min: 3, max: 5 },
+      restDistance: { base: 8, variance: 2, min: 6, max: 12 },
+      stiffness: { base: 0.8, variance: 0.1, min: 0.6, max: 0.95 },
+      iterations: { base: 3, variance: 1, min: 2, max: 5 },
+      damping: { base: 0.99, variance: 0.01, min: 0.95, max: 0.995 },
+      thicknessStart: { base: 12, variance: 3, min: 8, max: 18 },
+      thicknessEnd: { base: 6, variance: 2, min: 4, max: 10 },
+      enabled: false // Feature flag - will be enabled in later phases
+    };
+
+    // New: Enhanced gait configuration for two-leg model
+    this.gait = {
+      strideAmplitude: { base: 1.0, variance: 0.2, min: 0.7, max: 1.4 },
+      contactDutyCycle: { base: 0.6, variance: 0.1, min: 0.4, max: 0.8 },
+      bounceHeight: { base: 3, variance: 1, min: 1, max: 6 }
+    };
+
+    // New: Tail configuration for chain integration
+    this.tail = {
+      followFactor: { base: 0.3, variance: 0.1, min: 0.1, max: 0.6 }
+    };
   }
 
   generateRacerStats() {
