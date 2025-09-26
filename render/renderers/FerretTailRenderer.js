@@ -76,7 +76,7 @@ export class FerretTailRenderer {
 
     // Tail follows the last few nodes of the body chain
     // Use last nodes but render from body->tip (ensure base is at body and tip points outward)
-    const tailNodes = chain.nodes.slice(-3).map(n => ({ x: n.x, y: n.y })).reverse();
+    const tailNodes = chain.nodes.slice(-3).map(n => ({ x: n.x, y: n.y })); // keep order so index 0 = base, last = tip
 
     // Simple polyline sampling for tail
     const pts = [];
