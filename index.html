@@ -10,6 +10,7 @@
     <!-- Base Reset & Typography -->
     <link rel="stylesheet" href="styles/base/reset.css">
     <link rel="stylesheet" href="styles/base/typography.css">
+    <link rel="stylesheet" href="styles/base/typography-memphis.css">
 
     <!-- Layout Styles -->
     <link rel="stylesheet" href="styles/layout/main.css">
@@ -24,7 +25,22 @@
     <link rel="stylesheet" href="styles/components/racers.css">
     <link rel="stylesheet" href="styles/components/settings.css">
     <link rel="stylesheet" href="styles/components/loading.css">
-    <link rel="stylesheet" href="styles/components/banners.css">
+    <link rel="stylesheet" href="styles/components/header.css">
+    <link rel="stylesheet" href="styles/components/history.css">
+    <link rel="stylesheet" href="styles/components/intro-screen.css">
+
+    <!-- Memphis Component Styles -->
+    <link rel="stylesheet" href="styles/components/memphis/cards.css">
+    <link rel="stylesheet" href="styles/components/memphis/panels.css">
+    <link rel="stylesheet" href="styles/components/memphis/buttons.css">
+    <link rel="stylesheet" href="styles/components/memphis/racer-cards.css">
+    <link rel="stylesheet" href="styles/components/memphis/track-preview.css">
+    <link rel="stylesheet" href="styles/components/memphis/podium.css">
+    <link rel="stylesheet" href="styles/components/memphis/comic-elements.css">
+    <link rel="stylesheet" href="styles/components/memphis/newspaper.css">
+    <link rel="stylesheet" href="styles/components/memphis/week-recap-panel.css">
+    <link rel="stylesheet" href="styles/components/memphis/standings-panel.css">
+    <link rel="stylesheet" href="styles/components/memphis/earnings-panel.css">
 
     <!-- Utility Styles -->
     <link rel="stylesheet" href="styles/utilities/helpers.css">
@@ -34,12 +50,23 @@
     <!-- Theme Styles (load last to allow overrides) -->
     <link rel="stylesheet" href="styles/themes/dark.css">
     <link rel="stylesheet" href="styles/themes/light.css">
+    <link rel="stylesheet" href="styles/themes/memphis.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body data-theme="dark">
+<body data-theme="memphis">
+    <!-- Permanent header -->
+    <div id="header">
+        <div class="header-left">
+            <span class="logo" style="font-size:1.2rem;">Ferret Frenzy</span>
+        </div>
+        <div class="header-right">
+            <div id="headerMoney" class="money-display">$0</div>
+            <button id="headerSettingsBtn" class="btn btn-primary btn-memphis btn-small">Settings</button>
+        </div>
+    </div>
     <div id="no-js" style="text-align:center;background-color:white;width:80%;margin:5% 10%;color:#391d1d;padding:2px 4px 12px 4px;border:3px dashed #ff6000;z-index:99999;position:fixed;">
         <h2 style="color:red;">No JavaScript?</h2>
         <p style="font-weight:bold;">JavaScript is required for this page to work.</p>
@@ -50,8 +77,14 @@
     <script type="importmap">
     {
         "imports": {
-            "verlet-chain": "./render/systems/VerletChain.js",
-            "spline-utils": "./render/renderers/SplineUtils.js"
+            "preact": "https://esm.sh/preact@10.22.1",
+            "preact/hooks": "https://esm.sh/preact@10.22.1/hooks",
+            "htm/preact": "https://esm.sh/htm@3.1.1/preact",
+            "gsap": "https://esm.sh/gsap@3.12.5",
+            "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger",
+            "simplex-noise": "https://esm.sh/simplex-noise@4.0.1",
+            "verlet-chain": "/src/render/systems/VerletChain.js",
+            "spline-utils": "/render/renderers/SplineUtils.js"
         }
     }
     </script>
