@@ -44,8 +44,7 @@ export class FerretLegRenderer {
       const cosPhase = Math.cos(stridePhase);
       // Smooth interpolation for leg length changes
       const liftProgress = Math.max(0, Math.min(1, (cosPhase + 1) / 2));
-      const liftAmount = this.smoothStep(liftProgress) * liftHeight;
-      const liftAmount2 = this.smoothStep(Math.max(0, Math.min(1, ((-cosPhase + 1) / 2))) * liftHeight;
+      const liftAmount = this.smoothStep(liftProgress) * liftHeight);
 
       legPositions = [
         { x: bodyLength/3 + strideOffset, y: bodyHeight/4, lift: liftAmount },
