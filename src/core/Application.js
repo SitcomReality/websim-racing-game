@@ -5,6 +5,8 @@ import { RaceManager } from '../game/RaceManager.js';
 import { BettingManager } from '../game/betting/BettingManager.js';
 import { ProgressionManager } from '../game/progression/ProgressionManager.js';
 import { UIManager } from '../../ui/UIManager.js';
+import { IntroScreen } from '../../ui/screens/IntroScreen.js';
+import { GameScreen } from '../../ui/screens/GameScreen.js';
 import { LoadingManager } from './LoadingManager.js';
 import { XmlWordlistLoader } from '../data/XmlWordlistLoader.js';
 import { EventListeners } from './EventListeners.js';
@@ -131,8 +133,11 @@ export class Application {
     const noJsDiv = document.getElementById('no-js');
     if (noJsDiv) noJsDiv.style.display = 'none';
 
-    // Setup event listeners
-    // this.eventListeners.setup(); // removed: constructor already sets listeners
+    // Register screens and initialize UI
+    this.uiManager.registerScreen('intro', new IntroScreen());
+    this.uiManager.registerScreen('game', new GameScreen(this.gameStateManager));
+    this.uiManager.initialize();
+    this.uiManager.showScreen('intro', { gameState: this.gameStateManager });
 
     this.updateLoadingProgress(90, 'Interface ready');
   }

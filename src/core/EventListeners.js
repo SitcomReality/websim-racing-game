@@ -44,8 +44,10 @@ export class EventListeners {
     }); 
 
     this.app.eventBus.on('game:initialize', () => {
-      initGame(this.app.gameStateManager);
-      this.app.uiManager.showScreen('game');
+      import('../../init.js').then(({ initGame }) => {
+        initGame(this.app.gameStateManager);
+        this.app.uiManager.showScreen('game', { gameState: this.app.gameStateManager });
+      }).catch(err => console.error('Failed to load init.js', err));
     });
 
     this.app.eventBus.on('race:update', (raceData) => {
