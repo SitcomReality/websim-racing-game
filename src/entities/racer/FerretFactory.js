@@ -18,10 +18,10 @@ export class FerretFactory {
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
     const body = {
-      // Make bodies much longer - increase minimum length significantly and reduce variation
-      length: pick(2.4, 2.8), // Much higher minimum (was 1.5), reduced range for more consistent lengths
-      height: pick(0.9 * 1.5, 1.2 * 2.0), // taller overall
-      stockiness: pick(1.0, 1.3) // Reduced max stockiness variation for more consistent body thickness
+        // Standardize all ferrets to similar lengths - reduce variation significantly
+        length: pick(2.6, 2.9), // Much tighter range (was 2.4-2.8)
+        height: pick(0.9 * 1.5, 1.2 * 2.0), // taller overall
+        stockiness: pick(1.0, 1.3) // Reduced max stockiness variation for more consistent body thickness
     };
     const legs = {
       length: pick(0.8, 1.2),
@@ -89,41 +89,43 @@ export class FerretFactory {
    * Create the particle body chain for this ferret
    */
   static createBodyChain(racer, rnd, pick) {
-    // Get chain parameters with some randomization
-    const nodeCount = Math.round(pick(3, 5));
+    // Standardize to exactly 4 particles for all ferrets - no variation
+    const nodeCount = 4; // Fixed count (was pick(3, 5))
+    
     // Increase spacing between body nodes to reflect longer bodies
-    const restDistance = pick(9, 18);
+    const restDistance = pick(12, 20); // Increased from pick(9, 18)
     const stiffness = pick(0.6, 0.9);
     const iterations = Math.round(pick(2, 4));
     const damping = pick(0.95, 0.995);
+    
     // Thicker chain rendering for beefier bodies
-    const thicknessStart = pick(12, 24);
-    const thicknessEnd = pick(6, 12);
+    const thicknessStart = pick(14, 26); // Increased from pick(12, 24)
+    const thicknessEnd = pick(7, 13); // Increased from pick(6, 12)
 
     // Initial chain setup (will be positioned properly during animation)
     const chain = VerletChain.createChain({
-      count: nodeCount,
-      start: { x: 0, y: 0 },
-      dir: { x: 1, y: 0 }, // Horizontal initially
-      spacing: restDistance
+        count: nodeCount,
+        start: { x: 0, y: 0 },
+        dir: { x: 1, y: 0 }, // Horizontal initially
+        spacing: restDistance
     });
 
     return {
-      enabled: true, // Feature flag - enabled for Phase 1 body rendering
-      nodes: chain.nodes,
-      prevNodes: chain.prevNodes,
-      restLengths: chain.restLengths,
-      params: {
-        stiffness,
-        damping,
-        iterations,
-        thicknessStart,
-        thicknessEnd
-      },
-      anchors: {
-        head: { x: 0, y: 0, offsetY: 0, weight: 0.8 },
-        hip: { x: 0, y: 0, offsetY: 0, weight: 0.6 }
-      }
+        enabled: true, // Feature flag - enabled for Phase 1 body rendering
+        nodes: chain.nodes,
+        prevNodes: chain.prevNodes,
+        restLengths: chain.restLengths,
+        params: {
+            stiffness,
+            damping,
+            iterations,
+            thicknessStart,
+            thicknessEnd
+        },
+        anchors: {
+            head: { x: 0, y: 0, offsetY: 0, weight: 0.8 },
+            hip: { x: 0, y: 0, offsetY: 0, weight: 0.6 }
+        }
     };
   }
 }
