@@ -4,12 +4,10 @@ import { EventBus } from './EventBus.js';
 import { RaceManager } from '../game/RaceManager.js';
 import { BettingManager } from '../game/betting/BettingManager.js';
 import { ProgressionManager } from '../game/progression/ProgressionManager.js';
-import { UIManager } from '../../ui/UIManager.js';
+import { UIManager } from '../ui/UIManager.js';
 import { LoadingManager } from './LoadingManager.js';
 import { XmlWordlistLoader } from '../data/XmlWordlistLoader.js';
 import { EventListeners } from './EventListeners.js';
-
-import { UIManager } from '../ui/UIManager.js';
 
 /**
  * Application - Main application coordinator
@@ -27,7 +25,7 @@ export class Application {
     this.progressionManager = new ProgressionManager(this.eventBus, this.gameStateManager);
     this.eventBus._progressionManager = this.progressionManager;
 
-    // UI Manager - fix import path
+    // UI Manager
     this.uiManager = new UIManager(this.eventBus);
 
     // Loading system
