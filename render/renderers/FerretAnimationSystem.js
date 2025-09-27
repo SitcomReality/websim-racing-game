@@ -31,5 +31,15 @@ export class FerretAnimationSystem {
 
     // --- 3. Update eye tracking and expressions ---
     FerretLookSystem.update(ferret, racer, time, currentRace);
+    this.updateFootContacts(ferret);
+  }
+
+  updateFootContacts(ferret) {
+    // Ensure feet structure exists for downstream particle emission
+    ferret.gait = ferret.gait || {};
+    ferret.gait.feet = ferret.gait.feet || {
+      FL: { contact: false, justDown: false }, FR: { contact: false, justDown: false },
+      BL: { contact: false, justDown: false }, BR: { contact: false, justDown: false }
+    };
   }
 }

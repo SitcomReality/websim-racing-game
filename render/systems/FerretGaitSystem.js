@@ -74,6 +74,24 @@ export class FerretGaitSystem {
 
     ferret._prevPhase = phase;
 
+    // Foot contact tracking
+    ferret.gait.feet = ferret.gait.feet || {
+      FL: { contact: false, justDown: false }, FR: { contact: false, justDown: false },
+      BL: { contact: false, justDown: false }, BR: { contact: false, justDown: false }
+    };
+    const feet = ferret.gait.feet;
+    const offsets = { FL: 0, BR: 0, FR: Math.PI, BL: Math.PI };
+    const threshold = -0.1;
+    const active = isRacing && ferret.gait.stride > 0.05;
+    for (const key of Object.keys(feet)) {
+      const prev = feet[key].contact;
+      const ph = phase + offsets[key];
+      const wave = Math.sin(ph);
+      const now = active && wave < threshold;
+      feet[key].contact = now;
+      feet[key].justDown = !prev && now;
+    }
+
     if (ferret.isStumbling) {
       ferret.crashPhase += 0.2;
       if (racer.remainingStumble <= 1) {
@@ -83,4 +101,3 @@ export class FerretGaitSystem {
     }
   }
 }
-

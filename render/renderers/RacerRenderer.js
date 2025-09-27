@@ -42,69 +42,22 @@ export class RacerRenderer {
       // Render ferret using the dedicated renderer
       this.ferretRenderer.render(ctx, screenX, screenY, racer, time, this.renderManager.camera.zoom, this.renderManager.currentRace);
 
-      // Handle boost particles
-      this.renderBoostEffects(ctx, racer, { x: screenX, y: screenY, scale: this.renderManager.camera.zoom }, idx, worldTransform);
-
-      // Add subtle movement trail particles
-      this.renderTrailEffects({ x: screenX, y: screenY, scale: this.renderManager.camera.zoom });
+      // Emit discrete footstep particles on contact
+      this.emitFootstepParticles(racer, { x: screenX, y: screenY, scale: this.renderManager.camera.zoom });
     }
 
     this.updateLeaderboard(race);
   }
 
   renderBoostEffects(ctx, racer, screen, laneIndex, worldTransform) {
-    if (racer?.isBoosting && Math.random() < 0.3) {
-      // Don't emit particles if racer has finished
-      if (racer.visual?.finished) return;
-      
-      if (this.renderManager && this.renderManager.particleSystem) {
-        // Emit from feet position - feet are below the center
-        const feetY = screen.y + 15 * screen.scale; // Move down from center to feet
-        this.renderManager.particleSystem.emit(
-          screen.x, 
-          feetY, 
-          Math.PI, 
-          80 * screen.scale, 
-          2, 
-          'rgba(255,255,255,0.8)'
-        );
-      }
-    }
+    // disabled: continuous boost stream removed in favor of footstep events
+    return;
   }
 
   // New: dust trail while moving
   renderTrailEffects({ x, y, scale }) {
-    if (!this.renderManager?.particleSystem) return;
-    
-    // Don't emit particles if racer has finished - need to find the racer for this position
-    const racers = this.renderManager.currentRace?.racers || [];
-    const gameState = this.renderManager.gameState;
-    
-    // Find which racer corresponds to this screen position
-    // This is approximate but should work for the trail effect
-    const screenPositions = this.screenPositions;
-    const currentPosition = screenPositions.find(pos => 
-      Math.abs(pos.x - x) < 50 && Math.abs(pos.y - y) < 30
-    );
-    
-    if (currentPosition) {
-      const racer = gameState?.racers.find(r => r.id === currentPosition.rid);
-      if (racer?.visual?.finished) return;
-    }
-    
-    if (Math.random() < 0.12) {
-      // Emit from feet position - feet are below the center
-      const feetY = y + 15 * scale;
-      this.renderManager.particleSystem.emit(
-        x - 8 * scale,
-        feetY,
-        Math.PI,
-        30 * scale,
-        1,
-        'rgba(120,100,80,0.45)',
-        { spread: 0.6, forwardBoost: 0.2 }
-      );
-    }
+    // disabled: moved to discrete footstep puffs
+    return;
   }
 
   updateLeaderboard(race) {
@@ -147,5 +100,40 @@ export class RacerRenderer {
 
   getScreenPositions() {
     return this.screenPositions;
+  }
+
+  // Emit discrete puffs when feet touch ground
+  emitFootstepParticles(racer, screen) {
+    const ps = this.renderManager?.particleSystem;
+    if (!ps || !racer?.ferret || racer.visual?.finished) return;
+    const ferret = racer.ferret;
+    const feet = ferret.gait?.feet;
+    if (!feet) return;
+
+    const y = screen.y + 15 * screen.scale;
+    const dustColor = 'rgba(120,100,80,0.45)';
+    const speed = 55 * screen.scale;
+
+    const tryEmit = (foot, xOffset) => {
+      if (!feet[foot]) return;
+      if (feet[foot].justDown) {
+        ps.emit(
+          screen.x + xOffset * screen.scale,
+          y,
+          Math.PI, // blow backwards
+          speed,
+          6,
+          dustColor,
+          { spread: 0.9, forwardBoost: 0.15 }
+        );
+        feet[foot].justDown = false; // consume event
+      }
+    };
+
+    // Rear feet slightly further back, front a bit closer to center
+    tryEmit('BL', -12);
+    tryEmit('BR', -10);
+    tryEmit('FL', -7);
+    tryEmit('FR', -5);
   }
 }
