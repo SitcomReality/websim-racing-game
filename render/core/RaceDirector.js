@@ -14,7 +14,6 @@ export class RaceDirector {
     this.minShotDuration = 3000;
     this.lastShotChangeSection = -1;
     this.currentTransition = { urgency: 'smooth', suggestedDamping: { pan: 0.10, zoom: 0.10 } };
-    this.finishGraceMs = 1200; // ensure camera holds on finishers briefly
 
     // Initialize subsystems
     this.eventManager = new RaceEventManager();
@@ -65,13 +64,23 @@ export class RaceDirector {
       this.lastShotChangeTime = time;
       this.lastShotChangeSection = section;
 
-      // Transition metadata: urgent shots move faster, otherwise ease
-      const urgentShots = new Set(['incident_focus','finish_approach','finish_focus','close_finish']);
-      const urgency = urgentShots.has(shotName) ? 'urgent' : 'smooth';
-      this.currentTransition = {
-        urgency,
-        suggestedDamping: urgency === 'urgent' ? { pan: 0.05, zoom: 0.05 } : { pan: 0.015, zoom: 0.015 }
-      };
+      // Transition metadata: urgent shots move faster, but finish shots get smoother transitions
+      const urgentShots = new Set(['incident_focus']);
+      const finishShots = new Set(['finish_approach','finish_focus','close_finish']);
+      
+      let urgency, damping;
+      if (finishShots.has(shotName)) {
+        urgency = 'cinematic';
+        damping = { pan: 0.08, zoom: 0.08 }; // Smoother transitions for finish line drama
+      } else if (urgentShots.has(shotName)) {
+        urgency = 'urgent';
+        damping = { pan: 0.05, zoom: 0.05 };
+      } else {
+        urgency = 'smooth';
+        damping = { pan: 0.015, zoom: 0.015 };
+      }
+      
+      this.currentTransition = { urgency, suggestedDamping: damping };
 
       this.eventManager.emitEvent('shotChange', {
         from: previousShot,

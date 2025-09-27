@@ -25,13 +25,18 @@ export class ShotSelector {
    */
   updateShot(race, gameState, raceAnalysis) {
     const now = performance.now();
-    if (now - this.director.lastShotChangeTime < this.director.minShotDuration) {
+    
+    // Use longer minimum durations for finish-related shots
+    const isFinishShot = ['finish_focus', 'finish_approach', 'close_finish'].includes(this.director.currentShot);
+    const minDuration = isFinishShot ? 4000 : this.director.minShotDuration;
+    
+    if (now - this.director.lastShotChangeTime < minDuration) {
       return; // Don't change shots too frequently
     }
 
     const activeRacers = race.racers.filter(rid => {
       const t = race.finishedAt?.[rid];
-      return !t || (Date.now() - t) < 1500;
+      return !t || (Date.now() - t) < 2500; // Extended grace period
     }).filter(rid => !(race.results || []).includes(rid));
     
     // If no active racers remain, force finish focus on the last position.
@@ -57,18 +62,14 @@ export class ShotSelector {
     const recentEvents = this.director.eventManager.getRecentEvents(4000);
     const highPriorityEvent = recentEvents.some(e => e.type === 'stumble' || e.type === 'leadChange');
 
-    // Calculate recent finish drama (4 seconds is sufficient to view the crossing)
+    // Calculate recent finish drama with extended grace period
     const timeSinceLastFinish = now - (raceAnalysis.lastFinishTime || 0);
-    const isWithinFinishGrace = timeSinceLastFinish < (this.director.finishGraceMs || 500);
-    const isRecentFinishDrama = timeSinceLastFinish < 2500;
-    if (isWithinFinishGrace) {
-      this.trySetShot('finish_focus', now, currentSection, isSameSection, true);
-      return;
-    }
+    const isRecentFinishDrama = timeSinceLastFinish < 4000; // Extended to 4 seconds
 
     // 1. FINISH LINE SEQUENCE - ABSOLUTE TOP PRIORITY
-    if (leaderPos >= 92 || (isRecentFinishDrama && leaderPos >= 85)) {
-      if (leaderPos >= 95 || isRecentFinishDrama) {
+    // Be much more aggressive about staying on finish shots
+    if (leaderPos >= 88 || (isRecentFinishDrama && leaderPos >= 80)) {
+      if (leaderPos >= 94 || isRecentFinishDrama) {
         this.trySetShot('finish_focus', now, currentSection, isSameSection, true);
       } else {
         this.trySetShot('finish_approach', now, currentSection, isSameSection, true);
@@ -87,20 +88,14 @@ export class ShotSelector {
     const pack = positions.slice(0, Math.min(positions.length, 5));
     const packSpread = pack.length > 1 ? Math.max(...pack) - Math.min(...pack) : 0;
     
-    // Close finish potential
-    if (leaderPos > 85 && sortedRacers.length > 1) {
+    // Close finish potential - be more conservative near the end
+    if (leaderPos > 82 && sortedRacers.length > 1) {
       const secondPos = race.liveLocations[sortedRacers[1]] || 0;
-      if (leaderPos - secondPos < 8) {
+      if (leaderPos - secondPos < 10) {
         this.trySetShot('close_finish', now, currentSection, isSameSection, highPriorityEvent);
         return;
       }
     }
-
-    // Incidents
-    // if (highPriorityEvent && recentEvents.some(e => e.type === 'stumble')) {
-    //   this.trySetShot('incident_focus', now, currentSection, isSameSection, true);
-    //   return;
-    // }
 
     // Battles & Lead Changes
     if (highPriorityEvent && recentEvents.some(e => e.type === 'leadChange')) {

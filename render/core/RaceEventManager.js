@@ -17,6 +17,9 @@ export class RaceEventManager {
     
     if (!race || !race.racers) return;
     
+    // Track finish events
+    this.detectFinishEvents(race, now);
+
     const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
     
     // Detect lead changes
@@ -30,6 +33,29 @@ export class RaceEventManager {
     
     // Clean up old events
     this.cleanupOldEvents(now);
+  }
+
+  detectFinishEvents(race, now) {
+    if (!race.results || !race.finishedAt) return;
+    
+    // Check if any new finishers since last check
+    const recentFinishes = race.results.filter(rid => {
+      const finishTime = race.finishedAt[rid];
+      return finishTime && (now - finishTime) < 1000; // Within last second
+    });
+    
+    if (recentFinishes.length > 0) {
+      // Update last finish time to current time for camera tracking
+      this.raceAnalysis.lastFinishTime = now;
+      
+      recentFinishes.forEach(rid => {
+        this.emitEvent('racerFinished', {
+          racerId: rid,
+          finishTime: race.finishedAt[rid],
+          position: race.results.indexOf(rid) + 1
+        });
+      });
+    }
   }
 
   detectLeadChanges(race, now) {
