@@ -33,6 +33,8 @@ export class ShotSelector {
       const t = race.finishedAt?.[rid];
       return !t || (Date.now() - t) < 1500;
     }).filter(rid => !(race.results || []).includes(rid));
+    
+    // If no active racers remain, force finish focus on the last position.
     if (activeRacers.length === 0) {
       this.director.setShot('finish_focus', now, -1); // Use -1 for section as race is over
       return;
@@ -55,18 +57,23 @@ export class ShotSelector {
     const recentEvents = this.director.eventManager.getRecentEvents(4000);
     const highPriorityEvent = recentEvents.some(e => e.type === 'stumble' || e.type === 'leadChange');
 
+    // Calculate recent finish drama (4 seconds is sufficient to view the crossing)
+    const timeSinceLastFinish = now - (raceAnalysis.lastFinishTime || 0);
+    const isRecentFinishDrama = timeSinceLastFinish < 4000; 
+
     // 1. FINISH LINE SEQUENCE - ABSOLUTE TOP PRIORITY
-    if (race.results && (race.results.length >= 1 || (leaderPos >= 95))) {
-      // If first three racers are finishing (or we have any results), focus always on finish
-      this.trySetShot('finish_focus', now, currentSection, isSameSection, true); // Finishing is ALWAYS high priority
-      return;
+    if (leaderPos >= 92 || isRecentFinishDrama) {
+        
+        // Use 'finish_focus' if the leader is crossing (>=95%) or if someone just finished (recent drama)
+        if (leaderPos >= 95 || isRecentFinishDrama) {
+            this.trySetShot('finish_focus', now, currentSection, isSameSection, true);
+        } else {
+            // Use 'finish_approach' if leader is approaching (92% to 95%)
+            this.trySetShot('finish_approach', now, currentSection, isSameSection, true);
+        }
+        return;
     }
     
-    if (leaderPos >= 92) {
-      this.trySetShot('finish_approach', now, currentSection, isSameSection, true);
-      return;
-    }
-
     // 2. START OF RACE
     if (leaderPos < 15) {
       this.trySetShot('starting_lineup', now, currentSection, isSameSection, false);

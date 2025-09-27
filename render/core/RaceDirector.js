@@ -27,7 +27,8 @@ export class RaceDirector {
       closeFinishes: [],
       stumbles: [],
       injuries: [],
-      dramaticMoments: []
+      dramaticMoments: [],
+      lastFinishTime: 0 // Track time of last racer finishing (performance.now())
     };
   }
 

@@ -90,6 +90,9 @@ export class RenderManager {
       if (!this.currentRace) return;
       const lane = this.currentRace.racers.indexOf(racerId);
       if (lane >= 0) this.bannerSystem.showBanner('finish', lane, `P${position}`, racerId);
+      
+      // NEW: Update race director with finish time
+      this.camera.getRaceDirector().raceAnalysis.lastFinishTime = performance.now();
     });
     window.app?.eventBus?.on('race:racerRecovered', ({ racerId }) => {
       if (!this.currentRace) return;
