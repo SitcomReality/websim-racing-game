@@ -151,6 +151,9 @@ export class FerretAnimationSystem {
     if (ferret.bodyChain?.enabled) {
       this.updateBodyChain(ferret, racer, dtSeconds, velocity);
     }
+    if (ferret.tailChain?.enabled) { // update tail chain too
+      this.updateTailChain(ferret, dtSeconds);
+    }
 
     // Update eye tracking
     this.updateEyeTracking(ferret, racer, time, currentRace);
@@ -200,6 +203,19 @@ export class FerretAnimationSystem {
     VerletChain.updateAnchors(nodes, anchors.hip, anchors.head);
     VerletChain.satisfyConstraints(nodes, restLengths, params.iterations, params.stiffness);
     VerletChain.smoothCurvature(nodes, 0.1);
+  }
+
+  updateTailChain(ferret, dt) { // new: floppy tail solver
+    const tail = ferret.tailChain; if (!tail?.nodes) return;
+    const hip = ferret.bodyChain?.nodes?.[0] || { x: 0, y: 0 };
+    const sway = Math.sin(ferret.gait.cyclePhase * 2) * (4 + ferret.gait.stride * 2);
+    const { nodes, prevNodes, restLengths, params, anchors } = tail;
+    anchors.base.x = hip.x; anchors.base.y = hip.y;
+    VerletChain.integrate(nodes, prevNodes, dt, params.damping);
+    for (let i = 1; i < nodes.length; i++) { nodes[i].y += 0.9; nodes[i].x += sway * 0.02; } // mild gravity+sway
+    VerletChain.updateAnchors(nodes, anchors.base, anchors.tip);
+    VerletChain.satisfyConstraints(nodes, restLengths, params.iterations, params.stiffness);
+    VerletChain.smoothCurvature(nodes, 0.12);
   }
 
   updateEyeTracking(ferret, racer, time, currentRace) {

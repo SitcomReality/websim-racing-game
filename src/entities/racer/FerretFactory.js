@@ -77,13 +77,15 @@ export class FerretFactory {
 
     // New: Initialize particle body chain (currently disabled by default)
     const bodyChain = this.createBodyChain(racer, rnd, pick);
+    const tailChain = this.createTailChain(rnd, pick); // new tail chain
 
     return { 
       body, legs, tail, head, eye, gait, seed,
       isStumbling: false,
       crashPhase: 0,
       coat,
-      bodyChain // New particle chain system
+      bodyChain,
+      tailChain // include tail chain
     };
   }
 
@@ -130,6 +132,21 @@ export class FerretFactory {
             head: { x: 0, y: 0, offsetY: 0, weight: 0.5 }, // Reduced from 0.8 for more jiggle
             hip: { x: 0, y: 0, offsetY: 0, weight: 0.3 } // Reduced from 0.6 for more jiggle
         }
+    };
+  }
+
+  static createTailChain(rnd, pick) { // new: floppy tail chain
+    const nodeCount = 5;
+    const spacing = pick(10, 14);
+    const stiffness = pick(0.08, 0.18);
+    const iterations = 1;
+    const damping = pick(0.82, 0.9);
+    const chain = VerletChain.createChain({ count: nodeCount, start: { x: 0, y: 0 }, dir: { x: -1, y: 0 }, spacing });
+    return {
+      enabled: true,
+      nodes: chain.nodes, prevNodes: chain.prevNodes, restLengths: chain.restLengths,
+      params: { stiffness, iterations, damping, thicknessStart: pick(7, 10), thicknessEnd: pick(2, 3) },
+      anchors: { base: { x: 0, y: 0, weight: 0.95 }, tip: { x: 0, y: 0, weight: 0 } }
     };
   }
 }

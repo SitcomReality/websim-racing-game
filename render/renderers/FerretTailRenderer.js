@@ -9,51 +9,11 @@ export class FerretTailRenderer {
   }
 
   render(ctx, ferret, colors) {
-    // If body chain exists, attach the tail to node 0 (the hip/tail base) and render a thick spline
-    if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length >= 2) {
-      const nodes = ferret.bodyChain.nodes; 
-      
-      // 1. Identify tail base (Node 0) and the preceding body node (Node 1)
-      const tailBase = nodes[0];
-      const tailNext = nodes[1];
-
-      // 2. Calculate the backward direction (from tailNext towards tailBase)
-      const dx = tailBase.x - tailNext.x;
-      const dy = tailBase.y - tailNext.y;
-      const L = Math.hypot(dx, dy) || 1;
-      
-      // 3. Calculate animation parameters for sway and gravity
-      // Sway based on gait cycle (for visual wobble)
-      const sway = Math.sin(ferret.gait.cyclePhase * 3 + ferret.seed % 1000 * 0.1) * (1 + ferret.gait.stride * 0.5) * 4;
-      const gravityOffset = 8; 
-      const extensionLength = ferret.tail.length * 15;
-      
-      const bodyEndThickness = ferret.bodyChain.params?.thicknessEnd || 10;
-      
-      // 4. Define virtual control points for the tail spline (P1 is start/base)
-      const P1 = tailBase;
-      // Mid-tail point, offset by sway and gravity. Sway is amplified towards the tip.
-      const P2 = {
-        x: P1.x + (dx / L) * extensionLength * 0.5 + sway * 0.75,
-        y: P1.y + (dy / L) * extensionLength * 0.5 + gravityOffset * 0.5
-      };
-      // Tip point, full extension, max gravity and sway
-      const P3 = { 
-        x: P1.x + (dx / L) * extensionLength + sway * 1.5,
-        y: P1.y + (dy / L) * extensionLength + gravityOffset
-      };
-
-      // 5. Sample the Catmull-Rom spline defined by [P1, P2, P3]
-      // We use P1, P2, P3 as the points for the spline 
-      const tailSplinePts = [P1, P2, P3];
-      const finalSpline = SplineUtils.samplePolyline(tailSplinePts, 9);
-
-      const startW = bodyEndThickness * 0.8 * (ferret.tail.fluffiness || 1); 
-      const endW = (ferret.tail.fluffiness || 1) * 2;
-      
-      // Render the tail using the third racer color
-      SplineUtils.renderThickSpline(ctx, finalSpline, startW, endW, colors[2]);
-      
+    if (ferret.tailChain?.enabled && ferret.tailChain.nodes.length >= 2) {
+      const pts = SplineUtils.samplePolyline(ferret.tailChain.nodes, 16);
+      const startW = (ferret.tailChain.params?.thicknessStart || 8) * (ferret.tail.fluffiness || 1);
+      const endW = (ferret.tailChain.params?.thicknessEnd || 2) * (ferret.tail.fluffiness || 1);
+      SplineUtils.renderThickSpline(ctx, pts, startW, endW, colors[2]);
       return;
     }
 
