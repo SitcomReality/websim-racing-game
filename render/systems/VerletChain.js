@@ -64,6 +64,18 @@ export class VerletChain {
   }
   
   /**
+   * Apply a simple gravity force
+   * @param {Array} nodes - Node positions
+   * @param {number} strength - Gravity strength
+   */
+  static applyGravity(nodes, strength = 9.8) {
+    for (let i = 0; i < nodes.length; i++) {
+        // A small constant gravity pull downwards
+        nodes[i].y += strength * 0.05;
+    }
+  }
+
+  /**
    * Satisfy distance constraints between connected nodes
    * @param {Array} nodes - Node positions to modify
    * @param {Array} restLengths - Rest distances between adjacent nodes

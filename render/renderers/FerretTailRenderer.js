@@ -9,13 +9,17 @@ export class FerretTailRenderer {
   }
 
   render(ctx, ferret, colors) {
+    // If body chain exists, attach the tail to node 0 (the hip/tail base) and render a thick spline
     if (ferret.tailChain?.enabled && ferret.tailChain.nodes.length >= 2) {
-      const pts = SplineUtils.samplePolyline(ferret.tailChain.nodes, 16);
-      const groundY = 15; // match foot plant level used by leg renderer
-      const clampedPts = pts.map(p => ({ x: p.x, y: Math.min(p.y, groundY) }));
-      const startW = (ferret.tailChain.params?.thicknessStart || 8) * (ferret.tail.fluffiness || 1);
-      const endW = (ferret.tailChain.params?.thicknessEnd || 2) * (ferret.tail.fluffiness || 1);
-      SplineUtils.renderThickSpline(ctx, clampedPts, startW, endW, colors[2]);
+      const { nodes, params } = ferret.tailChain;
+      
+      const pts = SplineUtils.samplePolyline(nodes, 12);
+      const startW = params.thicknessStart;
+      const endW = params.thicknessEnd;
+      
+      // Render the tail using the third racer color
+      SplineUtils.renderThickSpline(ctx, pts, startW, endW, colors[2]);
+      
       return;
     }
 

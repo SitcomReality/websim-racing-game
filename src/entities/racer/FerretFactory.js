@@ -77,15 +77,15 @@ export class FerretFactory {
 
     // New: Initialize particle body chain (currently disabled by default)
     const bodyChain = this.createBodyChain(racer, rnd, pick);
-    const tailChain = this.createTailChain(rnd, pick); // new tail chain
+    const tailChain = this.createTailChain(racer, rnd, pick, tail, bodyChain);
 
     return { 
       body, legs, tail, head, eye, gait, seed,
       isStumbling: false,
       crashPhase: 0,
       coat,
-      bodyChain,
-      tailChain // include tail chain
+      bodyChain, // New particle chain system
+      tailChain // New tail chain system
     };
   }
 
@@ -135,18 +135,43 @@ export class FerretFactory {
     };
   }
 
-  static createTailChain(rnd, pick) { // new: floppy tail chain
-    const nodeCount = 5;
-    const spacing = pick(10, 14);
-    const stiffness = pick(0.08, 0.18);
-    const iterations = 1;
-    const damping = pick(0.82, 0.9);
-    const chain = VerletChain.createChain({ count: nodeCount, start: { x: 0, y: 0 }, dir: { x: -1, y: 0 }, spacing });
+  /**
+   * Create the particle tail chain for this ferret
+   */
+  static createTailChain(racer, rnd, pick, tail, bodyChain) {
+    const tailLength = tail?.length || 1.5;
+    const nodeCount = Math.round(Math.max(3, Math.min(7, 3 + tailLength)));
+    const restDistance = pick(6, 10);
+    const stiffness = pick(0.08, 0.2); // Floppy
+    const damping = pick(0.85, 0.92);
+    const iterations = Math.round(pick(2, 4));
+    
+    const bodyEndThickness = bodyChain.params?.thicknessEnd || 10;
+    const thicknessStart = bodyEndThickness * 0.8 * (tail.fluffiness || 1);
+    const thicknessEnd = (tail.fluffiness || 1) * 2;
+
+    const chain = VerletChain.createChain({
+        count: nodeCount,
+        start: { x: 0, y: 0 },
+        dir: { x: -1, y: 0 },
+        spacing: restDistance
+    });
+
     return {
-      enabled: true,
-      nodes: chain.nodes, prevNodes: chain.prevNodes, restLengths: chain.restLengths,
-      params: { stiffness, iterations, damping, thicknessStart: pick(7, 10), thicknessEnd: pick(2, 3) },
-      anchors: { base: { x: 0, y: 0, weight: 0.95 }, tip: { x: 0, y: 0, weight: 0 } }
+        enabled: true,
+        nodes: chain.nodes,
+        prevNodes: chain.prevNodes,
+        restLengths: chain.restLengths,
+        params: {
+            stiffness,
+            damping,
+            iterations,
+            thicknessStart,
+            thicknessEnd
+        },
+        anchors: {
+            base: { x: 0, y: 0, weight: 1.0 }
+        }
     };
   }
 }

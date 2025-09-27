@@ -47,7 +47,7 @@ export class IntroScreen {
         // Use a short timeout to allow the UI to update before starting the heavy work.
         setTimeout(() => {
             this.eventBus.emit('game:initialize');
-        }, 50);
+        }, 100);
       });
     }
 
