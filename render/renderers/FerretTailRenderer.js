@@ -23,9 +23,12 @@ export class FerretTailRenderer {
       const L = Math.hypot(dx, dy) || 1;
       
       // 3. Calculate animation parameters for sway and gravity
-      // Sway based on gait cycle (for visual wobble)
-      const sway = Math.sin(ferret.gait.cyclePhase * 3 + ferret.seed % 1000 * 0.1) * (1 + ferret.gait.stride * 0.5) * 4;
-      const gravityOffset = 8; 
+      // Lateral sway (perpendicular to body), smoothed over time
+      const dirX = dx / L, dirY = dy / L, nx = -dirY, ny = dirX;
+      const phase = ferret.gait.cyclePhase;
+      const targetSway = Math.sin(phase * 0.6 + (ferret.seed % 997) * 0.015) * (2 + ferret.gait.stride * 2);
+      ferret._tailSway = ferret._tailSway == null ? targetSway : ferret._tailSway + (targetSway - ferret._tailSway) * 0.15;
+      const droop = ferret.isStumbling ? 14 : 8;
       const extensionLength = ferret.tail.length * 15;
       
       const bodyEndThickness = ferret.bodyChain.params?.thicknessEnd || 10;
@@ -34,19 +37,19 @@ export class FerretTailRenderer {
       const P1 = tailBase;
       // Mid-tail point, offset by sway and gravity. Sway is amplified towards the tip.
       const P2 = {
-        x: P1.x + (dx / L) * extensionLength * 0.5 + sway * 0.75,
-        y: P1.y + (dy / L) * extensionLength * 0.5 + gravityOffset * 0.5
+        x: P1.x + dirX * extensionLength * 0.5 + nx * ferret._tailSway * 0.6,
+        y: P1.y + dirY * extensionLength * 0.5 + droop * 0.5
       };
       // Tip point, full extension, max gravity and sway
       const P3 = { 
-        x: P1.x + (dx / L) * extensionLength + sway * 1.5,
-        y: P1.y + (dy / L) * extensionLength + gravityOffset
+        x: P1.x + dirX * extensionLength + nx * ferret._tailSway * 1.2,
+        y: P1.y + dirY * extensionLength + droop
       };
 
       // 5. Sample the Catmull-Rom spline defined by [P1, P2, P3]
       // We use P1, P2, P3 as the points for the spline 
       const tailSplinePts = [P1, P2, P3];
-      const finalSpline = SplineUtils.samplePolyline(tailSplinePts, 9);
+      const finalSpline = SplineUtils.samplePolyline(tailSplinePts, 11);
 
       const startW = bodyEndThickness * 0.8 * (ferret.tail.fluffiness || 1); 
       const endW = (ferret.tail.fluffiness || 1) * 2;
