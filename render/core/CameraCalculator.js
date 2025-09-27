@@ -97,10 +97,13 @@ export class CameraCalculator {
    * Calculate optimal camera target position - focuses on actual racers, not empty space
    */
   calculateOptimalTarget(racers, race, shotDef) {
+    if (shotDef?.fixedFinishTarget && race?.finishPercent != null) {
+      return { x: race.finishPercent, y: 0 };
+    }
     if (racers.length === 0) {
       const activeRacers = race.racers.filter(rid => {
         const t = race.finishedAt?.[rid];
-        return !t || (Date.now() - t) < 1500;
+        return !t || (Date.now() - t) < 1000;
       }).filter(rid => !(race.results || []).includes(rid));
       if (activeRacers.length > 0) {
         const sorted = [...activeRacers].sort((a,b) => (race.liveLocations[b]||0) - (race.liveLocations[a]||0));

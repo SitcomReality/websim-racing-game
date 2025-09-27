@@ -4,6 +4,8 @@
 export class ShotSelector {
   constructor(director) {
     this.director = director;
+    this.lastSeenFinishTime = 0;
+    this.finishLockUntil = 0;
   }
   
   /**
@@ -26,6 +28,18 @@ export class ShotSelector {
   updateShot(race, gameState, raceAnalysis) {
     const now = performance.now();
     
+    // Detect new finisher and establish a finish lock window
+    if (raceAnalysis.lastFinishTime && raceAnalysis.lastFinishTime > this.lastSeenFinishTime) {
+      this.lastSeenFinishTime = raceAnalysis.lastFinishTime;
+      this.finishLockUntil = now + 1500; // enforce stable finish focus for 1.5s
+    }
+
+    // If within lock window, force finish_focus immediately (override minDuration)
+    if (now < this.finishLockUntil) {
+      this.director.setShot('finish_focus', now, -1);
+      return;
+    }
+
     // Use longer minimum durations for finish-related shots
     const isFinishShot = ['finish_focus', 'finish_approach', 'close_finish'].includes(this.director.currentShot);
     const minDuration = isFinishShot ? 4000 : this.director.minShotDuration;
@@ -36,9 +50,7 @@ export class ShotSelector {
 
     const activeRacers = race.racers.filter(rid => {
       const t = race.finishedAt?.[rid];
-      // A racer is "active" if they haven't finished OR they finished less than 2.5 seconds ago.
-      // This prevents the camera from flicking away immediately after a finish.
-      return !t || (Date.now() - t) < 2500;
+      return !t || (Date.now() - t) < 1000;
     });
     
     // If no active racers remain, force finish focus on the last position.
@@ -66,7 +78,7 @@ export class ShotSelector {
 
     // Calculate recent finish drama with extended grace period
     const timeSinceLastFinish = now - (raceAnalysis.lastFinishTime || 0);
-    const isRecentFinishDrama = timeSinceLastFinish < 4000; // Extended to 4 seconds
+    const isRecentFinishDrama = timeSinceLastFinish < 2000;
 
     // Force finish focus during recent finish drama, regardless of current leader position
     if (isRecentFinishDrama) {

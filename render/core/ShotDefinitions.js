@@ -7,7 +7,7 @@ export const shotDefinitions = {
       const now = performance.now();
       const activeRacers = race.racers.filter(rid => {
         const t = race.finishedAt?.[rid];
-        return !t || (Date.now() - t) < 1500;
+        return !t || (Date.now() - t) < 1000;
       }).filter(rid => !(race.results || []).includes(rid));
       return activeRacers.length > 0 ? activeRacers : race.racers;
     },
@@ -22,7 +22,7 @@ export const shotDefinitions = {
     updateRacers: (race, gameState) => {
       const active = race.racers.filter(rid => {
         const t = race.finishedAt?.[rid];
-        return !t || (Date.now() - t) < 1500;
+        return !t || (Date.now() - t) < 1000;
       }).filter(rid => !(race.results || []).includes(rid));
       const sorted = [...active].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.length > 0 ? [sorted[0]] : [];
@@ -39,7 +39,7 @@ export const shotDefinitions = {
     updateRacers: (race, gameState) => {
       const active = race.racers.filter(rid => {
         const t = race.finishedAt?.[rid];
-        return !t || (Date.now() - t) < 1500;
+        return !t || (Date.now() - t) < 1000;
       }).filter(rid => !(race.results || []).includes(rid));
       const sorted = [...active].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.slice(0, Math.min(4, sorted.length));
@@ -122,7 +122,7 @@ export const shotDefinitions = {
     updateRacers: (race, gameState) => {
       const active = race.racers.filter(rid => {
         const t = race.finishedAt?.[rid];
-        return !t || (Date.now() - t) < 2500;
+        return !t || (Date.now() - t) < 1000;
       }).filter(rid => !(race.results || []).includes(rid));
       const sorted = [...active].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.slice(0, Math.min(2, sorted.length));
@@ -137,24 +137,14 @@ export const shotDefinitions = {
   
   finish_focus: {
     updateRacers: (race, gameState) => {
-      const now = Date.now();
-      const recentFinishers = (race.results || []).filter(rid => {
-        const t = race.finishedAt?.[rid];
-        return t && (now - t) < 3000;
-      }).slice(-3);
-      if (recentFinishers.length > 0) return recentFinishers;
-      const active = race.racers.filter(rid => {
-        const t = race.finishedAt?.[rid];
-        return !t || (Date.now() - t) < 2500;
-      }).filter(rid => !(race.results || []).includes(rid));
-      const sorted = [...active].sort((a,b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-      return sorted.slice(0, 2);
+      return []; // use fixed finish-line target for stability
     },
     margin: 4,
     minSpan: 6,
     lookahead: 0,
     priority: 'tight',
     tightSpanThreshold: 6,
-    description: 'Focus on finishers'
+    fixedFinishTarget: true,
+    description: 'Lock on the finish line and let racers enter the frame'
   }
 };
