@@ -11,9 +11,11 @@ export class FerretTailRenderer {
   render(ctx, ferret, colors) {
     if (ferret.tailChain?.enabled && ferret.tailChain.nodes.length >= 2) {
       const pts = SplineUtils.samplePolyline(ferret.tailChain.nodes, 16);
+      const groundY = 15; // match foot plant level used by leg renderer
+      const clampedPts = pts.map(p => ({ x: p.x, y: Math.min(p.y, groundY) }));
       const startW = (ferret.tailChain.params?.thicknessStart || 8) * (ferret.tail.fluffiness || 1);
       const endW = (ferret.tailChain.params?.thicknessEnd || 2) * (ferret.tail.fluffiness || 1);
-      SplineUtils.renderThickSpline(ctx, pts, startW, endW, colors[2]);
+      SplineUtils.renderThickSpline(ctx, clampedPts, startW, endW, colors[2]);
       return;
     }
 
