@@ -83,7 +83,8 @@ export class RaceManager {
       liveLocations: {},
       livePositions: [],
       startTime: race.startTime,
-      finishedAt: {} // track finish timestamps
+      finishedAt: {}, // track finish timestamps
+      finishPercent: ((race.segments.length - 1) / race.segments.length) * 100 // New: finish at start of last segment
     };
     // Reset any prior race countdown
     this.raceEndCountdown = null;
@@ -171,8 +172,7 @@ export class RaceManager {
       const segmentIndex = Math.floor((currentPosition / 100) * (this.currentRace.segments.length -1) );
 
       if (segmentIndex >= this.currentRace.segments.length - 1) {
-        // Racer has finished
-        this.finishRacer(racerId);
+        // Racer has finished - removed check that's now handled earlier
         return;
       }
 
@@ -224,7 +224,7 @@ export class RaceManager {
 
       // Update position based on deltaTime for smooth movement
       const distanceToTravel = finalSpeed * deltaTime;
-      this.currentRace.liveLocations[racerId] = Math.min(100, currentPosition + distanceToTravel);
+      this.currentRace.liveLocations[racerId] = Math.min(this.currentRace.finishPercent, currentPosition + distanceToTravel);
       
       // Update the racer entity itself, especially its components
       racer.update(deltaTime, { race: this.currentRace, currentPosition });
@@ -255,7 +255,7 @@ export class RaceManager {
   checkForFinishers() {
     this.currentRace.racers.forEach(racerId => {
       const position = this.currentRace.liveLocations[racerId] || 0;
-      if (position >= 100 && !this.currentRace.results.includes(racerId)) {
+      if (position >= this.currentRace.finishPercent && !this.currentRace.results.includes(racerId)) {
         this.finishRacer(racerId);
       }
     });
