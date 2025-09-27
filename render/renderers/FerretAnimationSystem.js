@@ -216,9 +216,8 @@ export class FerretAnimationSystem {
     tail.anchors.base.y = hipNode.y;
 
     // Apply tail sway movement, primarily lateral, derived from gait
-    const sway = Math.sin(ferret.gait.cyclePhase * 0.8 + racer.id) * 3 * ferret.gait.stride;
-    tail.anchors.base.x += 0; // No major X movement here, anchor is rigid to body
-    tail.anchors.base.y += sway; 
+    // Rely solely on the hip node's solved position (which includes gait bounce) 
+    // to prevent unwanted vertical sliding at the attachment point.
 
     // 2. Solve Verlet Chain for the tail
     VerletChain.integrate(tail.nodes, tail.prevNodes, dt, tail.params.damping);
