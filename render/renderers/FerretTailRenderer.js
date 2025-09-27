@@ -27,11 +27,11 @@ export class FerretTailRenderer {
 
     // Tail should drag along the ground with gentle sway
     const groundMargin = 8; // How close tail stays to ground
-    const tailEndY = tailStartY + groundMargin + (ferret.isStumbling ? 0 : 2);
+    const tailEndY = tailStartY + (tailSway * 2); // minimal downforce; free oscillation
 
     // Create a gentle curve that extends outward to the left
     const controlPointX = tailStartX - tailLength * 0.6; // Extend further left
-    const controlPointY = tailStartY + groundMargin + (Math.abs(tailSway) * 0.2);
+    const controlPointY = tailStartY + (tailSway * 3); // amplify airy wobble
 
     ctx.beginPath();
     ctx.moveTo(tailStartX, tailStartY);
@@ -43,8 +43,8 @@ export class FerretTailRenderer {
     );
 
     // Tail should appear heavier/thicker at the base
-    const baseWidth = 6 * tailFluffiness;
-    const tipWidth = 3 * tailFluffiness;
+    const baseWidth = 4 * tailFluffiness;
+    const tipWidth = 2 * tailFluffiness;
     const currentWidth = baseWidth - (baseWidth - tipWidth) * (1 - Math.abs(tailSway) * 0.1);
 
     ctx.lineWidth = currentWidth;
@@ -54,7 +54,7 @@ export class FerretTailRenderer {
 
     // Add subtle shadow underneath for ground contact effect
     if (!ferret.isStumbling) {
-      ctx.globalAlpha = 0.3;
+      ctx.globalAlpha = 0.18;
       ctx.beginPath();
       ctx.moveTo(tailStartX, tailStartY + 2);
       ctx.quadraticCurveTo(
@@ -98,10 +98,10 @@ export class FerretTailRenderer {
     // 2. Calculate sway and tip position
     
     // Approximate ground level in local coordinates (used in FerretLegRenderer as well)
-    const targetGroundY = 15; 
+    const targetGroundY = baseNode.y + 4; // slight downforce relative to body
     
     const tailLength = ferret.tail.length * 25; 
-    const tailSwayFactor = Math.sin(ferret.gait.cyclePhase * 0.8 + ferret.seed % 1000 * 0.1) * 0.5;
+    const tailSwayFactor = Math.sin(ferret.gait.cyclePhase * 1.3 + ferret.seed % 1000 * 0.1) * 1.0; // freer oscillation
     
     // P0: Tail base, anchored at the last body node
     const P0 = { x: baseNode.x, y: baseNode.y }; 
@@ -109,20 +109,20 @@ export class FerretTailRenderer {
     // Calculate P1 (Tip) target: extend backward (in direction of normDir)
     const tipX = P0.x + normDirX * tailLength * 0.8; 
     // Calculate P1 (Tip) target Y: blend towards ground level (targetGroundY)
-    const tipY = P0.y * 0.2 + targetGroundY * 0.8;
+    const tipY = P0.y * 0.85 + targetGroundY * 0.15 + Math.sin(ferret.gait.cyclePhase * 1.1) * 3;
     
     // Control Point PC: Halfway, influenced by direction, slightly bent downwards, and sway
     const swayX = tailSwayFactor * 1.5;
     const PC = { 
         x: P0.x + normDirX * tailLength * 0.3 + swayX, 
-        y: P0.y + normDirY * tailLength * 0.2 + (tipY - P0.y) * 0.3 
+        y: P0.y + normDirY * tailLength * 0.15 + (tipY - P0.y) * 0.2 
     };
 
     const P1 = { x: tipX, y: tipY }; 
 
     // Calculate tail width based on fluffiness
-    const baseWidth = 6 * ferret.tail.fluffiness; 
-    const currentWidth = baseWidth; 
+    const baseWidth = 4 * ferret.tail.fluffiness;
+    const currentWidth = baseWidth * 0.85;
 
     // Render tail curve
     ctx.lineWidth = currentWidth;
@@ -138,7 +138,7 @@ export class FerretTailRenderer {
 
     // Add subtle ground contact shadow
     if (!ferret.isStumbling) {
-      ctx.globalAlpha = 0.3;
+      ctx.globalAlpha = 0.18;
       ctx.beginPath();
       // Offset points for shadow
       const shadowOffset = 2; 
@@ -149,7 +149,7 @@ export class FerretTailRenderer {
       ctx.moveTo(shadowP0.x, shadowP0.y);
       ctx.quadraticCurveTo(shadowPC.x, shadowPC.y, shadowP1.x, shadowP1.y);
 
-      ctx.lineWidth = currentWidth * 0.8;
+      ctx.lineWidth = currentWidth * 0.6;
       ctx.strokeStyle = 'rgba(0,0,0,0.2)';
       ctx.stroke();
       ctx.globalAlpha = 1;
