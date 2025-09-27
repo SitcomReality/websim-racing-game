@@ -44,7 +44,10 @@ export class IntroScreen {
     if (initButton) {
       initButton.addEventListener('click', () => {
         this.showLoadingIndicator();
-        this.eventBus.emit('game:initialize');
+        // Use a short timeout to allow the UI to update before starting the heavy work.
+        setTimeout(() => {
+            this.eventBus.emit('game:initialize');
+        }, 50);
       });
     }
 

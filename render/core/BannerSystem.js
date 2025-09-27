@@ -16,6 +16,7 @@ export class BannerSystem {
     const banner = this.activeBanners.get(laneIndex);
     if (banner) {
       // Update existing banner if needed, and reactivate it
+      const needsRedraw = banner.text !== text || banner.racer?.id !== racer?.id || banner.type !== type;
       banner.type = type;
       banner.text = text;
       banner.racer = racer;
@@ -23,16 +24,22 @@ export class BannerSystem {
       banner.startTime = Date.now();
       banner.duration = duration;
       banner.targetX = 20; // Slide in
+      if (needsRedraw) {
+        this.preRenderBanner(banner);
+      }
     } else {
       // Create a new banner, starting off-screen
-      this.activeBanners.set(laneIndex, {
+      const newBanner = {
         laneIndex, text, type, racer, duration,
         active: true,
         startTime: Date.now(),
         x: (window.innerWidth / (window.devicePixelRatio || 1)) + 100, // Start off-screen right
         targetX: 20, // Target on-screen left
         opacity: 0,
-      });
+        canvas: null, // for pre-rendering
+      };
+      this.activeBanners.set(laneIndex, newBanner);
+      this.preRenderBanner(newBanner);
     }
   }
 
@@ -78,7 +85,16 @@ export class BannerSystem {
           this.hideBanner(laneIndex);
       }
       
-      this.renderSingleBanner(ctx, banner, w, h, laneHeight, laneIndex, camera, renderProps);
+      if (banner.canvas) {
+        const laneY = (laneIndex * laneHeight + laneHeight/2 - (laneHeight * renderProps.numberOfLanes)/2) * camera.zoom + h/2;
+        const bannerHeight = laneHeight * camera.zoom;
+        const bannerY = laneY - bannerHeight/2;
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, Math.min(1, banner.opacity));
+        ctx.drawImage(banner.canvas, banner.x, bannerY, banner.canvas.width / dpr, bannerHeight);
+        ctx.restore();
+      }
     }
     
     ctx.restore();
@@ -107,25 +123,50 @@ export class BannerSystem {
     return null;
   }
 
-  renderSingleBanner(ctx, banner, w, h, laneHeight, laneIndex, camera, renderProps) {
-    // Resolve racer reference: banner.racer may be an object, an id, or undefined.
+  preRenderBanner(banner) {
+    // Resolve racer reference
     let racer = banner.racer;
     if (typeof racer === 'number' || typeof racer === 'string') {
-      // try to find racer object by id from common global locations
       const gs = (window.app && window.app.gameState) || window.gameState || (window.app && window.app.gameStateManager);
       racer = gs?.racers ? gs.racers.find(r => r.id === (typeof racer === 'string' ? parseInt(racer,10) : racer)) : null;
     } else if (!racer) {
       const gs = (window.app && window.app.gameState) || window.gameState || (window.app && window.app.gameStateManager);
-      // try to resolve by laneIndex using current race if available
       const currentRace = gs?.currentRace || (window.app && window.app.currentRace);
-      const rid = currentRace?.racers?.[laneIndex];
+      const rid = currentRace?.racers?.[banner.laneIndex];
       racer = rid != null ? (gs?.racers ? gs.racers.find(r => r.id === rid) : null) : null;
     }
-    if (!racer) {
-      // Nothing sensible to draw; skip gracefully
-      return;
-    }
+    if (!racer) return; // Cannot render without racer data
 
+    const dpr = window.devicePixelRatio || 1;
+    const tempCtx = document.createElement('canvas').getContext('2d');
+    
+    const bannerHeight = 80; // Use a high-res height for pre-rendering
+    const nameFontSize = Math.max(12, bannerHeight * 0.45);
+    tempCtx.font = `900 ${nameFontSize}px Orbitron`;
+    const nameMetrics = tempCtx.measureText(banner.text.toUpperCase());
+    const nameWidth = nameMetrics.width;
+
+    const numberCircleRadius = bannerHeight * 0.5;
+    const nameBarPadding = bannerHeight * 0.4;
+    const totalNameBarWidth = nameWidth + nameBarPadding * 2;
+    const slant = bannerHeight * 0.4;
+    
+    const canvasWidth = totalNameBarWidth + slant + numberCircleRadius + 20; // Add padding for shadow
+
+    if (!banner.canvas) {
+      banner.canvas = document.createElement('canvas');
+    }
+    banner.canvas.width = canvasWidth * dpr;
+    banner.canvas.height = (bannerHeight + 20) * dpr;
+    const ctx = banner.canvas.getContext('2d');
+    
+    ctx.scale(dpr, dpr);
+    ctx.translate(0, 10); // Translate down for shadow room
+
+    this.renderSingleBanner(ctx, banner, racer, bannerHeight);
+  }
+
+  renderSingleBanner(ctx, banner, racer, bannerHeight) {
     // Safely read color indices and fall back to defaults
     const c0 = (Array.isArray(racer.colors) && racer.colors[0] != null) ? racer.colors[0] : 0;
     const c1 = (Array.isArray(racer.colors) && racer.colors[1] != null) ? racer.colors[1] : 1;
@@ -134,15 +175,12 @@ export class BannerSystem {
     const color2 = window.racerColors?.[c1] || '#999999';
     const color3 = window.racerColors?.[c2] || '#666666';
 
-    // Calculate vertical position based on lane, respecting camera zoom
-    const laneY = (laneIndex * laneHeight + laneHeight/2 - (laneHeight * renderProps.numberOfLanes)/2) * camera.zoom + h/2;
-    const bannerHeight = laneHeight * camera.zoom;
-    const bannerY = laneY - bannerHeight/2;
-
-    const startX = banner.x;
+    const startX = 0;
+    const laneY = bannerHeight / 2;
+    const bannerY = 0;
 
     ctx.save();
-    ctx.globalAlpha = Math.max(0, Math.min(1, banner.opacity));
+    ctx.globalAlpha = 1.0; // Opacity is handled when drawing the cached canvas
 
     const nameFontSize = Math.max(12, bannerHeight * 0.45);
     ctx.font = `900 ${nameFontSize}px Orbitron`;
