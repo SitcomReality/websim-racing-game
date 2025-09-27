@@ -31,13 +31,12 @@ export class FerretRenderer {
       "#171219", "#225560", "#7AC74F", "#F1DABF", "#08BDBD"
     ];
     
-    // Map the racer's color indices to actual hex colors
-    // Ensure we produce exactly three resolved color strings for body/stripe/accents
-    const colors = [
-      FerretColorUtils.getColor(racer, 0),
-      FerretColorUtils.getColor(racer, 1),
-      FerretColorUtils.getColor(racer, 2)
-    ];
+    // Map the racer's color indices to actual hex colors (robust fallback)
+    const colors = racer?.colors?.map(c => {
+      if (typeof c === 'string' && /^#([0-9a-f]{3}){1,2}$/i.test(c)) return c;
+      const idx = typeof c === 'number' ? c % palette.length : 0;
+      return palette[idx] || palette[0];
+    }) || [palette[0], palette[1], palette[2]];
     
     // Render ferret components
     // Use the bodyRenderer's main render method which coordinates all components
