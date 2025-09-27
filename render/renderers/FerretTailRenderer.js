@@ -12,10 +12,12 @@ export class FerretTailRenderer {
     // If body chain exists, extend its last segment and render a thick spline (like body)
     if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length >= 2) {
       const nodes = ferret.bodyChain.nodes, N = nodes.length;
-      const last = nodes[N - 1], prev = nodes[N - 2];
-      const dx = last.x - prev.x, dy = last.y - prev.y, L = Math.hypot(dx, dy) || 1;
-      const tip = { x: last.x - (dx / L) * (ferret.tail.length * 20), y: last.y - (dy / L) * (ferret.tail.length * 20) };
-      const pts = SplineUtils.samplePolyline(nodes.slice(Math.max(0, N - 3)), 12); pts.push(tip);
+      // use hip/root at the start of the chain instead of the last (head) node
+      const root = nodes[0], next = nodes[1];
+      const dx = next.x - root.x, dy = next.y - root.y, L = Math.hypot(dx, dy) || 1;
+      const tip = { x: root.x - (dx / L) * (ferret.tail.length * 20), y: root.y - (dy / L) * (ferret.tail.length * 20) };
+      const baseSeg = nodes.slice(0, Math.min(3, N));
+      const pts = SplineUtils.samplePolyline(baseSeg, 12); pts.push(tip);
       const startW = (ferret.tail.fluffiness || 1) * 5, endW = (ferret.tail.fluffiness || 1) * 2;
       SplineUtils.renderThickSpline(ctx, pts, startW, endW, colors[2]);
       return;
