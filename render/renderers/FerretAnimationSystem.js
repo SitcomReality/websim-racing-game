@@ -196,7 +196,8 @@ export class FerretAnimationSystem {
     // --- 3. Solve Verlet Chain ---
     const { nodes, prevNodes, restLengths, params, anchors } = chain;
     VerletChain.integrate(nodes, prevNodes, dt, params.damping);
-    VerletChain.updateAnchors(nodes, anchors.head, anchors.hip);
+    // FIX: Node 0 is Hip/Tail attachment (Hip Anchor), Node N-1 is Head attachment (Head Anchor)
+    VerletChain.updateAnchors(nodes, anchors.hip, anchors.head);
     VerletChain.satisfyConstraints(nodes, restLengths, params.iterations, params.stiffness);
     VerletChain.smoothCurvature(nodes, 0.1);
   }

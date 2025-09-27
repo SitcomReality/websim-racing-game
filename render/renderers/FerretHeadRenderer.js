@@ -14,9 +14,11 @@ export class FerretHeadRenderer {
   render(ctx, ferret, colors, time, racer) {
     // New: Position head based on the front of the particle chain
     if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length > 0) {
-      const headNode = ferret.bodyChain.nodes[0];
-      // Get tangent from the first two nodes to determine rotation
-      const nextNode = ferret.bodyChain.nodes.length > 1 ? ferret.bodyChain.nodes[1] : headNode; 
+      // FIX: Node 0 is Hip/Tail, Node N-1 is Head.
+      const N = ferret.bodyChain.nodes.length;
+      const headNode = ferret.bodyChain.nodes[N - 1];
+      // Get tangent from the last two nodes to determine rotation
+      const nextNode = N > 1 ? ferret.bodyChain.nodes[N - 2] : headNode; 
       const tangentX = headNode.x - nextNode.x;
       const tangentY = headNode.y - nextNode.y;
       const angle = Math.atan2(tangentY, tangentX);
