@@ -1,1 +1,88 @@
-```\n/**\n * FerretLookSystem - Manages eye tracking, blinking, and subtle facial expressions.\n */\nexport class FerretLookSystem{\n\n  /**\n   * Updates eye tracking and blinking state.\n   * @param {Object} ferret - The ferret animation data object.\n   * @param {Object} racer - The racer entity.\n   * @param {number} time - Current time in milliseconds.\n   * @param {Object} currentRace - Current race state.\n   */\n  static update(ferret, racer, time, currentRace) {\n    if (!currentRace || !currentRace.racers) return;\n\n    const myLaneIndex = currentRace.racers.indexOf(racer.id);\n    let targetFound = false;\n\n    // Check adjacent lanes for targets\n    for (let offset of [-1, 1]) {\n      const targetLane = myLaneIndex + offset;\n      if (targetLane >= 0 && targetLane < currentRace.racers.length) {\n        const targetRacerId = currentRace.racers[targetLane];\n        const targetX = currentRace.liveLocations[targetRacerId] || 0;\n        const myX = currentRace.liveLocations[racer.id] || 0;\n\n        // Only track if target is within reasonable distance (20% track length)\n        if (Math.abs(targetX - myX) < 20) {\n          ferret.eye.targetRid = targetRacerId;\n\n          // Calculate look direction based on relative position\n          const deltaX = targetX - myX;\n          const distance = Math.abs(deltaX);\n          const maxPupilOffset = 1.5;\n\n          if (distance > 1) {\n            // Horizontal offset proportional to proximity\n            ferret.eye.targetPupilX = Math.sign(deltaX) * Math.min(maxPupilOffset, distance / 10);\n            // Vertical offset towards the adjacent lane center (0.5 for slight vertical offset)\n            ferret.eye.targetPupilY = (offset * 0.5); \n          } else {\n            // Too close, look forward (1.0 is default forward direction)\n            ferret.eye.targetPupilX = 1;\n            ferret.eye.targetPupilY = 0;\n          }\n          targetFound = true;\n          break;\n        }\n      }\n    }\n\n    // Default to looking forward if no target\n    if (!targetFound) {\n      ferret.eye.targetRid = null;\n      ferret.eye.targetPupilX = 1;\n      ferret.eye.targetPupilY = 0;\n    }\n\n    // Smooth pupil movement (using fixed deltaTime approximation)\n    const moveSpeed = 3;\n    const deltaTime = 0.016; \n    ferret.eye.pupil.x += (ferret.eye.targetPupilX - ferret.eye.pupil.x) * deltaTime * moveSpeed;\n    ferret.eye.pupil.y += (ferret.eye.targetPupilY - ferret.eye.pupil.y) * deltaTime * moveSpeed;\n\n    // Blink logic\n    const dt = (ferret._blinkLastTime != null) ? (time - ferret._blinkLastTime) : 0;\n    ferret._blinkLastTime = time;\n    ferret.eye.blinkTimer -= dt;\n    if (!ferret.eye.isBlinking && ferret.eye.blinkTimer <= 0) {\n      ferret.eye.isBlinking = true;\n      ferret.eye.blinkPhase = 0;\n    }\n    if (ferret.eye.isBlinking) {\n      ferret.eye.blinkPhase += (dt || 16) * 0.0018; \n      if (ferret.eye.blinkPhase >= Math.PI) {\n        ferret.eye.isBlinking = false;\n        const nextBlink = 2 + (ferret.seed % 4000) / 1000; \n        ferret.eye.blinkTimer = nextBlink * 1000; // Store in ms\n        ferret.eye.blinkPhase = 0;\n      }\n    }\n\n    // Update eyelid expressions (mood)\n    const moodTimer = time * 0.0005 + racer.id; \n    ferret.eye.upperLid = 0.1 + Math.sin(moodTimer) * 0.05;\n    ferret.eye.lowerLid = 0.05 + Math.cos(moodTimer * 0.7) * 0.02;\n  }\n}\n\n\n```\n\n```
+/**
+ * FerretLookSystem - Manages eye tracking, blinking, and subtle facial expressions.
+ */
+export class FerretLookSystem {
+
+  /**
+   * Updates eye tracking and blinking state.
+   * @param {Object} ferret - The ferret animation data object.
+   * @param {Object} racer - The racer entity.
+   * @param {number} time - Current time in milliseconds.
+   * @param {Object} currentRace - Current race state.
+   */
+  static update(ferret, racer, time, currentRace) {
+    if (!currentRace || !currentRace.racers) return;
+
+    const myLaneIndex = currentRace.racers.indexOf(racer.id);
+    let targetFound = false;
+
+    // Check adjacent lanes for targets
+    for (let offset of [-1, 1]) {
+      const targetLane = myLaneIndex + offset;
+      if (targetLane >= 0 && targetLane < currentRace.racers.length) {
+        const targetRacerId = currentRace.racers[targetLane];
+        const targetX = currentRace.liveLocations[targetRacerId] || 0;
+        const myX = currentRace.liveLocations[racer.id] || 0;
+
+        // Only track if target is within reasonable distance (20% track length)
+        if (Math.abs(targetX - myX) < 20) {
+          ferret.eye.targetRid = targetRacerId;
+
+          // Calculate look direction based on relative position
+          const deltaX = targetX - myX;
+          const distance = Math.abs(deltaX);
+          const maxPupilOffset = 1.5;
+
+          if (distance > 1) {
+            // Horizontal offset proportional to proximity
+            ferret.eye.targetPupilX = Math.sign(deltaX) * Math.min(maxPupilOffset, distance / 10);
+            // Vertical offset towards the adjacent lane center (0.5 for slight vertical offset)
+            ferret.eye.targetPupilY = (offset * 0.5); 
+          } else {
+            // Too close, look forward (1.0 is default forward direction)
+            ferret.eye.targetPupilX = 1;
+            ferret.eye.targetPupilY = 0;
+          }
+          targetFound = true;
+          break;
+        }
+      }
+    }
+
+    // Default to looking forward if no target
+    if (!targetFound) {
+      ferret.eye.targetRid = null;
+      ferret.eye.targetPupilX = 1;
+      ferret.eye.targetPupilY = 0;
+    }
+
+    // Smooth pupil movement (using fixed deltaTime approximation)
+    const moveSpeed = 3;
+    const deltaTime = 0.016; 
+    ferret.eye.pupil.x += (ferret.eye.targetPupilX - ferret.eye.pupil.x) * deltaTime * moveSpeed;
+    ferret.eye.pupil.y += (ferret.eye.targetPupilY - ferret.eye.pupil.y) * deltaTime * moveSpeed;
+
+    // Blink logic
+    const dt = (ferret._blinkLastTime != null) ? (time - ferret._blinkLastTime) : 0;
+    ferret._blinkLastTime = time;
+    ferret.eye.blinkTimer -= dt;
+    if (!ferret.eye.isBlinking && ferret.eye.blinkTimer <= 0) {
+      ferret.eye.isBlinking = true;
+      ferret.eye.blinkPhase = 0;
+    }
+    if (ferret.eye.isBlinking) {
+      ferret.eye.blinkPhase += (dt || 16) * 0.0018; 
+      if (ferret.eye.blinkPhase >= Math.PI) {
+        ferret.eye.isBlinking = false;
+        const nextBlink = 2 + (ferret.seed % 4000) / 1000; 
+        ferret.eye.blinkTimer = nextBlink * 1000; // Store in ms
+        ferret.eye.blinkPhase = 0;
+      }
+    }
+
+    // Update eyelid expressions (mood)
+    const moodTimer = time * 0.0005 + racer.id; 
+    ferret.eye.upperLid = 0.1 + Math.sin(moodTimer) * 0.05;
+    ferret.eye.lowerLid = 0.05 + Math.cos(moodTimer * 0.7) * 0.02;
+  }
+}
