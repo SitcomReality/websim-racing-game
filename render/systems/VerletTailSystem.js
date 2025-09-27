@@ -1,1 +1,53 @@
-```javascript\nimport { VerletChain } from \"verlet-chain\";\n\n/**\n * VerletTailSystem - Manages the physics simulation and anchoring for the ferret tail chain.\n */\nexport class VerletTailSystem {\n  /**\n   * Updates the tail chain state based on body movement and gravity/ground constraints.\n   * @param {Object} ferret - The ferret animation data object.\n   * @param {Object} racer - The racer entity.\n   * @param {number} dt - Delta time in seconds.\n   */\n  static update(ferret, racer, dt) {\n    const tail = ferret.tailChain;\n    const body = ferret.bodyChain;\n\n    // Need at least body node 0 and 1 to define orientation. Tail needs at least 2 nodes (0 and 1).\n    if (!tail?.nodes || tail.nodes.length < 2 || !body?.nodes || body.nodes.length < 2 || !tail.enabled) return; \n\n    // 1. Anchor tail base (P0) to the hip node of the body (node 0)\n    const hipNode = body.nodes[0];\n    tail.anchors.base.x = hipNode.x;\n    tail.anchors.base.y = hipNode.y;\n\n    // --- 2. Solve Verlet Chain for the tail ---\n    VerletChain.integrate(tail.nodes, tail.prevNodes, dt, tail.params.damping);\n    \n    // Apply gravity\n    VerletChain.applyGravity(tail.nodes, 9.8);\n    \n    // Apply ground constraint (Y=15 is floor level for ferret body/feet based on LegRenderer)\n    const GROUND_Y = 15;\n    const friction = 0.6; // Moderate drag\n    VerletChain.applyGroundConstraint(tail.nodes, tail.prevNodes, GROUND_Y, friction, dt);\n\n    // 3. Pin the base of the tail (nodes[0]) to its anchor\n    VerletChain.updateAnchors(tail.nodes, tail.anchors.base, null); // Only front anchor\n\n    // 4. Apply Rigid Orientation Constraint to segment 0-1 (post-anchor pin)\n    \n    const tailP0 = tail.nodes[0];\n    const tailP1 = tail.nodes[1];\n\n    // Calculate body segment 0-1 vector (pointing towards head/forward)\n    const bodyP0 = body.nodes[0];\n    const bodyP1 = body.nodes[1];\n    \n    let Vx = bodyP1.x - bodyP0.x;\n    let Vy = bodyP1.y - bodyP0.y;\n    let L = Math.sqrt(Vx*Vx + Vy*Vy);\n    \n    if (L > 0.001) {\n      // Normalized tangent of body segment (forward direction)\n      const Tx = Vx / L;\n      const Ty = Vy / L;\n      \n      const tailRestLength = tail.restLengths[0];\n      \n      // Normalized vector perpendicular to body tangent (Down relative to body cross section)\n      const Nx = -Ty; \n      const Ny = Tx;\n      \n      // Target tail direction: mostly backward (-Tx, -Ty), slightly rotated downwards relative to body frame\n      const downwardBiasFactor = 0.3; // Controls initial droop relative to body plane (Reduced from 0.5 to improve perpendicular alignment)\n      const targetTailDx = -Tx + Nx * downwardBiasFactor;\n      const targetTailDy = -Ty + Ny * downwardBiasFactor;\n      \n      const targetDirLength = Math.sqrt(targetTailDx*targetTailDx + targetTailDy*targetTailDy);\n      const DirTx = targetTailDx / targetDirLength;\n      const DirTy = targetTailDy / targetDirLength;\n      \n      const targetX1 = tailP0.x + DirTx * tailRestLength;\n      const targetY1 = tailP0.y + DirTy * tailRestLength;\n      \n      // Apply position constraint to tail.nodes[1] (strong correction towards desired orientation)\n      const orientationStiffness = 0.9; \n      \n      // P_new = P_current + (P_target - P_current) * stiffness\n      tailP1.x += (targetX1 - tailP1.x) * orientationStiffness;\n      tailP1.y += (targetY1 - tailP1.y) * orientationStiffness;\n    }\n\n    // 5. Satisfy constraints (distance)\n    VerletChain.satisfyConstraints(tail.nodes, tail.restLengths, tail.params.iterations, tail.params.stiffness);\n    VerletChain.smoothCurvature(tail.nodes, 0.1);\n  }\n}\n```
+import { VerletChain } from "verlet-chain";
+
+export class VerletTailSystem {
+  static update(ferret, racer, dt) {
+    const tail = ferret.tailChain;
+    const body = ferret.bodyChain;
+
+    if (!tail?.nodes || tail.nodes.length < 2 || !body?.nodes || body.nodes.length < 2 || !tail.enabled) return;
+
+    const hipNode = body.nodes[0];
+    tail.anchors.base.x = hipNode.x;
+    tail.anchors.base.y = hipNode.y;
+
+    VerletChain.integrate(tail.nodes, tail.prevNodes, dt, tail.params.damping);
+    VerletChain.applyGravity(tail.nodes, 9.8);
+    const GROUND_Y = 15;
+    const friction = 0.6;
+    VerletChain.applyGroundConstraint(tail.nodes, tail.prevNodes, GROUND_Y, friction, dt);
+
+    VerletChain.updateAnchors(tail.nodes, tail.anchors.base, null);
+
+    const tailP0 = tail.nodes[0];
+    const tailP1 = tail.nodes[1];
+    const bodyP0 = body.nodes[0];
+    const bodyP1 = body.nodes[1];
+    
+    let Vx = bodyP1.x - bodyP0.x;
+    let Vy = bodyP1.y - bodyP0.y;
+    let L = Math.sqrt(Vx*Vx + Vy*Vy);
+    
+    if (L > 0.001) {
+      const Tx = Vx / L;
+      const Ty = Vy / L;
+      const tailRestLength = tail.restLengths[0];
+      const Nx = -Ty;
+      const Ny = Tx;
+      const downwardBiasFactor = 0.3;
+      const targetTailDx = -Tx + Nx * downwardBiasFactor;
+      const targetTailDy = -Ty + Ny * downwardBiasFactor;
+      const targetDirLength = Math.sqrt(targetTailDx*targetTailDx + targetTailDy*targetTailDy);
+      const DirTx = targetTailDx / targetDirLength;
+      const DirTy = targetTailDy / targetDirLength;
+      const targetX1 = tailP0.x + DirTx * tailRestLength;
+      const targetY1 = tailP0.y + DirTy * tailRestLength;
+      const orientationStiffness = 0.9;
+      tailP1.x += (targetX1 - tailP1.x) * orientationStiffness;
+      tailP1.y += (targetY1 - tailP1.y) * orientationStiffness;
+    }
+
+    VerletChain.satisfyConstraints(tail.nodes, tail.restLengths, tail.params.iterations, tail.params.stiffness);
+    VerletChain.smoothCurvature(tail.nodes, 0.1);
+  }
+}
