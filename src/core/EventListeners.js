@@ -26,6 +26,11 @@ export class EventListeners {
       this.app.raceManager.startRace();
     }); 
 
+    // Manual end race now
+    this.app.eventBus.on('race:endNow', () => {
+      this.app.raceManager.endRaceNow();
+    });
+
     // Betting events
     this.app.eventBus.on('bet:placed', (betData) => {
       this.app.uiManager.refreshComponents();

@@ -49,6 +49,7 @@ export class GameScreen {
           <div class="ui-item"><button id="startRaceWeek" class="btn btn-primary">Start Race Week</button></div>
           <div class="ui-item"><button id="setupRace" disabled class="btn btn-secondary">Setup Race</button></div>
           <div class="ui-item"><button id="startRace" disabled class="btn btn-primary">Start Race</button></div>
+          <div class="ui-item"><button id="endRaceNow" disabled class="btn btn-outline">End Race Now</button></div>
         </div>
         <div class="header-right">
           <div class="ui-item stat"><span id="playerBalanceLabel">Player Balance:</span> <span id="playerBalance">$1000</span></div>
@@ -149,6 +150,7 @@ export class GameScreen {
     const startRaceWeekBtn = this.element.querySelector('#startRaceWeek');
     const setupRaceBtn = this.element.querySelector('#setupRace');
     const startBtn = this.element.querySelector('#startRace');
+    const endNowBtn = this.element.querySelector('#endRaceNow');
 
     if (startRaceWeekBtn) {
       startRaceWeekBtn.addEventListener('click', () => {
@@ -170,11 +172,20 @@ export class GameScreen {
       startBtn.addEventListener('click', () => {
         this.eventBus.emit('race:start');
         startBtn.disabled = true;
+        if (endNowBtn) endNowBtn.disabled = false;
       });
     }
 
     // Bind tab events
     this.bindTabEvents();
+
+    // Manual end race now
+    if (endNowBtn) {
+      endNowBtn.addEventListener('click', () => {
+        this.eventBus.emit('race:endNow');
+        endNowBtn.disabled = true;
+      });
+    }
   }
 
   onRaceWeekStarted(data) {
@@ -212,6 +223,8 @@ export class GameScreen {
     this.hudComponent.setStep(4, 'done');
     this.hudComponent.setStatus('The race is on!');
     this.renderManager.start();
+    const endNowBtn = this.element.querySelector('#endRaceNow');
+    if (endNowBtn) endNowBtn.disabled = false;
   }
   
   onCountdownStarted(data) {
@@ -224,7 +237,7 @@ export class GameScreen {
 
   onRaceFinish(raceData) {
     this.renderManager.stop();
-    this.hudComponent.setStep(3, 'active'); // Ready for next race setup
+    this.hudComponent.setStep(3, 'active'); 
     this.hudComponent.setStep(4, ''); 
     this.hudComponent.setStatus('Race finished! View results in History. Setup the next race.');
 
@@ -234,6 +247,7 @@ export class GameScreen {
     const setupRaceBtn = this.element.querySelector('#setupRace');
     const startBtn = this.element.querySelector('#startRace');
     const startRaceWeekBtn = this.element.querySelector('#startRaceWeek');
+    const endNowBtn = this.element.querySelector('#endRaceNow');
     
     const gameState = this.gameState;
     if (gameState.currentRaceIndex >= gameState.raceWeek.races.length) {
@@ -246,6 +260,7 @@ export class GameScreen {
       setupRaceBtn.disabled = false;
     }
     startBtn.disabled = true;
+    if (endNowBtn) endNowBtn.disabled = true;
   }
 
   updateRaceHistory(raceData) {

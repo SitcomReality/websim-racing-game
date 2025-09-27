@@ -387,4 +387,51 @@ export class RaceManager {
   getRaceResults() {
     return this.currentRace ? this.currentRace.results : [];
   }
+
+  /**
+   * Immediately finalize race based on current positions
+   */
+  endRaceNow() {
+    if (!this.currentRace) return;
+    this.gameState.running = false;
+
+    // Build standings by current liveLocations (desc)
+    const locs = this.currentRace.liveLocations;
+    const ids = [...this.currentRace.racers];
+    ids.sort((a, b) => {
+      const la = (locs[a] ?? 0);
+      const lb = (locs[b] ?? 0);
+      if (lb !== la) return lb - la;
+      // Tie-breaker: earlier finishedAt first, else stable by id
+      const fa = this.currentRace.finishedAt[a] ?? Infinity;
+      const fb = this.currentRace.finishedAt[b] ?? Infinity;
+      if (fa !== fb) return fa - fb;
+      return String(a).localeCompare(String(b));
+    });
+
+    this.currentRace.results = [];
+    ids.forEach((racerId, idx) => {
+      this.currentRace.results.push(racerId);
+      const racer = this.gameState.racers.find(r => r.id === racerId);
+      if (racer) {
+        racer.visual.finished = true;
+        racer.didNotFinish = false;
+        racer.updateRacerHistory(this.currentRace.id, idx + 1);
+      }
+    });
+
+    if (this.raceTimer) {
+      clearInterval(this.raceTimer);
+      this.raceTimer = null;
+    }
+    this.raceEndCountdown = null;
+
+    this.eventBus.emit('race:finish', {
+      race: this.currentRace,
+      results: this.currentRace.results
+    });
+
+    this.gameState.currentRaceIndex = (this.gameState.currentRaceIndex || 0) + 1;
+    this.currentRace = null;
+  }
 }
