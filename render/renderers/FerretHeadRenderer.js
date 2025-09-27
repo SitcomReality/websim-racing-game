@@ -18,9 +18,9 @@ export class FerretHeadRenderer {
       const N = ferret.bodyChain.nodes.length;
       const headNode = ferret.bodyChain.nodes[N - 1];
       // Get tangent from the last two nodes to determine rotation
-      const nextNode = N > 1 ? ferret.bodyChain.nodes[N - 2] : headNode; 
-      const tangentX = headNode.x - nextNode.x;
-      const tangentY = headNode.y - nextNode.y;
+      const prevNode = N > 1 ? ferret.bodyChain.nodes[N - 2] : headNode; 
+      const tangentX = headNode.x - prevNode.x;
+      const tangentY = headNode.y - prevNode.y;
       const angle = Math.atan2(tangentY, tangentX);
       
       ctx.save();
