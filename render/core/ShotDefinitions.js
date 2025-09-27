@@ -138,20 +138,25 @@ export const shotDefinitions = {
   finish_focus: {
     updateRacers: (race, gameState) => {
       const now = Date.now();
-      const recentFinishers = (race.results || []).filter(rid => {
-        const t = race.finishedAt?.[rid];
-        return t && (now - t) < 1500;
-      }).slice(-2);
-      if (recentFinishers.length > 0) return recentFinishers;
+      const recentFinishers = (race.results || [])
+        .filter(rid => {
+          const t = race.finishedAt?.[rid];
+          return t && (now - t) < 1800; // track finishers a bit longer
+        })
+        .slice(-3);
+      if (recentFinishers.length >= 3) return recentFinishers;
+      // Top up with current leaders near finish to always frame up to 3
       const active = race.racers.filter(rid => {
         const t = race.finishedAt?.[rid];
-        return !t || (Date.now() - t) < 1500;
+        return !t || (now - t) < 1500;
       }).filter(rid => !(race.results || []).includes(rid));
       const sorted = [...active].sort((a,b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-      return sorted.slice(0, 1);
+      const nearFinish = sorted.filter(rid => (race.liveLocations[rid] || 0) >= 85);
+      const padded = [...recentFinishers, ...nearFinish].slice(0, 3);
+      return padded.length ? padded : sorted.slice(0, 1);
     },
-    margin: 6,
-    minSpan: 8,
+    margin: 4,
+    minSpan: 6,
     lookahead: 0,
     priority: 'tight',
     tightSpanThreshold: 8,

@@ -14,6 +14,7 @@ export class RaceDirector {
     this.minShotDuration = 3000;
     this.lastShotChangeSection = -1;
     this.currentTransition = { urgency: 'smooth', suggestedDamping: { pan: 0.10, zoom: 0.10 } };
+    this.finishGraceMs = 1200; // ensure camera holds on finishers briefly
 
     // Initialize subsystems
     this.eventManager = new RaceEventManager();

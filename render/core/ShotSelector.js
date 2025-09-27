@@ -59,7 +59,12 @@ export class ShotSelector {
 
     // Calculate recent finish drama (4 seconds is sufficient to view the crossing)
     const timeSinceLastFinish = now - (raceAnalysis.lastFinishTime || 0);
-    const isRecentFinishDrama = timeSinceLastFinish < 2500; 
+    const isWithinFinishGrace = timeSinceLastFinish < (this.director.finishGraceMs || 500);
+    const isRecentFinishDrama = timeSinceLastFinish < 2500;
+    if (isWithinFinishGrace) {
+      this.trySetShot('finish_focus', now, currentSection, isSameSection, true);
+      return;
+    }
 
     // 1. FINISH LINE SEQUENCE - ABSOLUTE TOP PRIORITY
     if (leaderPos >= 92 || (isRecentFinishDrama && leaderPos >= 85)) {
