@@ -133,7 +133,10 @@ export class CameraCalculator {
 
     // Special handling for finish line shots - much less aggressive
     if (shotDef === shotDefinitions.finish_approach || shotDef === shotDefinitions.finish_focus) {
-      targetX = Math.max(targetX, 88); // Reduced from 92, less finish line leading
+      const maxPos = Math.max(...positions);
+      if (maxPos >= 90) {
+        targetX = Math.max(targetX, 88);
+      }
     }
 
     // Ensure target stays within track bounds

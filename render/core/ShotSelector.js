@@ -59,19 +59,16 @@ export class ShotSelector {
 
     // Calculate recent finish drama (4 seconds is sufficient to view the crossing)
     const timeSinceLastFinish = now - (raceAnalysis.lastFinishTime || 0);
-    const isRecentFinishDrama = timeSinceLastFinish < 4000; 
+    const isRecentFinishDrama = timeSinceLastFinish < 2500; 
 
     // 1. FINISH LINE SEQUENCE - ABSOLUTE TOP PRIORITY
-    if (leaderPos >= 92 || isRecentFinishDrama) {
-        
-        // Use 'finish_focus' if the leader is crossing (>=95%) or if someone just finished (recent drama)
-        if (leaderPos >= 95 || isRecentFinishDrama) {
-            this.trySetShot('finish_focus', now, currentSection, isSameSection, true);
-        } else {
-            // Use 'finish_approach' if leader is approaching (92% to 95%)
-            this.trySetShot('finish_approach', now, currentSection, isSameSection, true);
-        }
-        return;
+    if (leaderPos >= 92 || (isRecentFinishDrama && leaderPos >= 85)) {
+      if (leaderPos >= 95 || isRecentFinishDrama) {
+        this.trySetShot('finish_focus', now, currentSection, isSameSection, true);
+      } else {
+        this.trySetShot('finish_approach', now, currentSection, isSameSection, true);
+      }
+      return;
     }
     
     // 2. START OF RACE
