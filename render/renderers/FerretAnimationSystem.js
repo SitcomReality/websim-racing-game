@@ -96,6 +96,9 @@ export class FerretAnimationSystem {
     ferret._lastX = liveX;
     ferret._lastTime = time;
 
+    // Store signed forward velocity (percent/sec), positive when moving right
+    ferret._forwardVel = ((deltaX >= 0) ? 1 : -1) * speedPctPerSec;
+
     // Initialize ear state
     ferret.ear = ferret.ear || { value: 0, anim: null, reverse: false };
 
@@ -212,7 +215,18 @@ export class FerretAnimationSystem {
     const { nodes, prevNodes, restLengths, params, anchors } = tail;
     anchors.base.x = hip.x; anchors.base.y = hip.y;
     VerletChain.integrate(nodes, prevNodes, dt, params.damping);
-    for (let i = 1; i < nodes.length; i++) { nodes[i].y += 0.9; nodes[i].x += sway * 0.02; } // mild gravity+sway
+    // Apply gravity reduced by speed, and horizontal drag to trail behind movement
+    const speed = Math.abs(ferret._forwardVel || 0);
+    const dir = ferret._forwardVel >= 0 ? 1 : -1;
+    const gravity = 0.9 * (1 - Math.min(0.6, speed * 0.03)); // lift slightly with speed
+    const trail = (ferret.tail?.followFactor || 0.3);
+    for (let i = 1; i < nodes.length; i++) {
+      nodes[i].y += gravity;
+      // Drag opposite to motion so tail lags behind; bias left/back even at low speed
+      nodes[i].x += (-dir * Math.min(8, speed * 0.2) - 3 * trail) * dt;
+      // Keep a touch of gait sway for life
+      nodes[i].x += sway * 0.02;
+    }
     VerletChain.updateAnchors(nodes, anchors.base, anchors.tip);
     VerletChain.satisfyConstraints(nodes, restLengths, params.iterations, params.stiffness);
     VerletChain.smoothCurvature(nodes, 0.12);
