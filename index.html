@@ -25,7 +25,6 @@
     <link rel="stylesheet" href="styles/components/racers.css">
     <link rel="stylesheet" href="styles/components/settings.css">
     <link rel="stylesheet" href="styles/components/loading.css">
-    <link rel="stylesheet" href="styles/components/banners.css">
     <link rel="stylesheet" href="styles/components/header.css">
     <link rel="stylesheet" href="styles/components/history.css">
     <link rel="stylesheet" href="styles/components/intro-screen.css">
@@ -38,6 +37,10 @@
     <link rel="stylesheet" href="styles/components/memphis/track-preview.css">
     <link rel="stylesheet" href="styles/components/memphis/podium.css">
     <link rel="stylesheet" href="styles/components/memphis/comic-elements.css">
+    <link rel="stylesheet" href="styles/components/memphis/newspaper.css">
+    <link rel="stylesheet" href="styles/components/memphis/week-recap-panel.css">
+    <link rel="stylesheet" href="styles/components/memphis/standings-panel.css">
+    <link rel="stylesheet" href="styles/components/memphis/earnings-panel.css">
 
     <!-- Utility Styles -->
     <link rel="stylesheet" href="styles/utilities/helpers.css">
@@ -54,6 +57,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body data-theme="memphis">
+    <!-- Permanent header -->
+    <div id="header">
+        <div class="header-left">
+            <span class="logo" style="font-size:1.2rem;">Ferret Frenzy</span>
+        </div>
+        <div class="header-right">
+            <div id="headerMoney" class="money-display">$0</div>
+            <button id="headerSettingsBtn" class="btn btn-primary btn-memphis btn-small">Settings</button>
+        </div>
+    </div>
     <div id="no-js" style="text-align:center;background-color:white;width:80%;margin:5% 10%;color:#391d1d;padding:2px 4px 12px 4px;border:3px dashed #ff6000;z-index:99999;position:fixed;">
         <h2 style="color:red;">No JavaScript?</h2>
         <p style="font-weight:bold;">JavaScript is required for this page to work.</p>
