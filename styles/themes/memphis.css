@@ -14,77 +14,70 @@ body[data-theme="memphis"] {
     background: linear-gradient(to bottom, #fff, #f7d4a5, #9a2d4b) no-repeat;
 }
 
+/* Memphis headings on dark backgrounds - enhanced contrast */
+body[data-theme="memphis"] .gui-container h1,
+body[data-theme="memphis"] .gui-container h2,
+body[data-theme="memphis"] .gui-container h3,
+body[data-theme="memphis"] .gui-container h4 {
+    color: #ffffff;
+    text-shadow: 
+        0 0 10px rgba(255,212,0,0.8),
+        0 0 20px rgba(255,212,0,0.6),
+        0 0 30px rgba(255,212,0,0.4),
+        2px 2px 4px rgba(0,0,0,0.8);
+    background: linear-gradient(135deg, var(--accent-3), #fff176);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+body[data-theme="memphis"] .gui-container h1::after,
+body[data-theme="memphis"] .gui-container h2::after,
+body[data-theme="memphis"] .gui-container h3::after,
+body[data-theme="memphis"] .gui-container h4::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--accent-3), var(--accent-2));
+    border-radius: 2px;
+}
+
+body[data-theme="memphis"] .gui-container h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+body[data-theme="memphis"] .gui-container h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+body[data-theme="memphis"] .gui-container h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+body[data-theme="memphis"] .gui-container h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
 body[data-theme="memphis"] .gui-container {
     border: 4px solid var(--border-color);
     border-radius: 14px;
     padding: 24px;
     background: rgba(0, 0, 0, 0.85);
     box-shadow: 8px 8px 0 #141414, 0 2px 20px rgba(0,0,0,0.08);
-}
-
-/* Enhanced typography for Memphis theme */
-body[data-theme="memphis"] h1,
-body[data-theme="memphis"] h2,
-body[data-theme="memphis"] h3,
-body[data-theme="memphis"] h4,
-body[data-theme="memphis"] h5,
-body[data-theme="memphis"] h6 {
-    color: #ffffff;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-}
-
-body[data-theme="memphis"] h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-}
-
-body[data-theme="memphis"] h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-body[data-theme="memphis"] h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-/* High contrast headings for dark backgrounds */
-body[data-theme="memphis"] .gui-container h1,
-body[data-theme="memphis"] .gui-container h2,
-body[data-theme="memphis"] .gui-container h3,
-body[data-theme="memphis"] .gui-container h4,
-body[data-theme="memphis"] .gui-container h5,
-body[data-theme="memphis"] .gui-container h6 {
-    color: #ffffff;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.7), 0 0 10px rgba(255,255,255,0.1);
-}
-
-/* Special styling for section headers within gui containers */
-body[data-theme="memphis"] .gui-container .section-header,
-body[data-theme="memphis"] .gui-container .panel-header,
-body[data-theme="memphis"] .gui-container .category-toggle {
-    color: #ffd400;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
-    font-weight: 700;
-}
-
-/* Ensure track titles and race headers are visible */
-body[data-theme="memphis"] .track-title-memphis,
-body[data-theme="memphis"] .race-results-title-memphis,
-body[data-theme="memphis"] .podium-title-memphis,
-body[data-theme="memphis"] .week-title {
-    color: #ffffff;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.6), 0 0 15px rgba(255,255,255,0.2);
-}
-
-/* Betting and stats headers */
-body[data-theme="memphis"] .payout-title-memphis,
-body[data-theme="memphis"] .results-subtitle-memphis,
-body[data-theme="memphis"] .roster-title {
-    color: #00c2ff;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.7);
 }
 
 .race-week-container {
