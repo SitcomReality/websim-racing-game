@@ -9,7 +9,7 @@ export class PreRaceScreen {
     this.el.innerHTML = `<div class="ui gui-container pre-race-grid">
       <div class="pre-race-track" id="preRaceTrack" style="grid-column: 1 / -1;"></div>
       <div class="pre-race-participants">
-        <h3>Participants & Betting</h3>
+        <h3 class="pre-race-header-memphis">Participants & Betting</h3>
         <div class="racers-list pre-race-racers-list" id="prsRacers"></div>
         <div class="pre-race-actions"><button id="prsStart" class="btn btn-primary">Start Race</button></div>
       </div>

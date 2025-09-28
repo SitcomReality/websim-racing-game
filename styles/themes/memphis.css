@@ -14,64 +14,6 @@ body[data-theme="memphis"] {
     background: linear-gradient(to bottom, #fff, #f7d4a5, #9a2d4b) no-repeat;
 }
 
-/* Memphis headings on dark backgrounds - enhanced contrast */
-body[data-theme="memphis"] .gui-container h1,
-body[data-theme="memphis"] .gui-container h2,
-body[data-theme="memphis"] .gui-container h3,
-body[data-theme="memphis"] .gui-container h4 {
-    color: #ffffff;
-    text-shadow: 
-        0 0 10px rgba(255,212,0,0.8),
-        0 0 20px rgba(255,212,0,0.6),
-        0 0 30px rgba(255,212,0,0.4),
-        2px 2px 4px rgba(0,0,0,0.8);
-    background: linear-gradient(135deg, var(--accent-3), #fff176);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: 1px;
-    position: relative;
-}
-
-body[data-theme="memphis"] .gui-container h1::after,
-body[data-theme="memphis"] .gui-container h2::after,
-body[data-theme="memphis"] .gui-container h3::after,
-body[data-theme="memphis"] .gui-container h4::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-color), var(--accent-3), var(--accent-2));
-    border-radius: 2px;
-}
-
-body[data-theme="memphis"] .gui-container h1 {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-}
-
-body[data-theme="memphis"] .gui-container h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-body[data-theme="memphis"] .gui-container h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    letter-spacing: 1px;
-}
-
-body[data-theme="memphis"] .gui-container h4 {
-    font-size: 1.2rem;
-    margin-bottom: 0.8rem;
-}
-
 body[data-theme="memphis"] .gui-container {
     border: 4px solid var(--border-color);
     border-radius: 14px;
