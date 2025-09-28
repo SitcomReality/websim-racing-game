@@ -56,13 +56,6 @@ export class IntroScreen {
         this.showLoadingIndicator();
         // Use a short timeout to allow the UI to update before starting the heavy work.
         setTimeout(() => {
-           const afterInitToWeek = ({ name }) => {
-             if (name === 'GameScreen') {
-               this.eventBus.off('screen:changed', afterInitToWeek);
-               this.eventBus.emit('race:startWeek');
-             }
-           };
-           this.eventBus.on('screen:changed', afterInitToWeek);
             this.eventBus.emit('game:initialize');
         }, 100);
       });
