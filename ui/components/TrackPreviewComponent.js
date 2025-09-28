@@ -36,31 +36,35 @@ export class TrackPreviewComponent extends BaseComponent {
 
         const participants = this.raceData.participants ? this.raceData.participants.length : 0;
         const groundTypesList = [...new Set(this.track.sections)];
+        const totalSegments = this.raceData.segments?.length || 0;
         const numberOfSections = this.track.sections.length;
         
-        // Only show a concise surface list and a centered visual preview
         const sectionsHtml = this.renderTrackSections();
 
         this.element.className = 'track-preview-memphis';
         this.element.innerHTML = `
             ${this.raceData.showWeather && this.raceData.weather ? `<div class="weather-badge-memphis">${String(this.raceData.weather).toUpperCase()}</div>` : ''}
             <h3 class="track-title-memphis">
+                <span class="race-index">Race ${this.raceData.raceIndex}:</span> 
                 <span class="track-name-display">${this.track.name || 'Unknown Track'}</span>
             </h3>
             
-             <div class="track-info-summary-memphis">
+            <div class="track-info-summary-memphis">
                 <div class="track-info-label-memphis">Surfaces:</div>
                 <div class="track-info-value-memphis">${groundTypesList.join(', ')}</div>
-             </div>
+            </div>
 
-             <div class="track-visual-memphis track-sections-visual">
-                 <div class="track-path-container">${sectionsHtml}</div>
-             </div>
+            <div class="track-visual-memphis track-sections-visual">
+                <div class="track-path-container">${sectionsHtml}</div>
+                <div class="segment-count-indicator-memphis">
+                    ${totalSegments} Segments
+                </div>
+            </div>
             
-             <div class="participant-count-memphis">
-                 ${participants} Racers
-             </div>
-         `;
+            <div class="participant-count-memphis">
+                ${participants} Racers
+            </div>
+        `;
 
         this.addInteractivity();
     }

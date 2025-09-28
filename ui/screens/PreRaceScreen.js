@@ -6,13 +6,12 @@ export class PreRaceScreen {
   create() {
     this.el = document.createElement('div');
     this.el.id = 'preRaceScreen';
-    // Use a stacked layout: full-width track visual on top, participants/betting below
-    this.el.innerHTML = `<div class="ui gui-container pre-race-stack">
-      <div class="pre-race-track" id="preRaceTrack" style="width:100%;"></div>
-      <div class="pre-race-participants" style="margin-top:16px;">
+    this.el.innerHTML = `<div class="ui gui-container pre-race-grid">
+      <div class="pre-race-track" id="preRaceTrack" style="grid-column: 1 / -1;"></div>
+      <div class="pre-race-participants">
         <h3>Participants & Betting</h3>
         <div class="racers-list pre-race-racers-list" id="prsRacers"></div>
-        <div class="pre-race-actions" style="margin-top:12px;"><button id="prsStart" class="btn btn-primary">Start Race</button></div>
+        <div class="pre-race-actions"><button id="prsStart" class="btn btn-primary">Start Race</button></div>
       </div>
     </div>`;
     this.el.querySelector('#prsStart').addEventListener('click', () => this.eventBus.emit('race:start'));

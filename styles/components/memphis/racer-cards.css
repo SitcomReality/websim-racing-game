@@ -133,23 +133,17 @@
 .racer-odds-memphis {
     background: var(--accent-5);
     color: white;
-    padding: 6px 10px;
+    padding: 4px 8px;
     border-radius: 12px;
     font-size: 12px;
     font-weight: bold;
     position: absolute;
-    bottom: 8px;
+    top: 8px;
     right: 8px;
-    z-index: 1; /* allow action buttons appended after card to appear above if needed */
+    bottom: auto; /* avoid overlap with bet button */
 }
 
-.racer-card-memphis.compact .racer-odds-memphis {
-    bottom: 8px;
-    right: 8px;
-    font-size: 11px;
-    padding: 4px 8px;
-}
-
+.racer-card-memphis.compact .racer-odds-memphis,
 .racer-card-memphis.compact .racer-position-memphis { display: none; }
 
 .racer-card-memphis.compact .color-swatch-memphis {
@@ -167,10 +161,4 @@
     to { box-shadow: 8px 8px 0 var(--accent-3), 0 0 30px rgba(255, 212, 0, 0.6); }
 }
 
-.racer-card-memphis .bet-quick {
-    margin-top: 12px;
-    width: calc(100% - 16px);
-    display: block;
-    z-index: 3;
-    position: relative;
-}
+.racer-card-memphis .bet-quick { margin-top: 8px; width: 100%; }
