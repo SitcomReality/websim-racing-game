@@ -59,7 +59,7 @@ export class MemphisRacerCard extends BaseComponent {
     }
 
     // Get racer colors
-    const cols = Array.isArray(this.racer?.colors) ? this.racer.colors : [0,1,2];
+    const cols = Array.isArray(this.racer?.colors) && this.racer.colors.length ? this.racer.colors : [0,1,2];
     const color1 = this.getRacerColor(cols[0]);
     const color2 = this.getRacerColor(cols[1]);
     const color3 = this.getRacerColor(cols[2]);

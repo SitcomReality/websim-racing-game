@@ -20,6 +20,11 @@ export class RacerCardComponent extends BaseComponent {
     const primaryColor = this.getRacerColor(this.racer.colors[0]);
     const secondaryColor = this.getRacerColor(this.racer.colors[1]);
     const tertiaryColor = this.getRacerColor(this.racer.colors[2]);
+    // Defensive fallbacks if racer.colors is missing
+    if (!Array.isArray(this.racer?.colors) || this.racer.colors.length < 3) {
+      const fallback = [0,1,2];
+      this.racer = { ...this.racer, colors: this.racer?.colors ? [...this.racer.colors, ...fallback].slice(0,3) : fallback };
+    }
 
     this.element.style.setProperty('--primary-color', primaryColor);
     this.element.style.setProperty('--primary-color-dark', this.shadeColor(primaryColor, -20));
