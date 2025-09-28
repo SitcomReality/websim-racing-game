@@ -79,3 +79,95 @@
     min-height: 0;
 }
 
+.race-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  z-index: 1000;
+}
+
+.race-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.race-canvas-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.race-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.countdown-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  pointer-events: none;
+}
+
+.countdown-number {
+  font-size: 120px;
+  font-weight: bold;
+  color: #ff6b35;
+  text-shadow: 3px 3px 0px #000, -3px -3px 0px #000, 3px -3px 0px #000, -3px 3px 0px #000;
+  animation: countdownPulse 1s ease-in-out;
+}
+
+.countdown-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 2px 2px 0px #000;
+  letter-spacing: 3px;
+}
+
+@keyframes countdownPulse {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.race-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  pointer-events: auto;
+}
+
+.live-leaderboard {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  padding: 15px;
+  min-width: 200px;
+  pointer-events: none;
+}
+
+.race-complete {
+  animation: raceCompleteFlash 0.5s ease-in-out 3;
+}
+
+@keyframes raceCompleteFlash {
+  0%, 100% { background: #000; }
+  50% { background: #004400; }
+}
