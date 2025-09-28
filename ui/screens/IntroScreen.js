@@ -100,6 +100,9 @@ export class IntroScreen {
   show(data = {}) {
     (data?.container || document.getElementById('app') || document.body).appendChild(this.element);
     
+    // Add Memphis bounce animation
+    this.element.classList.add('memphis-bounce');
+    
     // Initialize settings panel if available
     if (this.settingsPanel) {
       this.settingsPanel.refresh(data.gameState);

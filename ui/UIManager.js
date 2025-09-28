@@ -33,7 +33,7 @@ export class UIManager {
   }
 
   /** 
-   * Show a screen
+   * Show a screen with transitions
    */
   showScreen(name, data = {}) {
     const screen = this.screens.get(name);
@@ -43,17 +43,32 @@ export class UIManager {
     }
     if (!this.root) this.root = document.getElementById('app');
 
-    // Hide current screen
-    if (this.activeScreen) {
-      this.activeScreen.hide?.();
+    // Hide current screen with exit animation
+    if (this.activeScreen && this.activeScreen.el) {
+      this.activeScreen.el.classList.add('screen-transition-exit');
+      setTimeout(() => {
+        this.activeScreen.hide?.();
+        this.showNewScreen(screen, data);
+      }, 300);
+    } else {
+      if (this.root) this.root.innerHTML = '';
+      this.showNewScreen(screen, data);
     }
-    
-    if (this.root) this.root.innerHTML = '';
+  }
 
-    // Show new screen
+  showNewScreen(screen, data) {
+    // Show new screen with enter animation
     this.activeScreen = screen;
     screen.show?.({ ...data, container: this.root });
-    this.eventBus.emit('screen:changed', { name, data });
+    
+    if (screen.el) {
+      screen.el.classList.add('screen-transition-enter');
+      setTimeout(() => {
+        screen.el.classList.remove('screen-transition-enter');
+      }, 400);
+    }
+    
+    this.eventBus.emit('screen:changed', { name: screen.constructor.name, data });
   }
 
   /** 

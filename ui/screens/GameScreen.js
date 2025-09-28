@@ -194,6 +194,12 @@ export class GameScreen {
     this.hudComponent.setStep(3, 'active');
     this.hudComponent.setStatus(`Race Week ${data.weekNumber} started. Setup the next race.`);
     this.updateRaceNumbers();
+    
+    // Add glow effect to setup button
+    const setupBtn = this.element.querySelector('#setupRace');
+    if (setupBtn) {
+      setupBtn.classList.add('memphis-glow');
+    }
   }
 
   onRaceSetup(data) {
@@ -201,6 +207,13 @@ export class GameScreen {
     this.hudComponent.setStep(4, 'active');
     this.hudComponent.setStatus('Race is set up. Place your bets and start the race!');
     this.updateRaceNumbers();
+    
+    // Remove glow from setup, add to start
+    const setupBtn = this.element.querySelector('#setupRace');
+    const startBtn = this.element.querySelector('#startRace');
+    if (setupBtn) setupBtn.classList.remove('memphis-glow');
+    if (startBtn) startBtn.classList.add('memphis-pulse');
+    
     const { race } = data;
     this.renderManager.setRace(race, { numberOfLanes: race.racers.length });
     // Reset countdown and camera for fresh race setup
@@ -223,6 +236,11 @@ export class GameScreen {
     this.hudComponent.setStep(4, 'done');
     this.hudComponent.setStatus('The race is on!');
     this.renderManager.start();
+    
+    // Remove pulse from start button
+    const startBtn = this.element.querySelector('#startRace');
+    if (startBtn) startBtn.classList.remove('memphis-pulse');
+    
     const endNowBtn = this.element.querySelector('#endRaceNow');
     if (endNowBtn) endNowBtn.disabled = false;
   }
@@ -240,6 +258,12 @@ export class GameScreen {
     this.hudComponent.setStep(3, 'active'); 
     this.hudComponent.setStep(4, ''); 
     this.hudComponent.setStatus('Race finished! View results in History. Setup the next race.');
+
+    // Add shake animation to indicate race completion
+    this.element.classList.add('memphis-shake');
+    setTimeout(() => {
+      this.element.classList.remove('memphis-shake');
+    }, 500);
 
     this.updateRaceHistory(raceData);
     
@@ -412,6 +436,9 @@ export class GameScreen {
   show(data = {}) {
     (data?.container || document.getElementById('app') || document.body).appendChild(this.element);
     
+    // Add fade in animation for game screen
+    this.element.classList.add('fade-in');
+    
     // Initial UI state update
     this.hudComponent.setStep(1, 'done');
     this.hudComponent.setStep(2, 'active');
@@ -424,6 +451,12 @@ export class GameScreen {
     }
 
     if (window.Tabs?.initialize) window.Tabs.initialize();
+    
+    // Add pulse animation to primary action buttons
+    const startWeekBtn = this.element.querySelector('#startRaceWeek');
+    if (startWeekBtn) {
+      startWeekBtn.classList.add('memphis-pulse');
+    }
   }
 
   hide() {

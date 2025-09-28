@@ -45,6 +45,7 @@ export class RaceResultsScreen {
 
   show({ container, gameState }) {
     (container || document.getElementById('app')).appendChild(this.el);
+    this.el.classList.add('memphis-bounce');
     
     const results = gameState?.raceHistory?.[gameState.raceHistory.length - 1]?.results ||
                     gameState?.currentRace?.results || [];
