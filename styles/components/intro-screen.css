@@ -94,19 +94,7 @@
     margin: 0;
 }
 
-.btn-close {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: var(--text-primary);
-}
-
 #settingsContent {
-    flex-grow: 1;
-    overflow-y: auto;
-    border: none;
-    background: none;
-    padding: 0;
+    color: #222;
 }
 
