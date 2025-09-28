@@ -22,6 +22,71 @@ body[data-theme="memphis"] .gui-container {
     box-shadow: 8px 8px 0 #141414, 0 2px 20px rgba(0,0,0,0.08);
 }
 
+/* Enhanced typography for Memphis theme */
+body[data-theme="memphis"] h1,
+body[data-theme="memphis"] h2,
+body[data-theme="memphis"] h3,
+body[data-theme="memphis"] h4,
+body[data-theme="memphis"] h5,
+body[data-theme="memphis"] h6 {
+    color: #ffffff;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+body[data-theme="memphis"] h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+body[data-theme="memphis"] h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+body[data-theme="memphis"] h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* High contrast headings for dark backgrounds */
+body[data-theme="memphis"] .gui-container h1,
+body[data-theme="memphis"] .gui-container h2,
+body[data-theme="memphis"] .gui-container h3,
+body[data-theme="memphis"] .gui-container h4,
+body[data-theme="memphis"] .gui-container h5,
+body[data-theme="memphis"] .gui-container h6 {
+    color: #ffffff;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.7), 0 0 10px rgba(255,255,255,0.1);
+}
+
+/* Special styling for section headers within gui containers */
+body[data-theme="memphis"] .gui-container .section-header,
+body[data-theme="memphis"] .gui-container .panel-header,
+body[data-theme="memphis"] .gui-container .category-toggle {
+    color: #ffd400;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+    font-weight: 700;
+}
+
+/* Ensure track titles and race headers are visible */
+body[data-theme="memphis"] .track-title-memphis,
+body[data-theme="memphis"] .race-results-title-memphis,
+body[data-theme="memphis"] .podium-title-memphis,
+body[data-theme="memphis"] .week-title {
+    color: #ffffff;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.6), 0 0 15px rgba(255,255,255,0.2);
+}
+
+/* Betting and stats headers */
+body[data-theme="memphis"] .payout-title-memphis,
+body[data-theme="memphis"] .results-subtitle-memphis,
+body[data-theme="memphis"] .roster-title {
+    color: #00c2ff;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.7);
+}
+
 .race-week-container {
     background-color: #3B5F49;
     border: 5px solid #87A5B3;
