@@ -296,3 +296,16 @@
 .end-race-btn:hover {
     opacity: 1;
 }
+
+#gameScreen.race-mode { position: fixed; inset: 0; background: #000; z-index: 10; }
+#gameScreen.race-mode #header,
+#gameScreen.race-mode #hud,
+#gameScreen.race-mode #left-panel,
+#gameScreen.race-mode #liveLeaderboard,
+#gameScreen.race-mode #overlayWeather { display: none !important; }
+#gameScreen.race-mode #game-container { margin: 0; padding: 0; height: 100vh; }
+#gameScreen.race-mode #right-panel { grid-column: 1 / -1; width: 100vw; height: 100vh; }
+#gameScreen.race-mode #right-panel .track-container { position: relative; width: 100%; height: 100%; }
+#gameScreen.race-mode #raceCanvas { width: 100%; height: 100%; display: block; }
+.race-overlay-memphis { pointer-events: none; }
+.end-race-btn { pointer-events: auto; }

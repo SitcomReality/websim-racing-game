@@ -205,6 +205,8 @@ export class GameScreen {
     
     if (raceTitleMini) raceTitleMini.textContent = race.track?.name || 'Race Track';
     if (weatherMini) weatherMini.textContent = race.weather;
+    
+    this.element.classList.remove('race-mode');
   }
 
   onRaceStart(data) {
@@ -220,6 +222,7 @@ export class GameScreen {
     if (endNowBtn) endNowBtn.disabled = false;
     
     // Start countdown before race
+    this.element.classList.add('race-mode');
     this.startRaceCountdown(() => {
       this.actuallyStartRace(data);
     });
@@ -377,6 +380,8 @@ export class GameScreen {
     }
     startBtn.disabled = true;
     if (endNowBtn) endNowBtn.disabled = true;
+    
+    this.element.classList.remove('race-mode');
   }
 
   updateRaceHistory(raceData) {
