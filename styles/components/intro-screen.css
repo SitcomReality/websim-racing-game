@@ -111,3 +111,84 @@
     color: #222;
 }
 
+/* New Memphis-styled loading indicator */
+#newGameLoading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 16px 24px;
+    background: var(--accent-2);
+    border: 4px solid var(--border-color);
+    border-radius: 0;
+    color: var(--bg-primary);
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    box-shadow: 8px 8px 0 var(--border-color);
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    transform: skewX(-15deg);
+    transition: all 0.3s ease;
+}
+
+#newGameLoading > * {
+    transform: skewX(15deg);
+}
+
+#newGameLoading .loading-spinner-small {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 3px solid var(--bg-primary);
+    animation: spin 1s linear infinite;
+    flex-shrink: 0;
+}
+
+#newGameLoading span {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+}
+
+/* Ensure advanced settings text is always below the button */
+.intro-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+#toggleSettings {
+    margin-top: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg) skewX(15deg); }
+    100% { transform: rotate(360deg) skewX(15deg); }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1) skewX(-15deg);
+    }
+    50% {
+        transform: scale(1.05) skewX(-15deg);
+    }
+}
+
+/* Loading text animation */
+#newGameLoading span {
+    animation: loading-text-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes loading-text-glow {
+    0% {
+        text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+    }
+    100% {
+        text-shadow: 4px 4px 0 rgba(0,0,0,0.4), 0 0 10px rgba(255,255,255,0.3);
+    }
+}

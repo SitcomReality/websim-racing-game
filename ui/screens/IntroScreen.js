@@ -30,7 +30,7 @@ export class IntroScreen {
           <button id="initGame" class="btn btn-primary btn-memphis btn-start-racing">START RACING!</button>
           <div id="newGameLoading" class="loading-indicator" style="display: none;">
             <div class="loading-spinner-small"></div>
-            <span>Building Tracks & Training Ferrets...</span>
+            <span>Loading Ferrets</span>
           </div>
           <button id="toggleSettings" class="btn-text">Advanced Settings</button>
         </div>
