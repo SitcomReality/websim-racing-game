@@ -10,12 +10,14 @@ export class MemphisRacerCard extends BaseComponent {
    * @param {object} options - Configuration options for the card.
    * @param {number} [options.position] - The racer's position to display (e.g., 1 for 1st).
    * @param {boolean} [options.isWinner] - If true, applies a special winner style.
+   * @param {boolean} [options.compact] - If true, displays a compact version of the card.
    */
   constructor(racer, options = {}) {
     super(null, options); // The element will be created by `createElement()`
     this.racer = racer;
     this.position = options.position;
     this.isWinner = options.isWinner || false;
+    this.compact = options.compact || false;
   }
 
   /**
@@ -25,9 +27,8 @@ export class MemphisRacerCard extends BaseComponent {
   createElement() {
     this.element = document.createElement('div');
     this.element.className = 'racer-card-memphis';
-    if (this.isWinner) {
-      this.element.classList.add('winner');
-    }
+    if (this.isWinner) this.element.classList.add('winner');
+    if (this.compact) this.element.classList.add('compact');
 
     const name = this.getRacerNameString(this.racer);
     
@@ -56,7 +57,7 @@ export class MemphisRacerCard extends BaseComponent {
         </div>
         <div class="racer-name-memphis">${name}</div>
       </div>
-      <div class="racer-stats-memphis">
+      ${this.compact ? '' : `<div class="racer-stats-memphis">
         <div class="stat-item-memphis">
           <div class="stat-label-memphis">Speed</div>
           <div class="stat-value-memphis">${Math.round(speed)}</div>
@@ -73,8 +74,8 @@ export class MemphisRacerCard extends BaseComponent {
           <div class="stat-label-memphis">Form</div>
           <div class="stat-value-memphis">${(form * 100).toFixed(0)}%</div>
         </div>
-      </div>
-      <div class="racer-odds-memphis">ODDS: ${odds}</div>
+      </div>`}
+      ${this.compact ? '' : `<div class="racer-odds-memphis">ODDS: ${odds}</div>`}
     `;
 
     // Dynamically set the card's accent color based on the racer's primary color

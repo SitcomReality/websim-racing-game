@@ -13,6 +13,12 @@
     flex-direction: column;
 }
 
+.racer-card-memphis.compact {
+    padding: 10px;
+    border-width: 3px;
+    box-shadow: 4px 4px 0 var(--accent-color);
+}
+
 .racer-card-memphis:hover {
     transform: translate(-3px, -3px);
     box-shadow: 9px 9px 0 var(--accent-color);
@@ -67,12 +73,22 @@
     flex-grow: 1;
 }
 
+.racer-card-memphis.compact .racer-name-memphis {
+    font-size: 14px;
+    margin: 6px 0 0;
+    line-height: 1.15;
+}
+
 .racer-stats-memphis {
     display: grid;
     grid-template-columns: repeat(2, 80px); /* Fixed width for consistency */
     justify-content: center; /* Center the grid items */
     gap: 8px;
     margin: 12px 0;
+}
+
+.racer-card-memphis.compact .racer-stats-memphis {
+    display: none;
 }
 
 .stat-item-memphis {
@@ -124,6 +140,13 @@
     position: absolute;
     bottom: 8px;
     right: 8px;
+}
+
+.racer-card-memphis.compact .racer-odds-memphis,
+.racer-card-memphis.compact .racer-position-memphis { display: none; }
+
+.racer-card-memphis.compact .color-swatch-memphis {
+    height: 8px;
 }
 
 .racer-card-memphis.winner {
