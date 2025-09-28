@@ -1,4 +1,3 @@
-ui/components/MemphisRacerCard.js
 import { BaseComponent } from './BaseComponent.js';
 
 /**
@@ -82,7 +81,6 @@ export class MemphisRacerCard extends BaseComponent {
     if (!racer || !racer.name) return "Unknown Racer";
     const prefix = window.racerNamePrefixes?.[racer.name[0]];
     const suffix = window.racerNameSuffixes?.[racer.name[1]];
-
     let prefixStr, suffixStr;
 
     if (typeof prefix === 'function') {
