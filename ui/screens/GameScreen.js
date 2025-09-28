@@ -21,6 +21,9 @@ export class GameScreen {
     this.tabsController = null;
     this.raceWeekPanel = null;
     this.historyPanel = null;
+    this.countdownElement = null;
+    this.raceOverlay = null;
+    this.leaderboard = null;
   }
 
   initialize(eventBus) {
@@ -42,10 +45,50 @@ export class GameScreen {
     this.eventBus.on('bets:settled', () => this.updatePlayerBalance());
     this.eventBus.on('race:update', (data) => this.onRaceUpdate(data));
     this.eventBus.on('progression:weekStarted', (data) => this.displayRaceWeekInfo(this.gameState.raceWeek));
+    this.eventBus.on('race:countdown', (data) => this.onRaceCountdown(data));
   }
 
   createElement() {
     this.element = createGameLayout();
+    this.createRaceOverlay();
+  }
+
+  createRaceOverlay() {
+    // Create race countdown overlay
+    this.countdownElement = document.createElement('div');
+    this.countdownElement.className = 'race-countdown-overlay';
+    this.countdownElement.innerHTML = `
+      <div class="countdown-container comic-burst-memphis">
+        <div class="countdown-number">3</div>
+        <div class="countdown-text">GET READY!</div>
+      </div>
+      <div class="action-lines-memphis"></div>
+    `;
+
+    // Create minimal race overlay with leaderboard
+    this.raceOverlay = document.createElement('div');
+    this.raceOverlay.className = 'race-overlay-memphis';
+    this.raceOverlay.innerHTML = `
+      <div class="race-info-panel">
+        <div class="race-title-mini"></div>
+        <div class="weather-mini"></div>
+      </div>
+      <div class="leaderboard-mini">
+        <div class="leaderboard-header">POSITIONS</div>
+        <div class="leaderboard-content"></div>
+      </div>
+      <button class="end-race-btn comic-burst-memphis" id="endRaceManual">
+        FINISH
+      </button>
+    `;
+
+    // Add overlays to canvas container
+    const canvasContainer = this.element.querySelector('#raceCanvas')?.parentElement;
+    if (canvasContainer) {
+      canvasContainer.style.position = 'relative';
+      canvasContainer.appendChild(this.countdownElement);
+      canvasContainer.appendChild(this.raceOverlay);
+    }
   }
 
   setupComponents() {
@@ -155,6 +198,13 @@ export class GameScreen {
     this.highlightCurrentRace(this.gameState.currentRaceIndex);
     // Initial render of the track and racers at starting line
     this.renderManager.renderOnce();
+    
+    // Update race overlay info
+    const raceTitleMini = this.raceOverlay?.querySelector('.race-title-mini');
+    const weatherMini = this.raceOverlay?.querySelector('.weather-mini');
+    
+    if (raceTitleMini) raceTitleMini.textContent = race.track?.name || 'Race Track';
+    if (weatherMini) weatherMini.textContent = race.weather;
   }
 
   onRaceStart(data) {
@@ -168,17 +218,134 @@ export class GameScreen {
     
     const endNowBtn = this.element.querySelector('#endRaceNow');
     if (endNowBtn) endNowBtn.disabled = false;
+    
+    // Start countdown before race
+    this.startRaceCountdown(() => {
+      this.actuallyStartRace(data);
+    });
   }
-  
-  onCountdownStarted(data) {
-    this.renderManager.raceEndCountdown = data.countdown;
+
+  startRaceCountdown(callback) {
+    if (!this.countdownElement) return callback();
+    
+    this.countdownElement.style.display = 'flex';
+    this.countdownElement.classList.add('countdown-active');
+    
+    const countdownNumber = this.countdownElement.querySelector('.countdown-number');
+    const countdownText = this.countdownElement.querySelector('.countdown-text');
+    
+    let count = 3;
+    const countdownInterval = setInterval(() => {
+      if (count > 0) {
+        countdownNumber.textContent = count;
+        countdownText.textContent = count === 1 ? 'GO!' : 'GET READY!';
+        
+        // Add pulse animation
+        countdownNumber.style.animation = 'none';
+        setTimeout(() => {
+          countdownNumber.style.animation = 'countdown-pulse 1s ease-out';
+        }, 10);
+        
+        count--;
+      } else {
+        clearInterval(countdownInterval);
+        
+        // Show GO! with explosion effect
+        countdownNumber.textContent = 'GO!';
+        countdownText.textContent = 'RACE!';
+        countdownNumber.parentElement.classList.add('explosion');
+        
+        setTimeout(() => {
+          this.countdownElement.style.display = 'none';
+          this.countdownElement.classList.remove('countdown-active');
+          this.raceOverlay.style.display = 'block';
+          callback();
+        }, 800);
+      }
+    }, 1000);
   }
-  
+
+  actuallyStartRace(data) {
+    this.hudComponent.setStep(4, 'done');
+    this.hudComponent.setStatus('The race is on!');
+    this.renderManager.start();
+    
+    // Remove pulse from start button
+    const startBtn = this.element.querySelector('#startRace');
+    if (startBtn) startBtn.classList.remove('memphis-pulse');
+    
+    const endNowBtn = this.element.querySelector('#endRaceNow');
+    if (endNowBtn) endNowBtn.disabled = false;
+    
+    // Setup manual end race button
+    const endRaceManual = this.raceOverlay?.querySelector('#endRaceManual');
+    if (endRaceManual) {
+      endRaceManual.addEventListener('click', () => {
+        this.eventBus.emit('race:endNow');
+      });
+    }
+    
+    // Start leaderboard updates
+    this.startLeaderboardUpdates();
+  }
+
+  onRaceCountdown(data) {
+    // Handle countdown events if needed
+  }
+
+  startLeaderboardUpdates() {
+    if (this.leaderboardInterval) clearInterval(this.leaderboardInterval);
+    
+    this.leaderboardInterval = setInterval(() => {
+      this.updateLeaderboard();
+    }, 500);
+  }
+
+  updateLeaderboard() {
+    const leaderboardContent = this.raceOverlay?.querySelector('.leaderboard-content');
+    if (!leaderboardContent || !this.gameState.currentRace) return;
+    
+    const race = this.gameState.currentRace;
+    const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+    
+    // Sort by current position
+    const sortedRacers = [...activeRacers]
+      .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0))
+      .slice(0, 6); // Show top 6
+    
+    const leaderboardHTML = sortedRacers.map((racerId, index) => {
+      const racer = this.gameState.racers.find(r => r.id === racerId);
+      const racerName = this.getRacerNameString(racer);
+      const position = race.liveLocations[racerId] || 0;
+      
+      return `
+        <div class="leaderboard-item">
+          <span class="position">${index + 1}</span>
+          <span class="racer-name">${racerName}</span>
+          <span class="progress">${Math.round(position)}%</span>
+        </div>
+      `;
+    }).join('');
+    
+    leaderboardContent.innerHTML = leaderboardHTML;
+  }
+
   onRaceUpdate(data) {
     // This is handled by the main.js now to avoid tight coupling
   }
 
   onRaceFinish(raceData) {
+    // Clear leaderboard updates
+    if (this.leaderboardInterval) {
+      clearInterval(this.leaderboardInterval);
+      this.leaderboardInterval = null;
+    }
+    
+    // Hide race overlay
+    if (this.raceOverlay) {
+      this.raceOverlay.style.display = 'none';
+    }
+    
     this.renderManager.stop();
     this.hudComponent.setStep(3, 'active'); 
     this.hudComponent.setStep(4, ''); 
@@ -336,6 +503,10 @@ export class GameScreen {
   }
 
   cleanup() {
+    if (this.leaderboardInterval) {
+      clearInterval(this.leaderboardInterval);
+      this.leaderboardInterval = null;
+    }
     this.hudComponent?.cleanup();
     this.bettingComponent?.cleanup();
     this.renderManager?.cleanup();
