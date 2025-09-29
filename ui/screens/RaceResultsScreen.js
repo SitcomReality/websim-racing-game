@@ -27,11 +27,8 @@ export class RaceResultsScreen {
         
         <div id="podiumContainer" class="podium-display-memphis"></div>
         
-        <div class="full-results-memphis">
-          <h2 class="results-subtitle-memphis">COMPLETE RESULTS</h2>
-          <ol id="resultsList" class="results-list-memphis"></ol>
-        </div>
-        
+        <!-- results list moved/kept later in the layout; removed duplicate block here -->
+
         <div class="race-results-actions-memphis">
           <button id="rrNext" class="btn btn-primary btn-memphis">NEXT RACE</button>
           <button id="rrWeek" class="btn btn-outline btn-memphis">WEEK SUMMARY</button>
