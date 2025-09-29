@@ -56,11 +56,11 @@ export class RacerCardComponent extends BaseComponent {
   }
 
   getRacerColor(index) {
-    const colors = window.racerColors || [
-      "#FFF275", "#FF8C42", "#FF3C38", "#A23E48", "#6C8EAD",
-      "#171219", "#225560", "#7AC74F", "#F1DABF", "#08BDBD"
-    ];
-    return colors[index % colors.length];
+    const colors = window.racerColors;
+    if (Array.isArray(colors) && colors.length) return colors[index % colors.length];
+    const css = getComputedStyle(document.documentElement);
+    const val = css.getPropertyValue(`--racer-color-${index % 31}`)?.trim();
+    return val || ["#FFF275","#FF8C42","#FF3C38"][index % 3];
   }
 
   getRacerNameString(racer) {
