@@ -16,52 +16,33 @@ export class WeekSummaryScreen {
     
     this.el.innerHTML = `
       <div class="newspaper-wrapper">
-        <!-- Newspaper Header -->
-        <header class="newspaper-header">
-          <div class="newspaper-masthead">
-            <h1 class="newspaper-title">THE FERRET HERALD</h1>
-            <div class="newspaper-subtitle">Weekly Racing Digest</div>
-            <div class="newspaper-date" id="newspaperDate"></div>
-          </div>
-          <div class="newspaper-banner-ads">
-            <div class="banner-ad">🏁 RACING NEWS 🏁</div>
-          </div>
-        </header>
+        <!-- Newspaper Header (Will be replaced by Header Component) -->
+        <header class="newspaper-header" id="headerPlaceholder"></header>
 
         <!-- Main Content Grid -->
         <main class="newspaper-content">
-          <!-- Lead Story Section -->
-          <section class="lead-story-section">
-            <div class="comic-burst top-story-burst">
-              <span>TOP STORY!</span>
-            </div>
-            <article class="lead-article">
-              <h2 class="headline" id="leadHeadline">WEEK RECAP</h2>
-              <div class="byline">By Sports Reporter Ferret</div>
-              <div class="article-content" id="leadStoryContent"></div>
-            </article>
-          </section>
+          <!-- Lead Story Section (Will be replaced by Recap Component) -->
+          <section class="lead-story-section" id="recapPlaceholder"></section>
 
-          <!-- Race Results Grid -->
+          <!-- Race Results Grid (Populated dynamically) -->
           <section class="race-results-grid" id="raceResultsGrid">
             <!-- Race result cards will be populated here -->
           </section>
 
           <!-- Stats & Highlights Sidebar -->
           <aside class="stats-sidebar">
-            <div class="sidebar-section">
-              <h3 class="sidebar-title">WEEK HIGHLIGHTS</h3>
-              <div class="highlights-content" id="weekHighlights"></div>
+            <div class="sidebar-section" id="standingsPlaceholder">
+              <!-- Standings Panel will be injected here -->
+            </div>
+            
+            <div class="sidebar-section betting-section" id="earningsPlaceholder">
+              <h3 class="sidebar-title">FINANCIALS</h3>
+              <!-- Earnings Panel will be injected here -->
             </div>
             
             <div class="sidebar-section">
-              <h3 class="sidebar-title">RACER STATS</h3>
+              <h3 class="sidebar-title">PROGRESSION TRACK</h3>
               <div class="stats-content" id="racerStats"></div>
-            </div>
-
-            <div class="sidebar-section betting-section">
-              <h3 class="sidebar-title">BETTING ROUNDUP</h3>
-              <div class="betting-content" id="bettingRoundup"></div>
             </div>
           </aside>
 
@@ -90,17 +71,17 @@ export class WeekSummaryScreen {
       </div>
     `;
 
-    // Inject components
-    const headerHost = this.el.querySelector('.newspaper-header');
-    this.header = new WeekSummaryHeader(); headerHost.replaceWith(this.header.create());
-    const recapHost = this.el.querySelector('.lead-story-section');
-    this.recap = new WeekRecapPanel(); recapHost.replaceWith(this.recap.create());
-    const standingsWrap = this.el.querySelector('.stats-sidebar');
-    this.standingsPanel = new StandingsPanel(); standingsWrap.appendChild(this.standingsPanel.create());
-    
-    // Inject Earnings Panel into the sidebar
-    const bettingRoundupHost = this.el.querySelector('#bettingRoundup');
-    this.earningsPanel = new EarningsPanel(); bettingRoundupHost.appendChild(this.earningsPanel.create());
+    // Initialize components
+    this.header = new WeekSummaryHeader();
+    this.recap = new WeekRecapPanel();
+    this.standingsPanel = new StandingsPanel();
+    this.earningsPanel = new EarningsPanel();
+
+    // Inject components into placeholders
+    this.el.querySelector('#headerPlaceholder').replaceWith(this.header.create());
+    this.el.querySelector('#recapPlaceholder').replaceWith(this.recap.create());
+    this.el.querySelector('#standingsPlaceholder').replaceWith(this.standingsPanel.create());
+    this.el.querySelector('#earningsPlaceholder').appendChild(this.earningsPanel.create());
 
     // Add event listeners
     this.el.querySelector('#wsNewWeek').addEventListener('click', () => {
@@ -118,29 +99,40 @@ export class WeekSummaryScreen {
   populateContent(gameState) {
     const weekNumber = gameState?.raceWeekCounter ?? 0;
     const raceHistory = gameState?.raceHistory || [];
-    const weekRaces = raceHistory.filter(h => 
-      String(h.race?.id || '').startsWith(`${weekNumber}-`)
-    );
+    
+    // Filter races belonging to the current week (based on raceId structure: "weekNumber-raceIndex")
+    const weekRaces = raceHistory.filter(h => {
+      // Safely access race ID and check if it starts with the current week number
+      const raceId = h.race?.id;
+      return typeof raceId === 'string' && raceId.startsWith(`${weekNumber}-`);
+    }).map(h => {
+        // Map history item to a consistent race result structure
+        return {
+            ...h.race,
+            results: h.results.map((racerId, index) => {
+                const racer = gameState.racers.find(r => r.id === racerId);
+                return {
+                    racer: racer,
+                    name: this.getName(racer),
+                    position: index + 1
+                };
+            }),
+            winner: { name: this.getName(gameState.racers.find(r => r.id === h.results[0])) }
+        };
+    });
 
     this.header?.updateDate(weekNumber);
+    
+    // Pass raw race history items to panels for data calculation
     this.recap?.populateContent(weekNumber, weekRaces, gameState);
     this.standingsPanel?.setData(weekNumber, weekRaces, gameState);
     this.earningsPanel?.populateData(weekNumber, weekRaces, gameState);
 
-    // Update newspaper date
-    const dateEl = this.el.querySelector('#newspaperDate');
-    dateEl.textContent = `Week ${weekNumber} Edition`;
-
-    // Populate lead story
-    this.populateLeadStory(weekNumber, weekRaces);
-    
-    // Populate race results
-    this.populateRaceResults(weekRaces);
-    
-    // Populate sidebar content
-    this.populateHighlights(weekRaces, gameState);
+    // Update progression stats
     this.populateStats(gameState);
-    this.populateBettingRoundup(weekRaces);
+    
+    // Populate race results grid (simplified cards)
+    this.populateRaceResults(weekRaces);
     
     // Populate fun facts
     this.populateFunFacts(weekRaces, gameState);
@@ -149,39 +141,13 @@ export class WeekSummaryScreen {
     this.updateNextWeekPreview(weekNumber);
   }
 
-  populateLeadStory(weekNumber, weekRaces) {
-    const headline = this.el.querySelector('#leadHeadline');
-    const content = this.el.querySelector('#leadStoryContent');
-    
-    if (weekRaces.length === 0) {
-      headline.textContent = `WEEK ${weekNumber} PREPARATION COMPLETE`;
-      content.innerHTML = `
-        <p class="article-paragraph">
-          The ferret racing community is buzzing with excitement as Week ${weekNumber} 
-          preparations conclude. Racers have been training hard and are ready to compete!
-        </p>
-      `;
-    } else {
-      const winner = this.findWeekWinner(weekRaces);
-      headline.textContent = `${winner?.name || 'CHAMPION'} DOMINATES WEEK ${weekNumber}!`;
-      content.innerHTML = `
-        <p class="article-paragraph">
-          In a spectacular display of speed and agility, ${winner?.name || 'our champion'} 
-          emerged victorious after ${weekRaces.length} thrilling races this week.
-        </p>
-        <p class="article-paragraph">
-          The week featured intense competition across ${weekRaces.length} different tracks, 
-          with fans cheering from the sidelines throughout each exciting race.
-        </p>
-      `;
-    }
-  }
-
   populateRaceResults(weekRaces) {
     const grid = this.el.querySelector('#raceResultsGrid');
+    if (!grid) return;
     grid.innerHTML = '';
     
     weekRaces.forEach((race, index) => {
+      const winnerName = race.winner?.name || 'TBD';
       const raceCard = document.createElement('div');
       raceCard.className = 'race-result-card';
       raceCard.innerHTML = `
@@ -191,10 +157,9 @@ export class WeekSummaryScreen {
         </div>
         <div class="race-winner">
           <div class="winner-label">WINNER:</div>
-          <div class="winner-name">${race.winner?.name || 'TBD'}</div>
+          <div class="winner-name">${winnerName}</div>
         </div>
         <div class="comic-elements">
-          <div class="speed-lines"></div>
           <div class="victory-burst">POW!</div>
         </div>
       `;
@@ -202,51 +167,37 @@ export class WeekSummaryScreen {
     });
   }
 
-  populateHighlights(weekRaces, gameState) {
-    const highlights = this.el.querySelector('#weekHighlights');
-    const highlightsList = [
-      `${weekRaces.length} races completed`,
-      'New track records set',
-      'Spectacular photo finishes',
-      'Crowd favorites emerged'
-    ];
-    
-    highlights.innerHTML = highlightsList.map(highlight => 
-      `<div class="highlight-item">★ ${highlight}</div>`
-    ).join('');
-  }
-
   populateStats(gameState) {
-    const stats = this.el.querySelector('#racerStats');
-    // This would be populated with actual racer statistics
-    stats.innerHTML = `
-      <div class="stat-item">
-        <span class="stat-label">Total Racers:</span>
-        <span class="stat-value">${gameState?.racers?.length || 0}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Active Season:</span>
-        <span class="stat-value">${gameState?.raceWeekCounter || 0}</span>
-      </div>
-    `;
-  }
+    const statsEl = this.el.querySelector('#racerStats');
+    if (!statsEl) return;
+    
+    const progressionStats = window.app.progressionManager.getProgressionStats();
 
-  populateBettingRoundup(weekRaces) {
-    const betting = this.el.querySelector('#bettingRoundup');
-    betting.innerHTML = `
-      <div class="betting-item">
-        <span class="betting-label">Races with Bets:</span>
-        <span class="betting-value">${weekRaces.length}</span>
+    statsEl.innerHTML = `
+      <div class="stat-item">
+        <span class="stat-label">Season:</span>
+        <span class="stat-value">${progressionStats.currentSeason}</span>
       </div>
-      <div class="betting-item">
-        <span class="betting-label">Avg. Payout:</span>
-        <span class="betting-value">2.5x</span>
+      <div class="stat-item">
+        <span class="stat-label">Week In Season:</span>
+        <span class="stat-value">${progressionStats.weekInSeason - 1}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Total Races:</span>
+        <span class="stat-value">${progressionStats.racesCompleted}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Player Balance:</span>
+        <span class="stat-value">$${gameState?.player?.balance || 0}</span>
       </div>
     `;
   }
 
   populateFunFacts(weekRaces, gameState) {
     const funFacts = this.el.querySelector('#funFacts');
+    if (!funFacts) return;
+
+    // Use placeholder facts for now
     const facts = [
       'Ferrets can run up to 15 mph!',
       'Racing ferrets sleep 18-20 hours per day',
@@ -265,11 +216,34 @@ export class WeekSummaryScreen {
 
   updateNextWeekPreview(currentWeek) {
     const preview = this.el.querySelector('#nextWeekPreview');
-    preview.textContent = `Get ready for Week ${currentWeek + 1} - New tracks, new challenges, new champions await!`;
+    if (preview) {
+        preview.textContent = `Get ready for Week ${currentWeek + 1} - New tracks, new challenges, new champions await!`;
+    }
+  }
+
+  getName(racer) {
+    if (!racer?.name) return 'Unknown Racer';
+    const prefix = window.racerNamePrefixes?.[racer.name[0]];
+    const suffix = window.racerNameSuffixes?.[racer.name[1]];
+    
+    let prefixStr, suffixStr;
+    
+    if (typeof prefix === 'function') {
+      prefixStr = racer._evaluatedPrefix || (racer._evaluatedPrefix = prefix());
+    } else {
+      prefixStr = prefix;
+    }
+    
+    if (typeof suffix === 'function') {
+      suffixStr = racer._evaluatedSuffix || (racer._evaluatedSuffix = suffix());
+    } else {
+      suffixStr = suffix;
+    }
+    
+    return `${prefixStr} ${suffixStr}`;
   }
 
   findWeekWinner(weekRaces) {
-    // Simple logic to find the most successful racer of the week
     const racerWins = {};
     weekRaces.forEach(race => {
       const winner = race.winner?.name;
