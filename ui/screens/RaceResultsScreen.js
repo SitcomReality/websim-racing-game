@@ -22,15 +22,9 @@ export class RaceResultsScreen {
       <div class="race-results-container-memphis">
         <div class="race-results-header-memphis">
           <h1 class="race-results-title-memphis">RACE RESULTS</h1>
-          <div class="race-results-burst-memphis"></div>
         </div>
         
         <div id="podiumContainer" class="podium-display-memphis"></div>
-        
-        <div class="full-results-memphis">
-          <h2 class="results-subtitle-memphis">COMPLETE RESULTS</h2>
-          <ol id="resultsList" class="results-list-memphis"></ol>
-        </div>
         
         <div class="race-results-actions-memphis">
           <button id="rrNext" class="btn btn-primary btn-memphis">NEXT RACE</button>
@@ -69,6 +63,8 @@ export class RaceResultsScreen {
     }
     
     // Show betting payouts if player has settled bets
+    // clear previous payouts
+    this.el.querySelectorAll('.betting-payouts-memphis').forEach(el => el.remove());
     this.showBettingPayouts(gameState);
     
     // Create podium display
@@ -90,54 +86,10 @@ export class RaceResultsScreen {
     
     this.podiumDisplay.setResults(podiumResults);
     
-    // Add celebration burst for winner
-    if (podiumResults.length > 0) {
-      const burst = new ComicBurst({
-        text: 'WINNER!',
-        type: 'winner',
-        duration: 3000
-      });
-      
-      const burstContainer = this.el.querySelector('.race-results-burst-memphis');
-      if (burstContainer) {
-        const burstElement = document.createElement('div');
-        burstElement.innerHTML = burst.renderToString();
-        burstContainer.appendChild(burstElement);
-      }
-    }
-    
     // Animate podium appearance
     setTimeout(() => {
       this.podiumDisplay.animateIn();
     }, 500);
-    
-    // Populate full results list with placement badges
-    const resultsList = this.el.querySelector('#resultsList');
-    resultsList.innerHTML = '';
-    
-    results.forEach((racerId, index) => {
-      const racer = gameState.racers.find(r => r.id === racerId);
-      const listItem = document.createElement('li');
-      listItem.className = 'results-item-memphis';
-      
-      const position = document.createElement('div');
-      position.className = `results-position-memphis position-${index + 1}`;
-      position.textContent = this.getPositionBadge(index + 1);
-      
-      const name = document.createElement('div');
-      name.className = 'results-name-memphis';
-      name.textContent = this.getName(racer);
-      
-      const time = document.createElement('div');
-      time.className = 'results-time-memphis';
-      time.textContent = this.getRaceTime(racer, index);
-      
-      listItem.appendChild(position);
-      listItem.appendChild(name);
-      listItem.appendChild(time);
-      
-      resultsList.appendChild(listItem);
-    });
   }
 
   showBettingPayouts(gameState) {

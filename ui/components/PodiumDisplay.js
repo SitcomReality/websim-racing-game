@@ -150,7 +150,7 @@ export class PodiumDisplay extends BaseComponent {
 
     // Position
     const positionElement = document.createElement('div');
-    positionElement.className = 'results-position-memphis';
+    positionElement.className = `results-position-memphis position-${position}`;
     positionElement.textContent = position;
     item.appendChild(positionElement);
 
