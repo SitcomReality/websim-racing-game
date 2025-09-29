@@ -85,6 +85,14 @@ export class WeekSummaryScreen {
       </div>
     `;
 
+    // Inject components
+    const headerHost = this.el.querySelector('.newspaper-header');
+    this.header = new WeekSummaryHeader(); headerHost.replaceWith(this.header.create());
+    const recapHost = this.el.querySelector('.lead-story-section');
+    this.recap = new WeekRecapPanel(); recapHost.replaceWith(this.recap.create());
+    const standingsWrap = this.el.querySelector('.stats-sidebar');
+    this.standingsPanel = new StandingsPanel(); standingsWrap.appendChild(this.standingsPanel.create());
+
     // Add event listeners
     this.el.querySelector('#wsNewWeek').addEventListener('click', () => {
       this.eventBus.emit('race:startWeek');
@@ -104,6 +112,10 @@ export class WeekSummaryScreen {
     const weekRaces = raceHistory.filter(h => 
       String(h.race?.id || '').startsWith(`${weekNumber}-`)
     );
+
+    this.header?.updateDate(weekNumber);
+    this.recap?.populateContent(weekNumber, weekRaces, gameState);
+    this.standingsPanel?.setData(weekNumber, weekRaces, gameState);
 
     // Update newspaper date
     const dateEl = this.el.querySelector('#newspaperDate');

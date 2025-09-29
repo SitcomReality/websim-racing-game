@@ -1,5 +1,3 @@
-ui/components/StandingsPanel.js
-
 export class StandingsPanel {
   constructor() {
     this.el = null;
