@@ -103,6 +103,14 @@
     max-width: 60px;
 }
 
+.track-section-block.groundTypeasphalt { background: #2b2b2b; }
+.track-section-block.groundTypegrass { background: #0a4d1f; }
+.track-section-block.groundTypedirt { background: #5a3b1f; }
+.track-section-block.groundTypegravel { background: #464646; }
+.track-section-block.groundTypemud { background: #4a2c14; }
+.track-section-block.groundTyperock { background: #2f3b3f; }
+.track-section-block.groundTypemarble { background: #606a70; }
+
 .track-info-grid-memphis { display: none; }
 
 .track-info-summary-memphis {

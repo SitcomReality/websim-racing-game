@@ -27,7 +27,7 @@ export class RaceResultsScreen {
         
         <div id="podiumContainer" class="podium-display-memphis"></div>
         
-        <div class="results-section-memphis full-results-memphis">
+        <div class="full-results-memphis">
           <h2 class="results-subtitle-memphis">COMPLETE RESULTS</h2>
           <ol id="resultsList" class="results-list-memphis"></ol>
         </div>
