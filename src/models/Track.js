@@ -18,4 +18,3 @@ export class Track {
     }
   }
 }
-window.Track = Track;

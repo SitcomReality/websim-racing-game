@@ -20,4 +20,3 @@ export class Race {
     this.segments.push('finishLine');
   }
 }
-window.Race = Race;

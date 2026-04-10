@@ -6,9 +6,13 @@ export class RaceManager {
     this.eventBus = eventBus;
     this.gameState = gameState;
     this.currentRace = null;
-    this.raceTimer = null;
     this.raceEndCountdown = null;
     this.animationFrameId = null;
+
+    // Racer lookup cache: Map<racerId, Racer> — rebuilt each race to avoid O(n) find() in hot loop
+    this._racerMap = new Map();
+    // Pre-allocated scratch object to avoid per-frame allocation
+    this._nearbyBuf = { ahead: 0, behind: 0 };
   }
 
   /**
@@ -57,8 +61,6 @@ export class RaceManager {
     if (!this.currentRace) return; // setupRace might have determined week is over
 
     this.gameState.running = true;
-    // The main loop in application will now call updateRace with deltaTime.
-    // this.startRaceTimer();
 
     // Emit distinct event to avoid recursively triggering startRace listeners
     this.eventBus.emit('race:started', {
@@ -89,10 +91,17 @@ export class RaceManager {
     // Reset any prior race countdown
     this.raceEndCountdown = null;
 
+    // Build racer lookup map for O(1) access in hot loop
+    this._racerMap.clear();
+    this.currentRace.racers.forEach(racerId => {
+      const racer = this.gameState.racers.find(r => r.id === racerId);
+      if (racer) this._racerMap.set(racerId, racer);
+    });
+
     // Initialize racer positions
     this.currentRace.racers.forEach(racerId => {
       this.currentRace.liveLocations[racerId] = 0;
-      const racer = this.gameState.racers.find(r => r.id === racerId);
+      const racer = this._racerMap.get(racerId);
       if (racer) {
         racer.reset();
         racer.formThisWeek = this.calculateRacerForm(racer);
@@ -127,15 +136,7 @@ export class RaceManager {
     return Math.max(0.8, Math.min(1.2, baseForm + formVariation));
   }
 
-  /**
-   * Start race timer
-   */
-  startRaceTimer() {
-    // DEPRECATED: updateRace is now called from main loop with deltaTime
-    this.raceTimer = setInterval(() => {
-      this.updateRace(0.016); // Simulate 16ms delta
-    }, 16); // ~60fps
-  }
+  // startRaceTimer() removed - race updates now driven by main loop via deltaTime
 
   /**
    * Update race state
@@ -165,10 +166,13 @@ export class RaceManager {
    * Update all racer positions
    */
   updateRacerPositions(deltaTime) {
+    const locs = this.currentRace.liveLocations;
+    const nearby = this._nearbyBuf;
+
     this.currentRace.racers.forEach(racerId => {
-      const racer = this.gameState.racers.find(r => r.id === racerId);
+      const racer = this._racerMap.get(racerId);
       if (!racer || racer.visual.finished) return;
-      const currentPosition = this.currentRace.liveLocations[racerId] || 0;
+      const currentPosition = locs[racerId] || 0;
       const segmentIndex = Math.floor((currentPosition / 100) * (this.currentRace.segments.length -1) );
 
       if (segmentIndex >= this.currentRace.segments.length - 1) {
@@ -181,7 +185,7 @@ export class RaceManager {
       const perf = racer.getComponent('performance'), stats = racer.getComponent('stats'), pers = racer.getComponent('personality');
       const activation = stats?.getStat('boostActivationPercent') || 70;
       if (!racer.isBoosting && perf?.remainingBoost > 0 && currentPosition >= activation) {
-        const locs = this.currentRace.liveLocations; let nearby = { ahead:0, behind:0 };
+        nearby.ahead = 0; nearby.behind = 0;
         this.currentRace.racers.forEach(id => { if (id!==racerId) { const d=(locs[id]||0)-currentPosition; if (Math.abs(d)<8) { d>0?nearby.ahead++:nearby.behind++; } } });
         if (!pers || pers.shouldActivateBoost(0, currentPosition, nearby)) racer.activateBoost();
       }
@@ -224,7 +228,7 @@ export class RaceManager {
 
       // Update position based on deltaTime for smooth movement
       const distanceToTravel = finalSpeed * deltaTime;
-      this.currentRace.liveLocations[racerId] = Math.min(this.currentRace.finishPercent, currentPosition + distanceToTravel);
+      locs[racerId] = Math.min(this.currentRace.finishPercent, currentPosition + distanceToTravel);
       
       // Update the racer entity itself, especially its components
       racer.update(deltaTime, { race: this.currentRace, currentPosition });
@@ -269,7 +273,7 @@ export class RaceManager {
     this.currentRace.results.push(racerId);
     this.currentRace.finishedAt[racerId] = Date.now(); // record finish time
 
-    const racer = this.gameState.racers.find(r => r.id === racerId);
+    const racer = this._racerMap.get(racerId);
     if (racer) {
       racer.visual.finished = true;
       racer.updateRacerHistory(this.currentRace.id, finishingPosition);
@@ -308,11 +312,6 @@ export class RaceManager {
   endRace() {
     this.gameState.running = false;
 
-    if (this.raceTimer) {
-      clearInterval(this.raceTimer);
-      this.raceTimer = null;
-    }
-
     // Handle any racers that didn't finish
     this.handleUnfinishedRacers();
 
@@ -337,7 +336,7 @@ export class RaceManager {
         const position = this.currentRace.results.length + 1;
         this.currentRace.results.push(racerId);
 
-        const racer = this.gameState.racers.find(r => r.id === racerId);
+        const racer = this._racerMap.get(racerId);
         if (racer) {
           racer.didNotFinish = true;
           racer.updateRacerHistory(this.currentRace.id, position);
@@ -412,7 +411,7 @@ export class RaceManager {
     this.currentRace.results = [];
     ids.forEach((racerId, idx) => {
       this.currentRace.results.push(racerId);
-      const racer = this.gameState.racers.find(r => r.id === racerId);
+      const racer = this._racerMap.get(racerId);
       if (racer) {
         racer.visual.finished = true;
         racer.didNotFinish = false;
@@ -420,10 +419,6 @@ export class RaceManager {
       }
     });
 
-    if (this.raceTimer) {
-      clearInterval(this.raceTimer);
-      this.raceTimer = null;
-    }
     this.raceEndCountdown = null;
 
     this.eventBus.emit('race:finish', {

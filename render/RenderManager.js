@@ -344,29 +344,3 @@ export class RenderManager {
     this.dpr = this.canvasAdapter.dpr;
   }
 }
-
-// Helper function for racer name strings
-function getRacerNameString(racer) {
-  if (!racer || !racer.name) {
-    return "Unknown Racer";
-  }
-
-  const prefix = window.racerNamePrefixes?.[racer.name[0]];
-  const suffix = window.racerNameSuffixes?.[racer.name[1]];
-
-  let prefixStr, suffixStr;
-
-  if (typeof prefix === 'function') {
-    prefixStr = racer._evaluatedPrefix || (racer._evaluatedPrefix = prefix());
-  } else {
-    prefixStr = prefix;
-  }
-
-  if (typeof suffix === 'function') {
-    suffixStr = racer._evaluatedSuffix || (racer._evaluatedSuffix = suffix());
-  } else {
-    suffixStr = suffix;
-  }
-
-  return `${prefixStr} ${suffixStr}`;
-}

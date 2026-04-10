@@ -107,6 +107,3 @@ export class SettingsPanel extends BaseComponent {
         });
     }
 }
-
-// Legacy compatibility
-window.SettingsPanel = SettingsPanel;
