@@ -1,6 +1,9 @@
 import { racerComponents } from './RacerComponents.js';
 import { FerretFactory } from './FerretFactory.js';
 
+// Factor for truncating speed to 4 decimal places: Math.trunc(v * 10000) / 10000
+const SPEED_PRECISION_FACTOR = 10000;
+
 /**
  * Racer - Lightweight entity that composes components
  * NOTE: This is becoming the new source of truth for racer objects.
@@ -132,7 +135,7 @@ export class Racer {
   }
 
   get performance() {
-    return this.getComponent('history')?.performance || {};
+    return this.getComponent('performance') || {};
   }
 
   get speedHistory() {
@@ -191,7 +194,7 @@ export class Racer {
       returnSpeed += this.stats.boostPower || 800;
     }
 
-    returnSpeed = Math.trunc(returnSpeed * this.config.racerProperties.speedMultiplier, 4);
+    returnSpeed = Math.trunc(returnSpeed * this.config.racerProperties.speedMultiplier * SPEED_PRECISION_FACTOR) / SPEED_PRECISION_FACTOR;
 
     if (this.speedThisRace[this.speedThisRace.length - 1] !== returnSpeed) {
       this.speedThisRace.push(returnSpeed);
@@ -260,7 +263,9 @@ export class Racer {
     if (history) {
       history.updateRacerHistory(raceid, finishingPosition);
     } else {
-      this.history.push([raceid, finishingPosition]);
+      // Fallback: history getter returns a copy, so direct push is a no-op.
+      // This path should not be reached when the history component is registered.
+      console.warn(`Racer ${this.id}: history component missing, race result not recorded`);
     }
   }
 
@@ -459,6 +464,3 @@ export class Racer {
 
 // Export the component registry for external use
 export { racerComponents };
-
-// Make Racer available on the window for legacy code and save/load compatibility
-window.Racer = Racer;

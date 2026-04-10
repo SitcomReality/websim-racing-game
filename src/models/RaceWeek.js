@@ -12,4 +12,3 @@ export class RaceWeek {
     this.races.push(race);
   }
 }
-window.RaceWeek = RaceWeek;

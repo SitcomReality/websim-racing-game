@@ -20,6 +20,3 @@ app.initialize().then(() => {
 }).catch(error => {
   console.error('Failed to initialize game:', error);
 });
-
-// Make app available globally for debugging
-window.app = app;

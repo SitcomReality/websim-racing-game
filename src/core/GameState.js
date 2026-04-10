@@ -141,13 +141,13 @@ export class GameState {
     return {
       id: 0,
       racers: [],
-      track: [],
+      track: null,
       segments: [],
       sections: [],
-      weather: [],
+      weather: null,
       results: [],
       winner: null,
-      liveLocations: [],
+      liveLocations: {},
       livePositions: [],
     };
   }
