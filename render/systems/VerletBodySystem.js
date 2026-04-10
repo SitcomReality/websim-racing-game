@@ -1,4 +1,4 @@
-import { VerletChain } from "verlet-chain";
+import { VerletChain } from "../src/render/systems/VerletChain.js";
 
 export class VerletBodySystem {
   static update(ferret, racer, dt) {
