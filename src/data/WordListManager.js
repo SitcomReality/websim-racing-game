@@ -53,7 +53,7 @@ export class WordListManager {
       ];
 
       // Load prefixes
-      const prefixResponse = await fetch('wordlist/racerNamePrefixes.xml');
+      const prefixResponse = await fetch('src/wordlist/racerNamePrefixes.xml');
       const prefixXmlText = await prefixResponse.text();
       const prefixParser = new DOMParser();
       const prefixXml = prefixParser.parseFromString(prefixXmlText, "text/xml");
@@ -69,7 +69,7 @@ export class WordListManager {
       this.prefixes.push(...dynamicPrefixes);
 
       // Load suffixes
-      const suffixResponse = await fetch('wordlist/racerNameSuffixes.xml');
+      const suffixResponse = await fetch('src/wordlist/racerNameSuffixes.xml');
       const suffixXmlText = await suffixResponse.text();
       const suffixParser = new DOMParser();
       const suffixXml = suffixParser.parseFromString(suffixXmlText, "text/xml");

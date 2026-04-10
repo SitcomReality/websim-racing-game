@@ -1,6 +1,6 @@
-import { calculateBasePropertyAverage, generateUniqueNumbers, getRacerNameString } from './src/utils/helpers.js';
-import { Racer } from './src/entities/racer/Racer.js';
-import { Track } from './src/models/Track.js';
+import { calculateBasePropertyAverage, generateUniqueNumbers, getRacerNameString } from './utils/helpers.js';
+import { Racer } from './entities/racer/Racer.js';
+import { Track } from './models/Track.js';
 
 // Import locationSuffixes from the constants file
 import { locationSuffixes } from './wordlist/const_locationSuffixes.js';

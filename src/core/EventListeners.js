@@ -58,7 +58,7 @@ export class EventListeners {
     }); 
 
     this.app.eventBus.on('game:initialize', () => {
-      import('../../init.js').then(({ initGame }) => {
+      import('../init.js').then(({ initGame }) => {
         initGame(this.app.gameStateManager);
         // After initialization, immediately start the first race week to show Week Preview
         this.app.eventBus.emit('race:startWeek');

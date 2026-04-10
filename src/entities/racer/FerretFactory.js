@@ -1,4 +1,4 @@
-import { VerletChain } from "../../../render/systems/VerletChain.js";
+import { VerletChain } from "../../render/systems/VerletChain.js";
 
 export class FerretFactory {
   static _hash(str) {

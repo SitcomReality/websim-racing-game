@@ -4,16 +4,16 @@ import { EventBus } from './EventBus.js';
 import { RaceManager } from '../game/RaceManager.js';
 import { BettingManager } from '../game/betting/BettingManager.js';
 import { ProgressionManager } from '../game/progression/ProgressionManager.js';
-import { UIManager } from '../../ui/UIManager.js';
-import { IntroScreen } from '../../ui/screens/IntroScreen.js';
-import { GameScreen } from '../../ui/screens/GameScreen.js';
+import { UIManager } from '../ui/UIManager.js';
+import { IntroScreen } from '../ui/screens/IntroScreen.js';
+import { GameScreen } from '../ui/screens/GameScreen.js';
 import { LoadingManager } from './LoadingManager.js';
 import { XmlWordlistLoader } from '../data/XmlWordlistLoader.js';
 import { EventListeners } from './EventListeners.js';
-import { WeekPreviewScreen } from '../../ui/screens/WeekPreviewScreen.js';
-import { PreRaceScreen } from '../../ui/screens/PreRaceScreen.js';
-import { RaceResultsScreen } from '../../ui/screens/RaceResultsScreen.js';
-import { WeekSummaryScreen } from '../../ui/screens/WeekSummaryScreen.js';
+import { WeekPreviewScreen } from '../ui/screens/WeekPreviewScreen.js';
+import { PreRaceScreen } from '../ui/screens/PreRaceScreen.js';
+import { RaceResultsScreen } from '../ui/screens/RaceResultsScreen.js';
+import { WeekSummaryScreen } from '../ui/screens/WeekSummaryScreen.js';
 import { PhaseManager } from './PhaseManager.js';
 
 /**
